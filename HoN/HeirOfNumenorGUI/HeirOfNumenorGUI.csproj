@@ -1,0 +1,124 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Library</OutputType>
+    <Platforms>x64</Platforms>
+    <Configurations>Debug;Release</Configurations>
+    <AssemblyName>HeirOfNumenorGUI.Placeholder</AssemblyName>
+    <RootNamespace>HeirOfNumenorGUI</RootNamespace>
+    <!-- This project produces no meaningful output - it just deploys GUI files -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <!-- 
+    Uses BANNERLORD_GAME_DIR environment variable.
+    Set it in your system environment variables, e.g.:
+    - Steam: C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord
+  -->
+  <PropertyGroup>
+    <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
+  </PropertyGroup>
+
+  <!-- Minimal placeholder class so project compiles -->
+  <ItemGroup>
+    <Compile Include="Placeholder.cs" />
+  </ItemGroup>
+
+  <!-- Post-build: Deploy GUI-only module to game folder -->
+  <Target Name="DeployGUIModule" AfterTargets="Build">
+    <PropertyGroup>
+      <GUIModuleFolder>$(GameFolder)\Modules\HeirOfNumenorGUI</GUIModuleFolder>
+    </PropertyGroup>
+
+    <!-- Create directory structure -->
+    <MakeDir Directories="$(GUIModuleFolder)" />
+    <MakeDir Directories="$(GUIModuleFolder)\GUI" />
+    <MakeDir Directories="$(GUIModuleFolder)\GUI\Prefabs" />
+    <MakeDir Directories="$(GUIModuleFolder)\GUI\Brushes" />
+    <MakeDir Directories="$(GUIModuleFolder)\GUI\SpriteParts" />
+    <MakeDir Directories="$(GUIModuleFolder)\GUI\SpriteParts\ui_ring_system" />
+    <MakeDir Directories="$(GUIModuleFolder)\GUI\SpriteParts\ui_ring_system\rings" />
+    <MakeDir Directories="$(GUIModuleFolder)\Assets" />
+    <MakeDir Directories="$(GUIModuleFolder)\Assets\GauntletUI" />
+    <MakeDir Directories="$(GUIModuleFolder)\AssetSources" />
+    <MakeDir Directories="$(GUIModuleFolder)\AssetSources\GauntletUI" />
+    <MakeDir Directories="$(GUIModuleFolder)\RuntimeDataCache" />
+
+    <!-- Copy SubModule.xml -->
+    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFolder="$(GUIModuleFolder)" SkipUnchangedFiles="true" />
+
+    <!-- Copy README -->
+    <Copy SourceFiles="$(ProjectDir)README.md" DestinationFolder="$(GUIModuleFolder)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)README.md')" />
+
+    <!-- Copy SpriteData XML (supports both naming conventions) -->
+    <ItemGroup>
+      <SpriteDataFiles Include="$(ProjectDir)GUI\*SpriteData.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SpriteDataFiles)" DestinationFolder="$(GUIModuleFolder)\GUI" SkipUnchangedFiles="true" />
+
+    <!-- Copy all Prefabs -->
+    <ItemGroup>
+      <PrefabFiles Include="$(ProjectDir)GUI\Prefabs\**\*.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PrefabFiles)" DestinationFiles="@(PrefabFiles->'$(GUIModuleFolder)\GUI\Prefabs\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+    <!-- Copy all Brushes -->
+    <ItemGroup>
+      <BrushFiles Include="$(ProjectDir)GUI\Brushes\*.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BrushFiles)" DestinationFolder="$(GUIModuleFolder)\GUI\Brushes" SkipUnchangedFiles="true" />
+
+    <!-- Copy SpriteParts - ALL files including PNGs, XMLs, TPACs, TXTs -->
+    <ItemGroup>
+      <SpritePartFiles Include="$(ProjectDir)GUI\SpriteParts\**\*.png" />
+      <SpritePartFiles Include="$(ProjectDir)GUI\SpriteParts\**\*.xml" />
+      <SpritePartFiles Include="$(ProjectDir)GUI\SpriteParts\**\*.tpac" />
+      <SpritePartFiles Include="$(ProjectDir)GUI\SpriteParts\**\*.txt" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SpritePartFiles)" DestinationFiles="@(SpritePartFiles->'$(GUIModuleFolder)\GUI\SpriteParts\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+    <!-- Copy Assets folder (compiled .tpac texture packs) -->
+    <ItemGroup>
+      <AssetFiles Include="$(ProjectDir)Assets\**\*.tpac" />
+      <AssetFiles Include="$(ProjectDir)Assets\**\*.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AssetFiles)" DestinationFiles="@(AssetFiles->'$(GUIModuleFolder)\Assets\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+    <!-- Copy AssetSources folder (source textures for regeneration) -->
+    <ItemGroup>
+      <AssetSourceFiles Include="$(ProjectDir)AssetSources\**\*.png" />
+      <AssetSourceFiles Include="$(ProjectDir)AssetSources\**\*.tga" />
+      <AssetSourceFiles Include="$(ProjectDir)AssetSources\**\*.psd" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AssetSourceFiles)" DestinationFiles="@(AssetSourceFiles->'$(GUIModuleFolder)\AssetSources\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+    <!-- Copy RuntimeDataCache folder -->
+    <ItemGroup>
+      <CacheFiles Include="$(ProjectDir)RuntimeDataCache\**\*.rdc" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CacheFiles)" DestinationFiles="@(CacheFiles->'$(GUIModuleFolder)\RuntimeDataCache\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+    <!-- Output success message -->
+    <Message Text="&#xA;========================================" Importance="high" />
+    <Message Text="HeirOfNumenorGUI deployed to:" Importance="high" />
+    <Message Text="  $(GUIModuleFolder)" Importance="high" />
+    <Message Text="  - GUI (Prefabs, Brushes, SpriteParts)" Importance="high" />
+    <Message Text="  - Assets (compiled textures)" Importance="high" />
+    <Message Text="  - AssetSources (source textures)" Importance="high" />
+    <Message Text="  - RuntimeDataCache" Importance="high" />
+    <Message Text="========================================&#xA;" Importance="high" />
+  </Target>
+
+  <!-- Clean target -->
+  <Target Name="CleanGUIModule" AfterTargets="Clean">
+    <PropertyGroup>
+      <GUIModuleFolder>$(GameFolder)\Modules\HeirOfNumenorGUI</GUIModuleFolder>
+    </PropertyGroup>
+    <RemoveDir Directories="$(GUIModuleFolder)" Condition="Exists('$(GUIModuleFolder)')" />
+    <Message Text="Cleaned HeirOfNumenorGUI module folder" Importance="high" />
+  </Target>
+
+</Project>

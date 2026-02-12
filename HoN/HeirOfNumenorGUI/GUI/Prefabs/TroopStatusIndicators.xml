@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TroopStatusIndicators.xml
+  =========================
+  Dynamic status indicator icons for party troop tuples.
+  Shows Fear, Bonding, Frustration, Loyalty as colored icons.
+  
+  Usage: Include in PartyTroopTuple.xml with DataSource bound to StatusIndicators
+-->
+<Prefab>
+  <Constants>
+    <Constant Name="Icon.Size.Small" Value="16" />
+    <Constant Name="Icon.Size.Medium" Value="18" />
+    <Constant Name="Icon.Size.Large" Value="22" />
+    <Constant Name="Icon.Margin" Value="3" />
+    <Constant Name="Container.Height" Value="24" />
+  </Constants>
+
+  <Window>
+    <!-- Main container for all status indicators -->
+    <ListPanel Id="StatusIndicatorsContainer" 
+               WidthSizePolicy="CoverChildren" 
+               HeightSizePolicy="Fixed" 
+               SuggestedHeight="!Container.Height"
+               LayoutImp.LayoutMethod="HorizontalLeftToRight"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Center"
+               IsHidden="@IsHero">
+      <Children>
+        
+        <!-- Fear Indicator -->
+        <Widget DataSource="{FearIndicator}"
+                WidthSizePolicy="Fixed" 
+                HeightSizePolicy="Fixed" 
+                SuggestedWidth="!Icon.Size.Medium" 
+                SuggestedHeight="!Icon.Size.Medium"
+                MarginLeft="!Icon.Margin"
+                MarginRight="!Icon.Margin"
+                Sprite="@SpriteName"
+                Color="@ColorHex"
+                IsVisible="@IsVisible">
+          <Children>
+            <HintWidget DataSource="{Hint}" 
+                        DoNotAcceptEvents="false" 
+                        WidthSizePolicy="StretchToParent" 
+                        HeightSizePolicy="StretchToParent"
+                        Command.HoverBegin="ExecuteBeginHint" 
+                        Command.HoverEnd="ExecuteEndHint"/>
+          </Children>
+        </Widget>
+
+        <!-- Bonding Indicator -->
+        <Widget DataSource="{BondingIndicator}"
+                WidthSizePolicy="Fixed" 
+                HeightSizePolicy="Fixed" 
+                SuggestedWidth="!Icon.Size.Small" 
+                SuggestedHeight="!Icon.Size.Small"
+                MarginLeft="!Icon.Margin"
+                MarginRight="!Icon.Margin"
+                Sprite="@SpriteName"
+                Color="@ColorHex"
+                IsVisible="@IsVisible">
+          <Children>
+            <HintWidget DataSource="{Hint}" 
+                        DoNotAcceptEvents="false" 
+                        WidthSizePolicy="StretchToParent" 
+                        HeightSizePolicy="StretchToParent"
+                        Command.HoverBegin="ExecuteBeginHint" 
+                        Command.HoverEnd="ExecuteEndHint"/>
+          </Children>
+        </Widget>
+
+        <!-- Frustration Indicator -->
+        <Widget DataSource="{FrustrationIndicator}"
+                WidthSizePolicy="Fixed" 
+                HeightSizePolicy="Fixed" 
+                SuggestedWidth="!Icon.Size.Medium" 
+                SuggestedHeight="!Icon.Size.Medium"
+                MarginLeft="!Icon.Margin"
+                MarginRight="!Icon.Margin"
+                Sprite="@SpriteName"
+                Color="@ColorHex"
+                IsVisible="@IsVisible">
+          <Children>
+            <HintWidget DataSource="{Hint}" 
+                        DoNotAcceptEvents="false" 
+                        WidthSizePolicy="StretchToParent" 
+                        HeightSizePolicy="StretchToParent"
+                        Command.HoverBegin="ExecuteBeginHint" 
+                        Command.HoverEnd="ExecuteEndHint"/>
+          </Children>
+        </Widget>
+
+        <!-- Loyalty Indicator -->
+        <Widget DataSource="{LoyaltyIndicator}"
+                WidthSizePolicy="Fixed" 
+                HeightSizePolicy="Fixed" 
+                SuggestedWidth="!Icon.Size.Medium" 
+                SuggestedHeight="!Icon.Size.Medium"
+                MarginLeft="!Icon.Margin"
+                MarginRight="!Icon.Margin"
+                Sprite="@SpriteName"
+                Color="@ColorHex"
+                IsVisible="@IsVisible">
+          <Children>
+            <HintWidget DataSource="{Hint}" 
+                        DoNotAcceptEvents="false" 
+                        WidthSizePolicy="StretchToParent" 
+                        HeightSizePolicy="StretchToParent"
+                        Command.HoverBegin="ExecuteBeginHint" 
+                        Command.HoverEnd="ExecuteEndHint"/>
+          </Children>
+        </Widget>
+
+      </Children>
+    </ListPanel>
+  </Window>
+</Prefab>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Prefab>
+  <Window>
+    <Widget DataSource="{..}" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren"
+            SuggestedWidth="300" HorizontalAlignment="Right" VerticalAlignment="Center"
+            MarginRight="20" IsVisible="@IsVisible">
+      <Children>
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                Sprite="BlankWhiteSquare_9" Color="#1A1A1ACC" MarginLeft="-10" MarginRight="-10" MarginTop="-10" MarginBottom="-10"/>
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalBottomToTop">
+          <Children>
+            <!-- Inner Layer -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginBottom="10">
+              <Children>
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            Brush="Popup.Text.Small" Brush.FontSize="12" Brush.FontColor="#88AAFFFF" Text="@InnerLabel"/>
+                <ListPanel DataSource="{InnerSlots}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                           StackLayout.LayoutMethod="VerticalBottomToTop">
+                  <ItemTemplate>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22">
+                      <Children>
+                        <TextWidget WidthSizePolicy="Fixed" SuggestedWidth="60" HeightSizePolicy="StretchToParent"
+                                    Brush="Popup.Text.Small" Brush.FontSize="10" Text="@SlotName"/>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                    HorizontalAlignment="Right" Brush="Popup.Text.Small" Brush.FontSize="10"
+                                    Brush.FontColor="#AAAAAA" Text="@ItemName"/>
+                      </Children>
+                    </Widget>
+                  </ItemTemplate>
+                </ListPanel>
+              </Children>
+            </Widget>
+            <!-- Middle Layer -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginBottom="10">
+              <Children>
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            Brush="Popup.Text.Small" Brush.FontSize="12" Brush.FontColor="#AACCFFFF" Text="@MiddleLabel"/>
+                <ListPanel DataSource="{MiddleSlots}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                           StackLayout.LayoutMethod="VerticalBottomToTop">
+                  <ItemTemplate>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22">
+                      <Children>
+                        <TextWidget WidthSizePolicy="Fixed" SuggestedWidth="60" HeightSizePolicy="StretchToParent"
+                                    Brush="Popup.Text.Small" Brush.FontSize="10" Text="@SlotName"/>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                    HorizontalAlignment="Right" Brush="Popup.Text.Small" Brush.FontSize="10"
+                                    Brush.FontColor="#AAAAAA" Text="@ItemName"/>
+                      </Children>
+                    </Widget>
+                  </ItemTemplate>
+                </ListPanel>
+              </Children>
+            </Widget>
+            <!-- Outer Layer -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren">
+              <Children>
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            Brush="Popup.Text.Small" Brush.FontSize="12" Brush.FontColor="#FFD700FF" Text="@OuterLabel"/>
+                <ListPanel DataSource="{OuterSlots}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                           StackLayout.LayoutMethod="VerticalBottomToTop">
+                  <ItemTemplate>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22">
+                      <Children>
+                        <TextWidget WidthSizePolicy="Fixed" SuggestedWidth="60" HeightSizePolicy="StretchToParent"
+                                    Brush="Popup.Text.Small" Brush.FontSize="10" Text="@SlotName"/>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                    HorizontalAlignment="Right" Brush="Popup.Text.Small" Brush.FontSize="10"
+                                    Brush.FontColor="#AAAAAA" Text="@ItemName"/>
+                      </Children>
+                    </Widget>
+                  </ItemTemplate>
+                </ListPanel>
+              </Children>
+            </Widget>
+          </Children>
+        </Widget>
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

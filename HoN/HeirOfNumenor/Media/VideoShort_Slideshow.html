@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heir of Numenor - Feature Highlights</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            width: 1080px; height: 1920px;
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #16213e;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .slide {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            padding: 50px;
+            opacity: 0; transform: scale(0.95);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .slide.active { opacity: 1; transform: scale(1); }
+        
+        /* Header styles */
+        .crown-symbol {
+            font-size: 100px;
+            filter: drop-shadow(0 0 30px rgba(255,215,0,0.8));
+            margin-bottom: 20px;
+        }
+        
+        .main-title {
+            font-size: 72px;
+            color: #ffd700;
+            text-shadow: 3px 3px 0 #8b6914, 0 0 30px rgba(255,215,0,0.6);
+            letter-spacing: 4px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .slide-subtitle {
+            font-size: 32px;
+            color: #c9a227;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+        
+        .tagline {
+            font-style: italic;
+            color: #87ceeb;
+            font-size: 28px;
+            text-shadow: 0 0 10px rgba(135,206,235,0.5);
+            margin-bottom: 30px;
+        }
+        
+        /* Section card styles */
+        .section-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border: 3px solid;
+            border-radius: 15px;
+            padding: 40px;
+            width: 90%;
+            max-width: 950px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .section-card.rings { border-color: #ffd700; box-shadow: 0 0 40px rgba(255,215,0,0.3); }
+        .section-card.combat { border-color: #dc143c; box-shadow: 0 0 40px rgba(220,20,60,0.3); }
+        .section-card.rpg { border-color: #ff8c42; box-shadow: 0 0 40px rgba(255,140,66,0.3); }
+        .section-card.realm { border-color: #4169e1; box-shadow: 0 0 40px rgba(65,105,225,0.3); }
+        .section-card.forge { border-color: #ff6b35; box-shadow: 0 0 40px rgba(255,107,53,0.3); }
+        .section-card.qol { border-color: #32cd32; box-shadow: 0 0 40px rgba(50,205,50,0.3); }
+        .section-card.dev { border-color: #9b59b6; box-shadow: 0 0 40px rgba(155,89,182,0.3); }
+        .section-card.preview { border-color: #ff6b6b; box-shadow: 0 0 40px rgba(255,107,107,0.3); background: rgba(255,50,50,0.1); }
+        
+        .section-header {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid currentColor;
+            text-shadow: 0 0 20px currentColor;
+        }
+        
+        .section-card.rings .section-header { color: #ffd700; }
+        .section-card.combat .section-header { color: #ff6b6b; }
+        .section-card.rpg .section-header { color: #ff8c42; }
+        .section-card.realm .section-header { color: #87ceeb; }
+        .section-card.forge .section-header { color: #ff8c42; }
+        .section-card.qol .section-header { color: #90ee90; }
+        .section-card.dev .section-header { color: #d4a5ff; }
+        .section-card.preview .section-header { color: #ff6b6b; }
+        
+        .section-icon { font-size: 1.1em; margin-right: 15px; }
+        
+        .section-quote {
+            text-align: center;
+            font-style: italic;
+            color: #b0b0b0;
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+        
+        /* Feature list */
+        .feature-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .feature-item {
+            background: rgba(0,0,0,0.4);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid;
+        }
+        
+        .section-card.rings .feature-item { border-left-color: #ffd700; }
+        .section-card.combat .feature-item { border-left-color: #dc143c; }
+        .section-card.rpg .feature-item { border-left-color: #ff8c42; }
+        .section-card.realm .feature-item { border-left-color: #4169e1; }
+        .section-card.forge .feature-item { border-left-color: #ff6b35; }
+        .section-card.qol .feature-item { border-left-color: #32cd32; }
+        .section-card.dev .feature-item { border-left-color: #9b59b6; }
+        
+        .feature-item h3 {
+            font-size: 26px;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        
+        .feature-item p {
+            font-size: 20px;
+            color: #d0d0d0;
+            line-height: 1.4;
+        }
+        
+        .feature-item ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-item li {
+            font-size: 20px;
+            color: #d0d0d0;
+            padding: 6px 0 6px 25px;
+            position: relative;
+        }
+        
+        .feature-item li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+        }
+        
+        .section-card.rings .feature-item li::before { color: #ffd700; }
+        .section-card.combat .feature-item li::before { color: #ff6b6b; }
+        .section-card.rpg .feature-item li::before { color: #ff8c42; }
+        .section-card.realm .feature-item li::before { color: #87ceeb; }
+        .section-card.forge .feature-item li::before { color: #ff8c42; }
+        .section-card.qol .feature-item li::before { color: #90ee90; }
+        .section-card.dev .feature-item li::before { color: #d4a5ff; }
+        
+        /* Tags */
+        .new-tag {
+            display: inline-block;
+            background: #50c878;
+            color: #000;
+            font-size: 18px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        
+        .dev-tag {
+            display: inline-block;
+            background: #9b59b6;
+            color: #fff;
+            font-size: 16px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+        
+        /* Banners */
+        .preview-banner {
+            background: linear-gradient(90deg, #8b0000, #dc143c, #8b0000);
+            color: #ffd700;
+            padding: 20px 60px;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            border: 3px solid #ffd700;
+            text-shadow: 2px 2px 4px #000;
+            box-shadow: 0 0 30px rgba(220,20,60,0.5);
+            margin-bottom: 30px;
+        }
+        
+        .for-mod-badge {
+            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
+            border: 3px solid #ffd700;
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #ffd700;
+            box-shadow: 0 0 25px rgba(255,215,0,0.4);
+            margin-top: 25px;
+        }
+        
+        .notice-text {
+            font-size: 26px;
+            color: #ffcccc;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 800px;
+        }
+        
+        .notice-text strong { color: #fff; }
+        
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            bottom: 0; left: 0;
+            height: 10px;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            width: 0%;
+            box-shadow: 0 0 15px rgba(255,215,0,0.5);
+        }
+        
+        /* Start screen */
+        #startScreen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #16213e;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        #startScreen.hidden { display: none; }
+        
+        #startBtn {
+            font-family: Georgia, serif;
+            font-size: 48px;
+            padding: 30px 100px;
+            background: linear-gradient(180deg, #ffd700, #b8860b);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            color: #1a0a2e;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 40px rgba(255,215,0,0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 3px;
+        }
+        #startBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(255,215,0,0.7);
+        }
+        
+        .start-hint {
+            font-size: 24px;
+            color: #87ceeb;
+            margin-top: 30px;
+            font-style: italic;
+        }
+        
+        /* Summary slide */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+        
+        .summary-section-title {
+            grid-column: span 2;
+            font-size: 24px;
+            padding: 10px 0 5px 0;
+            border-bottom: 2px solid;
+            margin-top: 10px;
+        }
+        
+        .summary-item {
+            background: rgba(0,0,0,0.4);
+            border-left: 3px solid #ffd700;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        .summary-item h4 { font-size: 16px; color: #fff; margin-bottom: 3px; }
+        .summary-item p { font-size: 13px; color: #b0b0b0; }
+        
+        .summary-footer {
+            grid-column: span 2;
+            text-align: center;
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(90deg, transparent, rgba(220,20,60,0.3), transparent);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- START SCREEN -->
+    <div id="startScreen">
+        <div class="crown-symbol">💍</div>
+        <div class="main-title">HEIR OF NUMENOR</div>
+        <div class="tagline">"One Mod to Rule Them All"</div>
+        <button id="startBtn" onclick="startSlideshow()">▶ START</button>
+        <div class="start-hint">Click to begin • Press SPACE to pause/resume</div>
+    </div>
+
+    <!-- Slide 0: Intro -->
+    <div class="slide" data-duration="6000">
+        <div class="crown-symbol">💍</div>
+        <div class="main-title">HEIR OF NUMENOR</div>
+        <div class="slide-subtitle">16 Major Features</div>
+        <div class="tagline">"One Mod to Rule Them All"</div>
+        <div class="for-mod-badge">★ FOR THE AGE OF MEN MOD ★</div>
+        <p style="margin-top: 20px; color: #a0a0a0; font-size: 20px;">
+            "Heir of Numenor" is the development name • Not an advertisement
+        </p>
+    </div>
+    
+    <!-- Slide 1: Preview Notice -->
+    <div class="slide" data-duration="7000">
+        <div class="preview-banner">🚧 PREVIEW ONLY 🚧</div>
+        <div class="section-card preview">
+            <div class="section-header">⚠️ NOT A RELEASE</div>
+            <div class="notice-text">
+                All features shown are <strong>IMPLEMENTED & TESTED</strong><br><br>
+                This is a <strong>PREVIEW</strong> of what's coming<br>
+                in the <strong>near and far future</strong><br><br>
+                Some features may change, be delayed,<br>
+                or take time to release
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 2: Ring System -->
+    <div class="slide" data-duration="7000">
+        <div class="section-card rings">
+            <div class="section-header"><span class="section-icon">💍</span> RINGS OF POWER</div>
+            <p class="section-quote">"Three Rings for the Elven-kings under the sky..."</p>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h3>💍 20 Rings of Power</h3>
+                    <ul>
+                        <li>3 Elven, 7 Dwarf, 9 Men</li>
+                        <li>The One Ring</li>
+                        <li>Unique abilities each</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🔮 Orbital Ring UI</h3>
+                    <ul>
+                        <li>Animated selection</li>
+                        <li>Visual power indicators</li>
+                        <li>Quick equip/unequip</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🖤 Corruption System</h3>
+                    <ul>
+                        <li>Rings corrupt over time</li>
+                        <li>Affects character stats</li>
+                        <li>Ring-specific penalties</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>👁️ Threat System</h3>
+                    <ul>
+                        <li>Nazgûl hunt ring bearers</li>
+                        <li>Threat level grows</li>
+                        <li>Strategic management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 3: Combat 1 -->
+    <div class="slide" data-duration="7000">
+        <div class="section-card combat">
+            <div class="section-header"><span class="section-icon">⚔️</span> COMBAT SYSTEMS</div>
+            <p class="section-quote">Master the art of war with advanced tactical options</p>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h3>🐎 Smart Cavalry AI</h3>
+                    <ul>
+                        <li>Coordinated line charges</li>
+                        <li>Auto-reform after pass</li>
+                        <li>Collision avoidance</li>
+                        <li>Skirmish tactics</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>📊 Battle Action Bar</h3>
+                    <ul>
+                        <li>Shield Wall / Testudo</li>
+                        <li>Pike Wall / Brace</li>
+                        <li>Volley Fire</li>
+                        <li>Hotkeys (1-9)</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🛡️ Layered Armor</h3>
+                    <ul>
+                        <li>Gambeson + Mail + Plate</li>
+                        <li>Damage type matters</li>
+                        <li>Configurable modes</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🏰 Siege Auto-Dismount</h3>
+                    <ul>
+                        <li>No horses on walls!</li>
+                        <li>Auto horse storage</li>
+                        <li>Auto-remount after</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 4: Combat 2 - Formations -->
+    <div class="slide" data-duration="6000">
+        <div class="section-card combat">
+            <div class="section-header"><span class="section-icon">📋</span> FORMATION SYSTEMS</div>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h3>📋 Formation Presets</h3>
+                    <ul>
+                        <li>Save Order of Battle</li>
+                        <li>Load before any battle</li>
+                        <li>Auto-assign companions</li>
+                        <li>Quick-apply in combat</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🎯 Mixed Formations</h3>
+                    <ul>
+                        <li>Infantry front, archers back</li>
+                        <li>Checkerboard patterns</li>
+                        <li>Custom row depths</li>
+                        <li>Configurable layouts</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 5: RPG Features -->
+    <div class="slide" data-duration="7000">
+        <div class="section-card rpg">
+            <div class="section-header"><span class="section-icon">👗</span> RPG FEATURES <span class="new-tag">NEW</span></div>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h3>👗 Armor Cosmetics</h3>
+                    <p style="color:#ff8c42; margin-bottom:10px;">Transmog for Bannerlord!</p>
+                    <ul>
+                        <li>Hide helmet or cape</li>
+                        <li>Apply different visuals</li>
+                        <li>Keep original stats</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🧠 Memory System</h3>
+                    <ul>
+                        <li>Troops remember battles</li>
+                        <li>Captain promotions</li>
+                        <li>Progression tracking</li>
+                        <li>Battle history</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>👥 Troop Status</h3>
+                    <ul>
+                        <li>Health tracking</li>
+                        <li>Morale indicators</li>
+                        <li>Fatigue system</li>
+                        <li>Visual status bars</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🏛️ Custom Resources</h3>
+                    <ul>
+                        <li>Culture-specific needs</li>
+                        <li>Crafting requirements</li>
+                        <li>Building materials</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 6: Realm & Forge -->
+    <div class="slide" data-duration="7000">
+        <div class="section-card realm">
+            <div class="section-header"><span class="section-icon">🏰</span> REALM & FORGE</div>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h3>🏘️ Fief Management</h3>
+                    <ul>
+                        <li>Enhanced settlement screen</li>
+                        <li>Building queue view</li>
+                        <li>Resource overview</li>
+                        <li>Garrison monitoring</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🏷️ Companion Roles</h3>
+                    <ul>
+                        <li>Visual role indicators</li>
+                        <li>Surgeon, Engineer, Scout</li>
+                        <li>Role-based bonuses</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>🛡️ Armor Smithing</h3>
+                    <ul>
+                        <li>Craft armor from parts</li>
+                        <li>Material requirements</li>
+                        <li>Quality tiers</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>⭐ Unique Items</h3>
+                    <ul>
+                        <li>24 bonus types</li>
+                        <li>Item repair system</li>
+                        <li>Legendary lore</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 7: QoL -->
+    <div class="slide" data-duration="6000">
+        <div class="section-card qol">
+            <div class="section-header"><span class="section-icon">🔧</span> QUALITY OF LIFE</div>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h3>🎒 Equipment Presets</h3>
+                    <ul>
+                        <li>Save loadouts per character</li>
+                        <li>Up to 10 presets each</li>
+                        <li>Quick-swap in inventory</li>
+                        <li>Battle, Siege, Cavalry</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3>📦 Quick Inventory</h3>
+                    <ul>
+                        <li>🔍 Search boxes enabled</li>
+                        <li>Sell damaged items</li>
+                        <li>Sell low-value items</li>
+                        <li>Store/Retrieve all</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 8: Dev Tools -->
+    <div class="slide" data-duration="7000">
+        <div class="section-card dev">
+            <div class="section-header"><span class="section-icon">🛠️</span> FOR DEVELOPERS</div>
+            <p class="section-quote">Tools for modders and community testers</p>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h3><span class="dev-tag">TOOL</span> Mod Toolkit</h3>
+                    <ul>
+                        <li>Combat event recording</li>
+                        <li>Exception capture</li>
+                        <li>F12 screenshots</li>
+                        <li>Export to Gist/Discord</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h3><span class="dev-tag">TOOL</span> UI Designer</h3>
+                    <ul>
+                        <li>WPF XML editor</li>
+                        <li>Widget palette</li>
+                        <li>In-game hot reload</li>
+                        <li>Real Gauntlet preview</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slide 9: Coming Soon -->
+    <div class="slide" data-duration="6000">
+        <div class="crown-symbol" style="filter: drop-shadow(0 0 40px rgba(255,215,0,0.9));">💍</div>
+        <div class="main-title" style="font-size: 64px;">COMING SOON</div>
+        <div class="tagline" style="font-size: 32px;">"One Mod to Rule Them All"</div>
+        <div class="for-mod-badge">★ FOR THE AGE OF MEN MOD ★</div>
+        <p style="margin-top: 30px; color: #ff6b6b; font-size: 24px;">
+            🚧 Preview Only • Features in Development 🚧
+        </p>
+    </div>
+    
+    <!-- Slide 10: Summary -->
+    <div class="slide" data-duration="18000" style="padding: 30px; justify-content: flex-start; padding-top: 40px;">
+        <div class="preview-banner" style="font-size: 28px; padding: 15px 40px; margin-bottom: 20px;">📋 FULL SUMMARY</div>
+        
+        <div class="summary-grid">
+            <div class="summary-section-title" style="color: #ffd700; border-color: #ffd700;">💍 RINGS OF POWER</div>
+            <div class="summary-item"><h4>💍 20 Rings</h4><p>Unique abilities, corruption, threat</p></div>
+            <div class="summary-item"><h4>🔮 Orbital UI</h4><p>Animated ring selection & management</p></div>
+            
+            <div class="summary-section-title" style="color: #ff6b6b; border-color: #ff6b6b;">⚔️ COMBAT</div>
+            <div class="summary-item"><h4>🐎 Cavalry AI</h4><p>Coordinated charges, auto-reform</p></div>
+            <div class="summary-item"><h4>📊 Action Bar</h4><p>Shield Wall, Pike Wall, Testudo</p></div>
+            <div class="summary-item"><h4>🛡️ Layered Armor</h4><p>Gambeson + Mail + Plate</p></div>
+            <div class="summary-item"><h4>🏰 Siege Dismount</h4><p>Auto horse handling</p></div>
+            <div class="summary-item"><h4>📋 Formations</h4><p>Presets, mixed layouts</p></div>
+            
+            <div class="summary-section-title" style="color: #ff8c42; border-color: #ff8c42;">👗 RPG FEATURES</div>
+            <div class="summary-item"><h4>👗 Cosmetics</h4><p>Hide/transmog armor</p></div>
+            <div class="summary-item"><h4>🧠 Memory</h4><p>Troop progression</p></div>
+            <div class="summary-item"><h4>👥 Status</h4><p>Health, morale, fatigue</p></div>
+            
+            <div class="summary-section-title" style="color: #90ee90; border-color: #90ee90;">🔧 QOL & MORE</div>
+            <div class="summary-item"><h4>🏘️ Fiefs</h4><p>Enhanced management</p></div>
+            <div class="summary-item"><h4>⚒️ Smithing</h4><p>Armor craft & repair</p></div>
+            <div class="summary-item"><h4>🎒 Presets</h4><p>Equipment loadouts</p></div>
+            <div class="summary-item"><h4>📦 Inventory</h4><p>Search, bulk actions</p></div>
+            
+            <div class="summary-footer">
+                <p style="color: #ffd700; font-size: 20px; margin-bottom: 5px;">★ 16 FEATURES • FOR AGE OF MEN ★</p>
+                <p style="color: #ff6b6b; font-size: 16px;">🚧 PREVIEW ONLY • Coming Soon 🚧</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="progress-bar" id="progress"></div>
+    
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const progress = document.getElementById('progress');
+        const startScreen = document.getElementById('startScreen');
+        let current = 0, start = 0, total = 0, elapsed = 0;
+        let running = false, timeout = null;
+        
+        slides.forEach(s => total += parseInt(s.dataset.duration));
+        
+        function startSlideshow() {
+            startScreen.classList.add('hidden');
+            slides[0].classList.add('active');
+            start = Date.now();
+            running = true;
+            timeout = setTimeout(next, parseInt(slides[0].dataset.duration));
+            tick();
+        }
+        
+        function next() {
+            if (!running) return;
+            slides[current].classList.remove('active');
+            elapsed += parseInt(slides[current].dataset.duration);
+            current = (current + 1) % slides.length;
+            if (current === 0) elapsed = 0;
+            slides[current].classList.add('active');
+            start = Date.now();
+            timeout = setTimeout(next, parseInt(slides[current].dataset.duration));
+        }
+        
+        function tick() {
+            if (running) {
+                const pct = ((elapsed + Date.now() - start) / total) * 100;
+                progress.style.width = Math.min(pct, 100) + '%';
+            }
+            requestAnimationFrame(tick);
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && startScreen.classList.contains('hidden')) {
+                e.preventDefault();
+                running = !running;
+                if (running) {
+                    start = Date.now();
+                    timeout = setTimeout(next, parseInt(slides[current].dataset.duration));
+                } else {
+                    clearTimeout(timeout);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Khuzait Theme</Name>
+  <Description>Steppe green and sky blue</Description>
+  <Author>BannerlordThemeSwitcher</Author>
+  <Version>2.0.0</Version>
+  <BaseCulture>khuzait</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>khuzait</Kingdom>
+  </BoundKingdoms>
+  <ColorScheme>
+    <Primary>#9ACD32</Primary>
+    <Secondary>#87CEEB</Secondary>
+    <Tertiary>#CD5C5C</Tertiary>
+    <Text>#FFFFFFEE</Text>
+    <TextMuted>#C8D8B8</TextMuted>
+    <TextHighlight>#9ACD32</TextHighlight>
+    <TextTitle>#9ACD32</TextTitle>
+    <TextOnPrimary>#0A1A0A</TextOnPrimary>
+    <TextDisabled>#607050</TextDisabled>
+    <Background>#0F1A0A99</Background>
+    <BackgroundDark>#070D05BB</BackgroundDark>
+    <BackgroundLight>#1A2A15AA</BackgroundLight>
+    <BackgroundAccent>#9ACD3220</BackgroundAccent>
+    <BackgroundHover>#9ACD3240</BackgroundHover>
+    <BackgroundSelected>#9ACD3260</BackgroundSelected>
+    <Border>#87CEEBAA</Border>
+    <BorderMuted>#87CEEB55</BorderMuted>
+    <BorderHighlight>#9ACD32FF</BorderHighlight>
+    <BorderSecondary>#CD5C5CAA</BorderSecondary>
+    <ButtonBackground>#9ACD3225</ButtonBackground>
+    <ButtonHover>#9ACD3250</ButtonHover>
+    <ButtonPressed>#9ACD3280</ButtonPressed>
+    <ButtonDisabled>#40504044</ButtonDisabled>
+    <ButtonBorder>#87CEEBCC</ButtonBorder>
+    <Success>#9ACD32</Success>
+    <Warning>#FFD700</Warning>
+    <Error>#CD5C5C</Error>
+    <Info>#87CEEB</Info>
+    <Gold>#FFD700</Gold>
+    <Experience>#87CEEB</Experience>
+    <Health>#CD5C5C</Health>
+    <Morale>#9ACD32</Morale>
+    <Shadow>#0F1A0A88</Shadow>
+    <Glow>#9ACD3266</Glow>
+  </ColorScheme>
+</Theme>

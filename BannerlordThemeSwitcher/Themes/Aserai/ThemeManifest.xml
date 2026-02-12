@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Aserai Theme</Name>
+  <Description>Desert orange and midnight blue</Description>
+  <Author>BannerlordThemeSwitcher</Author>
+  <Version>2.0.0</Version>
+  <BaseCulture>aserai</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>aserai</Kingdom>
+  </BoundKingdoms>
+  <ColorScheme>
+    <Primary>#FF8C00</Primary>
+    <Secondary>#191970</Secondary>
+    <Tertiary>#40E0D0</Tertiary>
+    <Text>#FFFFFFEE</Text>
+    <TextMuted>#D8C8A8</TextMuted>
+    <TextHighlight>#FF8C00</TextHighlight>
+    <TextTitle>#FF8C00</TextTitle>
+    <TextOnPrimary>#1A0A00</TextOnPrimary>
+    <TextDisabled>#807060</TextDisabled>
+    <Background>#1A150599</Background>
+    <BackgroundDark>#0D0A02BB</BackgroundDark>
+    <BackgroundLight>#2A2510AA</BackgroundLight>
+    <BackgroundAccent>#FF8C0020</BackgroundAccent>
+    <BackgroundHover>#FF8C0040</BackgroundHover>
+    <BackgroundSelected>#FF8C0060</BackgroundSelected>
+    <Border>#FF8C00AA</Border>
+    <BorderMuted>#FF8C0055</BorderMuted>
+    <BorderHighlight>#FF8C00FF</BorderHighlight>
+    <BorderSecondary>#191970AA</BorderSecondary>
+    <ButtonBackground>#FF8C0025</ButtonBackground>
+    <ButtonHover>#FF8C0050</ButtonHover>
+    <ButtonPressed>#FF8C0080</ButtonPressed>
+    <ButtonDisabled>#50403044</ButtonDisabled>
+    <ButtonBorder>#FF8C00CC</ButtonBorder>
+    <Success>#40E0D0</Success>
+    <Warning>#FFD700</Warning>
+    <Error>#FF6347</Error>
+    <Info>#40E0D0</Info>
+    <Gold>#FFD700</Gold>
+    <Experience>#40E0D0</Experience>
+    <Health>#FF6347</Health>
+    <Morale>#40E0D0</Morale>
+    <Shadow>#1A150588</Shadow>
+    <Glow>#FF8C0066</Glow>
+  </ColorScheme>
+</Theme>

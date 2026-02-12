@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
+<!-- SPRITE DATA REFERENCE FOR BANNERLORD THEME AUTHORS                                          -->
+<!-- This file documents how SpriteData.xml works in Bannerlord for custom UI theming           -->
+<!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
+
+<!-- 
+═══════════════════════════════════════════════════════════════════════════════════════════════
+SPRITE SYSTEM OVERVIEW
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+Bannerlord's sprite system consists of three main components:
+1. SpriteCategories - Define sprite sheets (PNG texture atlases)
+2. SpriteParts - Define regions within sprite sheets
+3. Sprites - Map names to SpriteParts for use in Brushes
+
+SPRITE CATEGORIES FROM NATIVE MODULE:
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+Category               | Purpose                              | AlwaysLoad | Sheet Size
+───────────────────────────────────────────────────────────────────────────────────────────────
+ui_bannerbuilder       | Banner builder interface             | No         | 512x128
+ui_bannericons         | Banner icons/sigils (250+)           | No         | 4096x1024
+ui_barter              | Trade/barter UI                      | No         | 4096x1024
+ui_conversation        | Conversation UI elements             | No         | 4096x256
+ui_credits             | Credits screen                       | No         | 4096x512
+ui_encyclopedia        | Encyclopedia UI                      | No         | 4096x2048
+ui_facegen             | Face/character creation              | No         | 4096x1024
+ui_fonts               | Font sprite sheets                   | YES        | Multiple sheets
+ui_fullbackgrounds     | Full screen backgrounds              | YES        | 4096x4096 (x2)
+ui_fullscreens         | Fullscreen overlays                  | No         | 4096x512
+ui_group1              | Main UI elements                     | YES        | 4096x4096 (x3)
+ui_launcher            | Launcher UI                          | No         | 4096x2048
+ui_loading             | Loading screen images                | No         | 1920x1080 (x12)
+ui_mpbackgrounds       | Multiplayer backgrounds              | No         | 1920x1080
+ui_mpbadges            | Multiplayer badges                   | No         | 4096x4096
+ui_mplobby             | Multiplayer lobby UI                 | No         | 4096x4096 (x2)
+ui_mpmission           | Multiplayer mission UI               | No         | 4096x1024
+ui_options             | Options menu                         | No         | 4096x2048
+ui_order               | Battle orders                        | No         | 4096x1024
+ui_order_of_battle     | Order of battle UI                   | No         | 1024x128
+ui_photomode           | Photo mode UI                        | No         | 4096x512
+ui_textures            | General textures (buttons, frames)   | YES        | Various sizes
+
+SANDBOX MODULE CATEGORIES:
+───────────────────────────────────────────────────────────────────────────────────────────────
+ui_armymanagement      | Army management screens              | No         | 4096x256
+ui_boardgame           | Board game UI (Tablut, etc.)         | No         | 4096x4096
+ui_charactercreation   | Character creation screens           | No         | 4096x4096 (x2)
+ui_characterdeveloper  | Character development/skills         | No         | 4096x2048
+ui_clan                | Clan management UI                   | No         | 4096x1024
+ui_crafting            | Smithy/crafting UI                   | No         | 4096x2048
+ui_gameover            | Game over screens                    | No         | 4096x2048
+ui_inventory           | Inventory UI                         | No         | 4096x1024
+ui_kingdom             | Kingdom management                   | No         | 4096x2048
+ui_mapbar              | Map bar UI                           | No         | 4096x128
+ui_map_incidents       | Map incidents/events                 | No         | 4096x512
+ui_partyscreen         | Party management                     | No         | 4096x1024
+ui_quest               | Quest log UI                         | No         | 4096x1024
+ui_saveload            | Save/load screens                    | No         | 4096x1024
+ui_town_management     | Town management UI                   | No         | 4096x512
+
+NAVAL DLC CATEGORIES (if applicable):
+───────────────────────────────────────────────────────────────────────────────────────────────
+ui_naval_common        | Common naval UI (AlwaysLoad)         | YES        | 4096x1024
+ui_naval_fullbackgrounds| Naval backgrounds                   | No         | 4096x4096
+ui_naval_loading       | Naval loading screens                | No         | 1920x1080 (x10)
+ui_naval_ship_pieces   | Ship customization                   | No         | 4096x2048
+ui_port                | Port screen UI                       | No         | 4096x256
+
+═══════════════════════════════════════════════════════════════════════════════════════════════
+KEY SPRITES USED BY BRUSHES (for color tinting)
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+9-SLICE SPRITES (scalable frames/buttons):
+───────────────────────────────────────────────────────────────────────────────────────────────
+frame_9                      - Standard popup/panel frame
+rounded_frame_9              - Rounded frame (character creation buttons)
+rounded_canvas_9             - Rounded canvas/fill background
+button_canvas_9              - Standard button background
+button_frame_9               - Standard button frame
+BlankWhiteSquare_9           - Solid color placeholder (for tinting)
+dialog_option_canvas_9       - Dialog option background
+dialog_option_canvas_white_9 - White variant for tinting
+conversation_frame_9         - Conversation panel frame
+conversation_frame_canvas_9  - Conversation panel background
+esc_menu_frame_canvas_9      - Escape menu background
+slick_frame_9                - Modern/slick frame style
+scroll_button_9              - Scrollbar button
+tutorial_canvas_9            - Tutorial panel background
+tutorial_frame_9             - Tutorial panel frame
+done_button_9                - Done/confirm button
+bottom_button_9              - Bottom button style
+gold_frame_9                 - Gold-colored frame
+power_bar_frame_9            - Power bar frame
+power_bar_canvas_9           - Power bar background
+
+CONVERSATION SPRITES:
+───────────────────────────────────────────────────────────────────────────────────────────────
+npc_dialogue_panel_9         - NPC dialogue panel
+name_shadow_9                - Name label shadow
+persuasion_extension_canvas_9- Persuasion panel background
+persuasion_extension_frame_9 - Persuasion panel frame
+conversation_relation_canvas_9- Relation indicator background
+
+ENCYCLOPEDIA SPRITES:
+───────────────────────────────────────────────────────────────────────────────────────────────
+list_divider_9               - List divider line
+list_closed_divider_9        - Closed list divider
+list_open_divider_9          - Open list divider
+subpage_slick_frame_9        - Subpage frame
+
+SIMPLE SHAPE SPRITES:
+───────────────────────────────────────────────────────────────────────────────────────────────
+BlankWhiteSquare             - Solid white square (tint for any color)
+BlankWhiteCircle             - Solid white circle
+BlankWhiteCircleOutlined     - Circle outline
+
+═══════════════════════════════════════════════════════════════════════════════════════════════
+SPRITE TYPES
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+GenericSprite - Standard sprite, rendered at its original size
+NineRegionSprite - 9-slice sprite for scalable UI elements
+
+9-SLICE SPRITE STRUCTURE:
+───────────────────────────────────────────────────────────────────────────────────────────────
+A 9-slice sprite is divided into 9 regions:
++-----+---------------+-----+
+|  1  |       2       |  3  |  <- TopHeight
++-----+---------------+-----+
+|     |               |     |
+|  4  |       5       |  6  |  <- Stretches vertically
+|     |               |     |
++-----+---------------+-----+
+|  7  |       8       |  9  |  <- BottomHeight
++-----+---------------+-----+
+   ^          ^          ^
+   |          |          |
+LeftWidth  Stretches  RightWidth
+
+Corners (1,3,7,9) maintain their size
+Edges (2,8) stretch horizontally
+Edges (4,6) stretch vertically  
+Center (5) stretches in both directions
+
+═══════════════════════════════════════════════════════════════════════════════════════════════
+CREATING CUSTOM SPRITES
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+STEP 1: Create sprite sheet PNG
+- Use power-of-2 dimensions (512, 1024, 2048, 4096)
+- Save as PNG with transparency if needed
+- Place in: YourMod/GUI/SpriteParts/ui_yourtheme/
+
+STEP 2: Create SpriteData.xml in YourMod/GUI/
+-->
+
+<SpriteData>
+  <!-- STEP 2a: Define your sprite category -->
+  <SpriteCategories>
+    <SpriteCategory>
+      <n>ui_mytheme</n>
+      <!-- Optional: Add AlwaysLoad tag if sprites should always be in memory -->
+      <!-- <AlwaysLoad /> -->
+      <SpriteSheetCount>1</SpriteSheetCount>
+      <SpriteSheetSize ID="1" Width="1024" Height="1024" />
+    </SpriteCategory>
+  </SpriteCategories>
+
+  <!-- STEP 2b: Define sprite parts (regions in sprite sheet) -->
+  <SpriteParts>
+    <!-- Simple sprite example -->
+    <SpritePart>
+      <SheetID>1</SheetID>
+      <n>MyTheme\my_icon</n>
+      <Width>64</Width>
+      <Height>64</Height>
+      <SheetX>0</SheetX>
+      <SheetY>0</SheetY>
+      <CategoryName>ui_mytheme</CategoryName>
+    </SpritePart>
+
+    <!-- Button sprite for 9-slice -->
+    <SpritePart>
+      <SheetID>1</SheetID>
+      <n>MyTheme\my_button</n>
+      <Width>128</Width>
+      <Height>64</Height>
+      <SheetX>64</SheetX>
+      <SheetY>0</SheetY>
+      <CategoryName>ui_mytheme</CategoryName>
+    </SpritePart>
+
+    <!-- Frame sprite for 9-slice -->
+    <SpritePart>
+      <SheetID>1</SheetID>
+      <n>MyTheme\my_frame</n>
+      <Width>96</Width>
+      <Height>96</Height>
+      <SheetX>192</SheetX>
+      <SheetY>0</SheetY>
+      <CategoryName>ui_mytheme</CategoryName>
+    </SpritePart>
+  </SpriteParts>
+
+  <!-- STEP 2c: Define sprite mappings -->
+  <Sprites>
+    <!-- Generic sprite (fixed size) -->
+    <GenericSprite>
+      <n>MyTheme\my_icon</n>
+      <SpritePartName>MyTheme\my_icon</SpritePartName>
+    </GenericSprite>
+
+    <!-- 9-slice sprite (scalable button) -->
+    <NineRegionSprite>
+      <n>my_button_9</n>
+      <SpritePartName>MyTheme\my_button</SpritePartName>
+      <LeftWidth>16</LeftWidth>
+      <RightWidth>16</RightWidth>
+      <TopHeight>16</TopHeight>
+      <BottomHeight>16</BottomHeight>
+    </NineRegionSprite>
+
+    <!-- 9-slice sprite (scalable frame) -->
+    <NineRegionSprite>
+      <n>my_frame_9</n>
+      <SpritePartName>MyTheme\my_frame</SpritePartName>
+      <LeftWidth>24</LeftWidth>
+      <RightWidth>24</RightWidth>
+      <TopHeight>24</TopHeight>
+      <BottomHeight>24</BottomHeight>
+    </NineRegionSprite>
+  </Sprites>
+</SpriteData>
+
+<!--
+═══════════════════════════════════════════════════════════════════════════════════════════════
+USING SPRITES IN BRUSHES
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+Reference your sprites in Brush XML files using the Sprite attribute:
+
+<Brush Name="MyTheme.Button">
+  <Layers>
+    <BrushLayer Name="Default" Sprite="my_button_9" Color="#FFD700FF" />
+  </Layers>
+  <Styles>
+    <Style Name="Hovered">
+      <BrushLayer Name="Default" Color="#FFFFFFFF" />
+    </Style>
+  </Styles>
+</Brush>
+
+═══════════════════════════════════════════════════════════════════════════════════════════════
+TIPS FOR THEME AUTHORS
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+1. COLOR TINTING: Use white/grayscale sprites with Color attribute for easy theming
+   <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#FFD700FF" />
+
+2. SPRITE NAMING: Use backslash for paths: "MyTheme\sprite_name"
+
+3. SHEET ORGANIZATION: Group related sprites together in your sprite sheet
+
+4. 9-SLICE BORDERS: Keep corner sizes consistent for uniform appearance
+
+5. TRANSPARENCY: Use PNG with alpha channel for overlays and glows
+
+6. SIZE OPTIMIZATION: Use smallest power-of-2 that fits your sprites
+
+7. EXISTING SPRITES: You can override existing sprites by using the same name
+
+8. HUE/SATURATION: BrushLayers support HueFactor, SaturationFactor, ValueFactor
+   for color manipulation without replacing sprites
+
+═══════════════════════════════════════════════════════════════════════════════════════════════
+FACTION BACKGROUND SPRITES (from ui_fullbackgrounds)
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+Bannerlord includes faction-specific background images that can be used or replaced:
+- encounter_aserai, encounter_battania, encounter_empire
+- encounter_khuzait, encounter_sturgia, encounter_vlandia
+- aserai_port, battania_port, empire_port, khuzait_port, sturgia_port, vlandia_port
+- wait_nord_castle, wait_nord_town, wait_nord_village (Naval DLC)
+
+These are typically 445x805 pixels in the sprite sheets.
+
+═══════════════════════════════════════════════════════════════════════════════════════════════
+-->

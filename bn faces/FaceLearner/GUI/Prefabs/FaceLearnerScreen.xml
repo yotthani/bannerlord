@@ -1,0 +1,577 @@
+<Prefab>
+  <Window>
+    <Widget Id="FaceLearnerScreen" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+      <Children>
+
+        <!-- ==================== TOP HEADER BAR ==================== -->
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="55" Sprite="Clan\header">
+          <Children>
+            <TextWidget Text="FACELEARNER" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Text.Title"/>
+          </Children>
+        </Widget>
+
+        <!-- ==================== MAIN CONTENT AREA ==================== -->
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="55" MarginLeft="15" MarginRight="15" MarginBottom="52" ClipRect="true">
+          <Children>
+
+            <!-- ========== GENERATE PAGE ========== -->
+            <Widget Id="GeneratePageContent" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsGeneratePageActive">
+              <Children>
+
+                <!-- LEFT PANEL: Generate Controls -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="294" Sprite="BlankWhiteSquare_9" Color="#C7A672FF">
+                  <Children>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#3A2A1AFF">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#1A1512FF">
+                          <Children>
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Sprite="Clan\panel_header">
+                              <Children>
+                                <TextWidget Text="Generate Face" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Header.Text"/>
+                              </Children>
+                            </Widget>
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="48" MarginBottom="12" MarginLeft="12" MarginRight="12">
+                              <Children>
+                                <!-- SOURCE -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="4">
+                                  <Children>
+                                    <TextWidget Text="─── SOURCE ───" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                  </Children>
+                                </Widget>
+                                <TextWidget Text="@CurrentImagePath" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20" MarginTop="30" Brush="FaceLearner.Text.Small"/>
+                                <!-- Image Nav -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="36" MarginTop="54">
+                                  <Children>
+                                    <ButtonWidget WidthSizePolicy="Fixed" SuggestedWidth="36" HeightSizePolicy="StretchToParent" Brush="FaceLearner.Button" Command.Click="ExecutePrevImage" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                      <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                    </ButtonWidget>
+                                    <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="FaceLearner.Button" Command.Click="ExecuteBrowseImage" MarginLeft="4" MarginRight="4" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                      <Children><TextWidget Text="Browse Images" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                    </ButtonWidget>
+                                    <ButtonWidget WidthSizePolicy="Fixed" SuggestedWidth="36" HeightSizePolicy="StretchToParent" Brush="FaceLearner.Button" Command.Click="ExecuteNextImage" HorizontalAlignment="Right" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                      <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                    </ButtonWidget>
+                                  </Children>
+                                </Widget>
+                                <TextWidget Text="@AvailableImagesInfo" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="16" MarginTop="92" HorizontalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                <!-- Gender -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="36" MarginTop="115">
+                                  <Children>
+                                    <TextWidget Text="Gender:" WidthSizePolicy="Fixed" SuggestedWidth="55" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Text.Normal"/>
+                                    <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" MarginLeft="58" Command.Click="ExecuteToggleGender" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                      <Children><TextWidget Text="@GenderText" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Footer.Button.Text"/></Children>
+                                    </ButtonWidget>
+                                  </Children>
+                                </Widget>
+                                <!-- ACTIONS -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="165">
+                                  <Children>
+                                    <TextWidget Text="─── ACTIONS ───" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                  </Children>
+                                </Widget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="42" Brush="FaceLearner.Button" Command.Click="ExecuteGenerateFaceFromImage" MarginTop="192" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Generate from Image" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" Brush="FaceLearner.Button" Command.Click="ExecuteGenerateFace" MarginTop="240" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Random Face" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" Brush="FaceLearner.Button" Command.Click="ExecuteApplyToCharacter" MarginTop="278" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Apply to Game" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" Brush="FaceLearner.Button" Command.Click="ExecuteExportCharacter" MarginTop="316" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Export Code" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="32" Brush="FaceLearner.Button" Command.Click="ExecuteImportCharacter" MarginTop="354" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Import Code" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </Widget>
+                          </Children>
+                        </Widget>
+                      </Children>
+                    </Widget>
+                  </Children>
+                </Widget>
+
+                <!-- RIGHT PANEL: Log -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="294" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#C7A672FF">
+                  <Children>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#3A2A1AFF">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#1A1512FF">
+                          <Children>
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Sprite="Clan\panel_header">
+                              <Children>
+                                <TextWidget Text="Log" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Header.Text"/>
+                              </Children>
+                            </Widget>
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="48" MarginBottom="12" MarginLeft="12" MarginRight="12">
+                              <Children>
+                                <TextWidget Text="@GenerateLog" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="FaceLearner.Text.Small"/>
+                              </Children>
+                            </Widget>
+                          </Children>
+                        </Widget>
+                      </Children>
+                    </Widget>
+                  </Children>
+                </Widget>
+
+              </Children>
+            </Widget>
+
+            <!-- ========== EDIT PAGE ========== -->
+            <Widget Id="EditPageContent" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsEditPageActive">
+              <Children>
+
+                <!-- LEFT PANEL: Body Editor -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="294" Sprite="BlankWhiteSquare_9" Color="#C7A672FF">
+                  <Children>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#3A2A1AFF">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#1A1512FF">
+                          <Children>
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Sprite="Clan\panel_header">
+                              <Children>
+                                <TextWidget Text="Body Editor" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Header.Text"/>
+                              </Children>
+                            </Widget>
+
+                            <!-- Scrollable Body Content -->
+                            <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="48" MarginBottom="60" ClipRect="true" AutoHideScrollBars="true" InnerPanel="BodyInnerPanel" VerticalScrollbar="BodyScrollbar" MouseScrollAxis="Vertical">
+                              <Children>
+                                <Widget Id="BodyClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" ClipRect="true" MarginRight="12">
+                                  <Children>
+                                    <ListPanel Id="BodyInnerPanel" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="8" MarginRight="4" StackLayout.LayoutMethod="VerticalTopToBottom">
+                                      <Children>
+                                        <!-- View Toggle -->
+                                        <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30" Brush="FaceLearner.Button" Command.Click="ExecuteToggleView" MarginTop="4" MarginBottom="8" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                          <Children><TextWidget Text="@FaceZoomText" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                        </ButtonWidget>
+                                        
+                                        <!-- BODY SECTIONS ACCORDION -->
+                                        <ListPanel DataSource="{BodySections}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" StackLayout.LayoutMethod="VerticalTopToBottom">
+                                          <ItemTemplate>
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginBottom="4">
+                                              <Children>
+                                                <!-- Accordion Header -->
+                                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="28" Command.Click="ExecuteToggle" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                                  <Children>
+                                                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#2A2520FF"/>
+                                                    <TextWidget Text="@HeaderText" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="10" VerticalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                                  </Children>
+                                                </ButtonWidget>
+                                                <!-- Sliders (visible when expanded) -->
+                                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="30" IsVisible="@IsExpanded">
+                                                  <Children>
+                                                    <ListPanel DataSource="{Sliders}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="6" StackLayout.LayoutMethod="VerticalTopToBottom">
+                                                      <ItemTemplate>
+                                                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="26" MarginBottom="2" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                                          <Children>
+                                                            <TextWidget Text="@Name" WidthSizePolicy="Fixed" SuggestedWidth="55" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="22" MarginLeft="4" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecuteDecrease" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                                              <Children><TextWidget Text="-" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                                            </ButtonWidget>
+                                                            <TextWidget Text="@ValueText" WidthSizePolicy="Fixed" SuggestedWidth="44" HeightSizePolicy="StretchToParent" MarginLeft="4" MarginRight="4" VerticalAlignment="Center" HorizontalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="22" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecuteIncrease" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                                              <Children><TextWidget Text="+" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                                            </ButtonWidget>
+                                                          </Children>
+                                                        </ListPanel>
+                                                      </ItemTemplate>
+                                                    </ListPanel>
+                                                  </Children>
+                                                </Widget>
+                                              </Children>
+                                            </Widget>
+                                          </ItemTemplate>
+                                        </ListPanel>
+
+                                        <!-- APPEARANCE Section -->
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="12">
+                                          <Children><TextWidget Text="─ APPEARANCE ─" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/></Children>
+                                        </Widget>
+                                        <!-- Beard -->
+                                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="28" MarginTop="8" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                          <Children>
+                                            <TextWidget Text="Beard" WidthSizePolicy="Fixed" SuggestedWidth="50" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Text.Normal"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="24" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecutePrevBeardStyle" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                            <TextWidget Text="@BeardStyleText" WidthSizePolicy="Fixed" SuggestedWidth="40" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="24" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecuteNextBeardStyle" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                          </Children>
+                                        </ListPanel>
+                                        <!-- Hair -->
+                                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="28" MarginTop="4" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                          <Children>
+                                            <TextWidget Text="Hair" WidthSizePolicy="Fixed" SuggestedWidth="50" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Text.Normal"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="24" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecutePrevHairStyle" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                            <TextWidget Text="@HairStyleText" WidthSizePolicy="Fixed" SuggestedWidth="40" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="24" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecuteNextHairStyle" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                          </Children>
+                                        </ListPanel>
+                                        
+                                        <!-- ─ COLORS Section ─ -->
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="12">
+                                          <Children><TextWidget Text="─ COLORS ─" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/></Children>
+                                        </Widget>
+                                        <!-- Skin Tone -->
+                                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="26" MarginTop="6" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                          <Children>
+                                            <TextWidget Text="Skin" WidthSizePolicy="Fixed" SuggestedWidth="50" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="22" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecutePrevSkinTone" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                            <TextWidget Text="@SkinToneText" WidthSizePolicy="Fixed" SuggestedWidth="60" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="22" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecuteNextSkinTone" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                          </Children>
+                                        </ListPanel>
+                                        <!-- Eye Color -->
+                                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="26" MarginTop="4" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                          <Children>
+                                            <TextWidget Text="Eyes" WidthSizePolicy="Fixed" SuggestedWidth="50" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="22" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecutePrevEyeColor" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                            <TextWidget Text="@EyeColorText" WidthSizePolicy="Fixed" SuggestedWidth="60" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="22" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecuteNextEyeColor" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                          </Children>
+                                        </ListPanel>
+                                        <!-- Hair Color -->
+                                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="26" MarginTop="4" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                          <Children>
+                                            <TextWidget Text="Hair" WidthSizePolicy="Fixed" SuggestedWidth="50" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="22" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecutePrevHairColor" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&lt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                            <TextWidget Text="@HairColorText" WidthSizePolicy="Fixed" SuggestedWidth="60" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                            <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="28" SuggestedHeight="22" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecuteNextHairColor" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children><TextWidget Text="&gt;" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                            </ButtonWidget>
+                                          </Children>
+                                        </ListPanel>
+                                        <!-- Bottom Padding -->
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20"/>
+                                      </Children>
+                                    </ListPanel>
+                                  </Children>
+                                </Widget>
+                                <ScrollbarWidget Id="BodyScrollbar" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="8" HorizontalAlignment="Right" AlignmentAxis="Vertical" Handle="BodyHandle" MinValue="0" MaxValue="100" Brush="FaceLearner.Scrollbar.Track">
+                                  <Children>
+                                    <Widget Id="BodyHandle" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Brush="FaceLearner.Scrollbar.Handle"/>
+                                  </Children>
+                                </ScrollbarWidget>
+                              </Children>
+                            </ScrollablePanel>
+                            
+                            <!-- Bottom Buttons: Random / Reset -->
+                            <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="44" VerticalAlignment="Bottom" MarginLeft="10" MarginRight="10" MarginBottom="8" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                              <Children>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="FaceLearner.Button" Command.Click="ExecuteRandomize" MarginRight="4" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Random" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="FaceLearner.Button" Command.Click="ExecuteReset" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Reset" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </ListPanel>
+                          </Children>
+                        </Widget>
+                      </Children>
+                    </Widget>
+                  </Children>
+                </Widget>
+
+                <!-- CENTER: DNA Code Panel -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="300" MarginRight="326">
+                  <Children>
+                    <!-- DNA Code Input at Bottom -->
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" VerticalAlignment="Bottom" MarginLeft="10" MarginRight="10" MarginBottom="8">
+                      <Children>
+                        <!-- DNA Input Field -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="28" Sprite="BlankWhiteSquare_9" Color="#2A2520FF">
+                          <Children>
+                            <EditableTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Text="@PreviewCode" Brush="FaceLearner.EditableText" MarginLeft="6" MarginRight="6"/>
+                          </Children>
+                        </Widget>
+                        <!-- Buttons: Load / Copy / Apply -->
+                        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="26" MarginTop="32" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                          <Children>
+                            <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="FaceLearner.Button" Command.Click="ExecuteLoadCode" MarginRight="4" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                              <Children><TextWidget Text="Load" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                            </ButtonWidget>
+                            <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="FaceLearner.Button" Command.Click="ExecuteCopyCode" MarginRight="4" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                              <Children><TextWidget Text="Copy" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                            </ButtonWidget>
+                            <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="FaceLearner.Button" Command.Click="ExecuteApplyToGame" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                              <Children><TextWidget Text="Apply to Game" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                            </ButtonWidget>
+                          </Children>
+                        </ListPanel>
+                      </Children>
+                    </Widget>
+                  </Children>
+                </Widget>
+
+                <!-- RIGHT PANEL: Face Morphs with WORKING Accordion -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="320" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#C7A672FF">
+                  <Children>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#3A2A1AFF">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#1A1512FF">
+                          <Children>
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Sprite="Clan\panel_header">
+                              <Children>
+                                <TextWidget Text="Face Morphs" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Header.Text"/>
+                              </Children>
+                            </Widget>
+                            
+                            <!-- Face Lock Toggle -->
+                            <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30" Brush="FaceLearner.Button" Command.Click="ExecuteToggleFaceLock" MarginTop="48" MarginLeft="8" MarginRight="8" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                              <Children><TextWidget Text="@FaceLockText" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                            </ButtonWidget>
+                            
+                            <!-- MORPH CATEGORIES ACCORDION with ScrollablePanel -->
+                            <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="86" MarginBottom="8" ClipRect="true" AutoHideScrollBars="true" InnerPanel="MorphInnerPanel" VerticalScrollbar="MorphScrollbar" MouseScrollAxis="Vertical">
+                              <Children>
+                                <Widget Id="MorphClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" ClipRect="true" MarginRight="12">
+                                  <Children>
+                                    <ListPanel Id="MorphInnerPanel" DataSource="{MorphCategories}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="8" MarginRight="4" StackLayout.LayoutMethod="VerticalTopToBottom">
+                                      <ItemTemplate>
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginBottom="4">
+                                          <Children>
+                                            <!-- Category Header Button -->
+                                            <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="28" Command.Click="ExecuteToggle" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                              <Children>
+                                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#2A2520FF"/>
+                                                <TextWidget Text="@HeaderText" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="10" VerticalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                              </Children>
+                                            </ButtonWidget>
+                                            <!-- Morphs inside category (visible when expanded) -->
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="30" IsVisible="@IsExpanded">
+                                              <Children>
+                                                <ListPanel DataSource="{Morphs}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="4" StackLayout.LayoutMethod="VerticalTopToBottom">
+                                                  <ItemTemplate>
+                                                    <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" MarginBottom="2" StackLayout.LayoutMethod="HorizontalLeftToRight">
+                                                      <Children>
+                                                        <TextWidget Text="@Name" WidthSizePolicy="Fixed" SuggestedWidth="70" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                                        <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="24" SuggestedHeight="20" MarginLeft="4" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecuteDecrease" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                                          <Children><TextWidget Text="-" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                                        </ButtonWidget>
+                                                        <TextWidget Text="@ValueText" WidthSizePolicy="Fixed" SuggestedWidth="38" HeightSizePolicy="StretchToParent" MarginLeft="4" MarginRight="4" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                                        <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="24" SuggestedHeight="20" VerticalAlignment="Center" Brush="FaceLearner.Button" Command.Click="ExecuteIncrease" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                                          <Children><TextWidget Text="+" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                                        </ButtonWidget>
+                                                      </Children>
+                                                    </ListPanel>
+                                                  </ItemTemplate>
+                                                </ListPanel>
+                                              </Children>
+                                            </Widget>
+                                          </Children>
+                                        </Widget>
+                                      </ItemTemplate>
+                                    </ListPanel>
+                                  </Children>
+                                </Widget>
+                                <ScrollbarWidget Id="MorphScrollbar" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="8" HorizontalAlignment="Right" AlignmentAxis="Vertical" Handle="MorphHandle" MinValue="0" MaxValue="100" Brush="FaceLearner.Scrollbar.Track">
+                                  <Children>
+                                    <Widget Id="MorphHandle" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Brush="FaceLearner.Scrollbar.Handle"/>
+                                  </Children>
+                                </ScrollbarWidget>
+                              </Children>
+                            </ScrollablePanel>
+                          </Children>
+                        </Widget>
+                      </Children>
+                    </Widget>
+                  </Children>
+                </Widget>
+
+              </Children>
+            </Widget>
+
+            <!-- ========== LEARN PAGE ========== -->
+            <Widget Id="LearnPageContent" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" IsVisible="@IsLearnPageActive">
+              <Children>
+
+                <!-- LEFT PANEL: Learning Controls -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="294" Sprite="BlankWhiteSquare_9" Color="#C7A672FF">
+                  <Children>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#3A2A1AFF">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" Sprite="BlankWhiteSquare_9" Color="#1A1512FF">
+                          <Children>
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Sprite="Clan\panel_header">
+                              <Children>
+                                <TextWidget Text="Learning" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Header.Text"/>
+                              </Children>
+                            </Widget>
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="48" MarginBottom="12" MarginLeft="12" MarginRight="12">
+                              <Children>
+                                <!-- SYSTEM -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="4">
+                                  <Children>
+                                    <TextWidget Text="─── SYSTEM ───" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                  </Children>
+                                </Widget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Brush="FaceLearner.Button" Command.Click="ExecuteInit" MarginTop="30" IsEnabled="@IsNotMLLearning" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Initialize" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <!-- CONTROL -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="85">
+                                  <Children>
+                                    <TextWidget Text="─── CONTROL ───" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                  </Children>
+                                </Widget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Brush="FaceLearner.Button" Command.Click="ExecuteStart" MarginTop="111" IsEnabled="@IsNotMLLearning" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Start Learning" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Brush="FaceLearner.Button" Command.Click="ExecuteStop" MarginTop="157" IsEnabled="@IsMLLearning" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Stop" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="35" Brush="FaceLearner.Button" Command.Click="ExecuteCapture" MarginTop="203" IsEnabled="@IsNotMLLearning" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Capture" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="35" Brush="FaceLearner.Button" Command.Click="ExecuteMorphTest" MarginTop="243" IsEnabled="@IsNotMLLearning" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Test Morphs" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <!-- LIVE STATUS - The stuff that actually changes! -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="290">
+                                  <Children>
+                                    <TextWidget Text="─── LIVE ───" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                  </Children>
+                                </Widget>
+                                <!-- FeatureStats: Phase, Morphs, Locked, Iter -->
+                                <TextWidget Text="@FeatureStats" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="316" Brush="FaceLearner.Text.Normal"/>
+                                <!-- Score: Current vs Best -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="420">
+                                  <Children>
+                                    <TextWidget Text="─── SCORE ───" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                  </Children>
+                                </Widget>
+                                <TextWidget Text="@RunStatus" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="446" Brush="FaceLearner.Text.Normal"/>
+                                <!-- VIEW -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="510">
+                                  <Children>
+                                    <TextWidget Text="─── VIEW ───" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                  </Children>
+                                </Widget>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="34" Brush="FaceLearner.Button" Command.Click="ExecuteToggleView" MarginTop="536" IsEnabled="@IsNotMLLearning" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="@FaceZoomText" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                                <!-- ML STATUS -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="22" MarginTop="585">
+                                  <Children>
+                                    <TextWidget Text="─── ML ───" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                  </Children>
+                                </Widget>
+                                <TextWidget Text="@MLAddonStatus" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20" MarginTop="611" HorizontalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="28" Brush="FaceLearner.Button" Command.Click="ExecuteResetKnowledge" MarginTop="636" IsEnabled="@IsNotMLLearning" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                                  <Children><TextWidget Text="Reset Knowledge" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Button.Text"/></Children>
+                                </ButtonWidget>
+                              </Children>
+                            </Widget>
+                          </Children>
+                        </Widget>
+                      </Children>
+                    </Widget>
+                  </Children>
+                </Widget>
+
+                <!-- RIGHT PANEL: Stats + Activity Log -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="294" HorizontalAlignment="Right" ClipContents="true" Sprite="BlankWhiteSquare_9" Color="#C7A672FF">
+                  <Children>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" ClipContents="true" Sprite="BlankWhiteSquare_9" Color="#3A2A1AFF">
+                      <Children>
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="1" MarginRight="1" MarginTop="1" MarginBottom="1" ClipContents="true" Sprite="BlankWhiteSquare_9" Color="#1A1512FF">
+                          <Children>
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Sprite="Clan\panel_header">
+                              <Children>
+                                <TextWidget Text="Knowledge &amp; Log" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="FaceLearner.Header.Text"/>
+                              </Children>
+                            </Widget>
+                            <!-- Knowledge Section -->
+                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="120" MarginTop="48" MarginLeft="8" MarginRight="8">
+                              <Children>
+                                <TextWidget Text="─ KNOWLEDGE ─" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="16" HorizontalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+                                <TextWidget Text="@TreeStats" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="18" Brush="FaceLearner.Text.Small"/>
+                                <!-- Session Summary -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="1" MarginTop="80" Sprite="BlankWhiteSquare_9" Color="#3A3530FF"/>
+                                <TextWidget Text="@SessionStats" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="86" Brush="FaceLearner.Text.Small"/>
+                              </Children>
+                            </Widget>
+                            <!-- Session Trend -->
+                            <TextWidget Text="@SessionTrend" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="16" MarginTop="175" MarginLeft="8" MarginRight="8" Brush="FaceLearner.Text.Small"/>
+                            <!-- Activity Log Header -->
+                            <TextWidget Text="─ ACTIVITY LOG ─" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="18" HorizontalAlignment="Center" MarginTop="200" MarginLeft="8" MarginRight="8" Brush="FaceLearner.Section.Label"/>
+                            <!-- Scrollable Log Area -->
+                            <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="223" MarginBottom="8" MarginLeft="8" MarginRight="8" ClipRect="true" AutoHideScrollBars="false" InnerPanel="LogInnerPanel" VerticalScrollbar="LogScrollbar">
+                              <Children>
+                                <ListPanel Id="LogInnerPanel" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginRight="12" StackLayout.LayoutMethod="VerticalBottomToTop">
+                                  <Children>
+                                    <TextWidget Text="@LogText" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginLeft="4" MarginRight="4" Brush="FaceLearner.Text.Small"/>
+                                  </Children>
+                                </ListPanel>
+                                <ScrollbarWidget Id="LogScrollbar" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="8" HorizontalAlignment="Right" AlignmentAxis="Vertical" Handle="LogHandle" MinValue="0" MaxValue="100" Brush="FaceLearner.Scrollbar.Track">
+                                  <Children>
+                                    <Widget Id="LogHandle" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" Brush="FaceLearner.Scrollbar.Handle"/>
+                                  </Children>
+                                </ScrollbarWidget>
+                              </Children>
+                            </ScrollablePanel>
+                          </Children>
+                        </Widget>
+                      </Children>
+                    </Widget>
+                  </Children>
+                </Widget>
+
+              </Children>
+            </Widget>
+
+          </Children>
+        </Widget>
+
+        <!-- ==================== BOTTOM FOOTER BAR ==================== -->
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="48" VerticalAlignment="Bottom" Sprite="Clan\flat_header">
+          <Children>
+            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" StackLayout.LayoutMethod="HorizontalLeftToRight">
+              <Children>
+                <TextWidget Text="@VersionText" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" MarginRight="15" Brush="FaceLearner.Text.Status"/>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="1" SuggestedHeight="24" VerticalAlignment="Center" MarginRight="15" Sprite="BlankWhiteSquare_9" Color="#5A4A3AFF"/>
+                <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Command.Click="ExecuteSelectGeneratePage" MarginRight="6" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                  <Children><TextWidget Text="Generate" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Footer.Button.Text"/></Children>
+                </ButtonWidget>
+                <TextWidget Text="|" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" MarginRight="6" Brush="FaceLearner.Text.Status"/>
+                <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Command.Click="ExecuteSelectEditPage" MarginRight="6" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                  <Children><TextWidget Text="Edit" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Footer.Button.Text"/></Children>
+                </ButtonWidget>
+                <TextWidget Text="|" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" MarginRight="6" Brush="FaceLearner.Text.Status"/>
+                <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Command.Click="ExecuteSelectLearnPage" MarginRight="6" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                  <Children><TextWidget Text="Learn" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Footer.Button.Text"/></Children>
+                </ButtonWidget>
+                <TextWidget Text="|" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" MarginRight="6" Brush="FaceLearner.Text.Status"/>
+                <ButtonWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Command.Click="ExecuteExit" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+                  <Children><TextWidget Text="Exit" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Footer.Button.Text"/></Children>
+                </ButtonWidget>
+              </Children>
+            </ListPanel>
+          </Children>
+        </Widget>
+
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

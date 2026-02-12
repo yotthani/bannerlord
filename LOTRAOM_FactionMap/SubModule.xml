@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name value="LOTRAOM Faction Map" />
+  <Id value="LOTRAOM.FactionMap" />
+  <Version value="v0.1.0" />
+  <SingleplayerModule value="true" />
+  <MultiplayerModule value="false" />
+  <Official value="false" />
+
+  <DependedModules>
+    <DependedModule Id="Native" DependentVersion="e1.0.0" Optional="false" />
+    <DependedModule Id="SandBoxCore" DependentVersion="e1.0.0" Optional="false" />
+    <DependedModule Id="Sandbox" DependentVersion="e1.0.0" Optional="false" />
+    <DependedModule Id="StoryMode" DependentVersion="e1.0.0" Optional="true" />
+    <DependedModule Id="Bannerlord.Harmony" DependentVersion="v1.0.0" Optional="false" />
+  </DependedModules>
+
+  <SubModules>
+    <SubModule>
+      <Name value="LOTRAOM.FactionMap" />
+      <DLLName value="LOTRAOM.FactionMap.dll" />
+      <SubModuleClassType value="LOTRAOM.FactionMap.SubModule" />
+      <Tags>
+        <Tag key="DedicatedServerType" value="none" />
+        <Tag key="IsNoRenderModeElement" value="false" />
+      </Tags>
+    </SubModule>
+  </SubModules>
+
+  <Xmls />
+</Module>

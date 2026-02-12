@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ════════════════════════════════════════════════════════════════════════════
+  EXAMPLE: Basic Theme Structure
+  ════════════════════════════════════════════════════════════════════════════
+  
+  This is a reference example - NOT loaded by the game.
+  Copy this folder to Themes/ and rename to create your own theme.
+  
+  FOLDER STRUCTURE:
+  
+  Themes/
+  └── YourThemeName/
+      ├── ThemeManifest.xml       (this file)
+      └── GUI/
+          └── Brushes/
+              └── YourBrushes.xml
+  
+  HOW IT WORKS:
+  
+  1. Game loads vanilla brush "ButtonBrush"
+  2. Your theme adds "ButtonBrush.YourTheme"  
+  3. When active, patch redirects "ButtonBrush" -> "ButtonBrush.YourTheme"
+  4. No vanilla files modified!
+  
+  BRUSH NAMING: OriginalName.ThemeId
+    ButtonBrush       -> ButtonBrush.MyTheme
+    Standard.Panel    -> Standard.Panel.MyTheme
+-->
+<Theme>
+  <!-- REQUIRED: Must match folder name -->
+  <Id>ExampleTheme</Id>
+  
+  <!-- Display name in settings -->
+  <n>Example Theme</n>
+  
+  <Description>An example theme showing the basic structure</Description>
+  <Author>Your Name</Author>
+  <Version>1.0.0</Version>
+  
+  <!-- 
+    KINGDOM BINDINGS - Auto-switch when player joins these kingdoms
+    Known IDs: vlandia, battania, empire, empire_w, empire_s, sturgia, aserai, khuzait
+  -->
+  <KingdomBindings>
+    <!-- <Kingdom id="vlandia" /> -->
+  </KingdomBindings>
+  
+  <Components>
+    <Brushes enabled="true" />
+    <Sprites enabled="false" />
+  </Components>
+  
+  <!-- Reference colors - not used by system, just documentation -->
+  <ColorPalette>
+    <Background>#1E1E1E</Background>
+    <Surface>#2D2D30</Surface>
+    <Border>#3E3E42</Border>
+    <Primary>#007ACC</Primary>
+    <Secondary>#68217A</Secondary>
+    <Accent>#00D4AA</Accent>
+    <TextPrimary>#F1F1F1</TextPrimary>
+    <TextSecondary>#CCCCCC</TextSecondary>
+    <TextMuted>#808080</TextMuted>
+    <Positive>#90EE90</Positive>
+    <Negative>#FF6B6B</Negative>
+    <Warning>#FFD700</Warning>
+  </ColorPalette>
+</Theme>

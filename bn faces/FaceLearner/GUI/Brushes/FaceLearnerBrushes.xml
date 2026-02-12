@@ -1,0 +1,426 @@
+<Brushes>
+
+  <!-- ==================== PANEL BACKGROUNDS ==================== -->
+  <Brush Name="FaceLearner.Panel.Dark">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#1A1512FF"/>
+      <BrushLayer Name="Border" Sprite="BlankWhiteSquare_9" Color="#3D3226FF" ExtendLeft="-2" ExtendRight="-2" ExtendTop="-2" ExtendBottom="-2"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+        <BrushLayer Name="Border"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <!-- Panel with gold border and 3D effect -->
+  <Brush Name="FaceLearner.Panel.GoldBorder">
+    <Layers>
+      <!-- Main panel background -->
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#1A1512FF"/>
+      <!-- Gold border -->
+      <BrushLayer Name="GoldBorder" Sprite="BlankWhiteSquare_9" Color="#C7A672FF" ExtendLeft="-2" ExtendRight="-2" ExtendTop="-2" ExtendBottom="-2"/>
+      <!-- Dark outer edge for depth -->
+      <BrushLayer Name="DarkEdge" Sprite="BlankWhiteSquare_9" Color="#3A2A1AFF" ExtendLeft="-3" ExtendRight="-3" ExtendTop="-3" ExtendBottom="-3"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="DarkEdge"/>
+        <BrushLayer Name="GoldBorder"/>
+        <BrushLayer Name="Default"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Panel.Medium">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#252019FF"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Inset.Deep">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#080606FF"/>
+      <BrushLayer Name="InnerShadow" Sprite="BlankWhiteSquare_9" Color="#000000AA" ExtendLeft="2" ExtendRight="2" ExtendTop="2" ExtendBottom="2"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+        <BrushLayer Name="InnerShadow"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <!-- ==================== TEXT BRUSHES ==================== -->
+  <Brush Name="FaceLearner.Text.Title" Font="Galahad" TextHorizontalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColor="#D4AF37FF" FontSize="26" TextGlowColor="#00000088" TextGlowRadius="3"/>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Header.Text" Font="Galahad" TextHorizontalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColor="#C7A672FF" FontSize="17" TextGlowColor="#00000066" TextGlowRadius="2"/>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Section.Label" Font="FiraSansExtraCondensed-Regular" TextHorizontalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColor="#9A8360FF" FontSize="12"/>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Text.Normal" Font="FiraSansExtraCondensed-Regular" TextHorizontalAlignment="Left">
+    <Styles>
+      <Style Name="Default" FontColor="#F4E1C4FF" FontSize="15"/>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Text.Small" Font="FiraSansExtraCondensed-Regular" TextHorizontalAlignment="Left">
+    <Styles>
+      <Style Name="Default" FontColor="#B8A080FF" FontSize="13"/>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Text.Log" Font="FiraSansExtraCondensed-Regular" TextHorizontalAlignment="Left">
+    <Styles>
+      <Style Name="Default" FontColor="#8A8070FF" FontSize="12"/>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Text.Status" Font="FiraSansExtraCondensed-Regular" TextHorizontalAlignment="Left">
+    <Styles>
+      <Style Name="Default" FontColor="#8A7350FF" FontSize="12"/>
+    </Styles>
+  </Brush>
+
+  <!-- Footer nav button text with hover/click effects -->
+  <Brush Name="FaceLearner.Footer.Button.Text" Font="FiraSansExtraCondensed-Regular" TextHorizontalAlignment="Center" TextVerticalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColor="#9A8A70FF" FontSize="14"/>
+      <Style Name="Hovered" FontColor="#E8D8B8FF" FontSize="14" TextGlowColor="#C7A67244" TextGlowRadius="3"/>
+      <Style Name="Pressed" FontColor="#6A5A40FF" FontSize="14"/>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.EditableText" Font="FiraSansExtraCondensed-Regular" TextHorizontalAlignment="Left" TextVerticalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColor="#C4B8A0FF" FontSize="14"/>
+    </Styles>
+  </Brush>
+
+  <!-- ==================== BUTTON BRUSHES ==================== -->
+  <Brush Name="FaceLearner.Button">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#2C251FFF"/>
+      <BrushLayer Name="Highlight" Sprite="BlankWhiteSquare_9" Color="#4A3D30FF" ExtendTop="-1" ExtendLeft="-1" ExtendRight="-1" ExtendBottom="-1"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default" ColorFactor="1.0"/>
+        <BrushLayer Name="Highlight" ColorFactor="0.0"/>
+      </Style>
+      <Style Name="Hovered">
+        <BrushLayer Name="Default" ColorFactor="1.3"/>
+        <BrushLayer Name="Highlight" ColorFactor="1.0"/>
+      </Style>
+      <Style Name="Pressed">
+        <BrushLayer Name="Default" ColorFactor="0.6"/>
+        <BrushLayer Name="Highlight" ColorFactor="0.0"/>
+      </Style>
+      <Style Name="Disabled">
+        <BrushLayer Name="Default" ColorFactor="0.35"/>
+        <BrushLayer Name="Highlight" ColorFactor="0.0"/>
+      </Style>
+    </Styles>
+    <SoundProperties>
+      <StateSounds>
+        <StateSound StateName="Hovered" Audio="panel_hover"/>
+      </StateSounds>
+      <EventSounds>
+        <EventSound EventName="Click" Audio="checkbox"/>
+      </EventSounds>
+    </SoundProperties>
+  </Brush>
+
+  <Brush Name="FaceLearner.Button.Positive">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#1B3D1BFF"/>
+      <BrushLayer Name="Glow" Sprite="BlankWhiteSquare_9" Color="#3D8B3DFF" ExtendTop="-1" ExtendLeft="-1" ExtendRight="-1" ExtendBottom="-1"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default" ColorFactor="1.0"/>
+        <BrushLayer Name="Glow" ColorFactor="0.0"/>
+      </Style>
+      <Style Name="Hovered">
+        <BrushLayer Name="Default" ColorFactor="1.4"/>
+        <BrushLayer Name="Glow" ColorFactor="0.6"/>
+      </Style>
+      <Style Name="Pressed">
+        <BrushLayer Name="Default" ColorFactor="0.6"/>
+        <BrushLayer Name="Glow" ColorFactor="0.0"/>
+      </Style>
+      <Style Name="Disabled">
+        <BrushLayer Name="Default" ColorFactor="0.25"/>
+        <BrushLayer Name="Glow" ColorFactor="0.0"/>
+      </Style>
+    </Styles>
+    <SoundProperties>
+      <StateSounds>
+        <StateSound StateName="Hovered" Audio="panel_hover"/>
+      </StateSounds>
+      <EventSounds>
+        <EventSound EventName="Click" Audio="checkbox"/>
+      </EventSounds>
+    </SoundProperties>
+  </Brush>
+
+  <Brush Name="FaceLearner.Button.Negative">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#3D1B1BFF"/>
+      <BrushLayer Name="Glow" Sprite="BlankWhiteSquare_9" Color="#8B3D3DFF" ExtendTop="-1" ExtendLeft="-1" ExtendRight="-1" ExtendBottom="-1"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default" ColorFactor="1.0"/>
+        <BrushLayer Name="Glow" ColorFactor="0.0"/>
+      </Style>
+      <Style Name="Hovered">
+        <BrushLayer Name="Default" ColorFactor="1.4"/>
+        <BrushLayer Name="Glow" ColorFactor="0.6"/>
+      </Style>
+      <Style Name="Pressed">
+        <BrushLayer Name="Default" ColorFactor="0.6"/>
+        <BrushLayer Name="Glow" ColorFactor="0.0"/>
+      </Style>
+      <Style Name="Disabled">
+        <BrushLayer Name="Default" ColorFactor="0.25"/>
+        <BrushLayer Name="Glow" ColorFactor="0.0"/>
+      </Style>
+    </Styles>
+    <SoundProperties>
+      <StateSounds>
+        <StateSound StateName="Hovered" Audio="panel_hover"/>
+      </StateSounds>
+      <EventSounds>
+        <EventSound EventName="Click" Audio="checkbox"/>
+      </EventSounds>
+    </SoundProperties>
+  </Brush>
+
+  <Brush Name="FaceLearner.Button.Small">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#2B2218FF"/>
+      <BrushLayer Name="Border" Sprite="BlankWhiteSquare_9" Color="#4A3D30FF" ExtendTop="-1" ExtendLeft="-1" ExtendRight="-1" ExtendBottom="-1"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default" ColorFactor="1.0"/>
+        <BrushLayer Name="Border" ColorFactor="0.5"/>
+      </Style>
+      <Style Name="Hovered">
+        <BrushLayer Name="Default" ColorFactor="1.4"/>
+        <BrushLayer Name="Border" ColorFactor="1.2"/>
+      </Style>
+      <Style Name="Pressed">
+        <BrushLayer Name="Default" ColorFactor="0.5"/>
+        <BrushLayer Name="Border" ColorFactor="0.3"/>
+      </Style>
+    </Styles>
+    <SoundProperties>
+      <StateSounds>
+        <StateSound StateName="Hovered" Audio="panel_hover"/>
+      </StateSounds>
+      <EventSounds>
+        <EventSound EventName="Click" Audio="checkbox"/>
+      </EventSounds>
+    </SoundProperties>
+  </Brush>
+
+  <!-- Button Text with hover effects -->
+  <Brush Name="FaceLearner.Button.Text" Font="FiraSansExtraCondensed-Regular" TextHorizontalAlignment="Center" TextVerticalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColor="#C4B8A0FF" FontSize="15"/>
+      <Style Name="Hovered" FontColor="#FFFEF0FF" FontSize="15" TextGlowColor="#C7A67244" TextGlowRadius="2"/>
+      <Style Name="Pressed" FontColor="#8A8070FF" FontSize="15"/>
+      <Style Name="Disabled" FontColor="#4A4540FF" FontSize="15"/>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Button.Text.Small" Font="FiraSansExtraCondensed-Regular" TextHorizontalAlignment="Center" TextVerticalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColor="#C7A672FF" FontSize="18"/>
+      <Style Name="Hovered" FontColor="#FFE8B0FF" FontSize="18" TextGlowColor="#C7A67266" TextGlowRadius="3"/>
+      <Style Name="Pressed" FontColor="#8A7350FF" FontSize="18"/>
+    </Styles>
+  </Brush>
+
+  <!-- ==================== SCROLLBAR ==================== -->
+  <Brush Name="FaceLearner.Scrollbar.Track">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#0A0908FF"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Scrollbar.Handle">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#4A3B2AFF"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default" ColorFactor="1.0"/>
+      </Style>
+      <Style Name="Hovered">
+        <BrushLayer Name="Default" ColorFactor="1.5"/>
+      </Style>
+      <Style Name="Pressed">
+        <BrushLayer Name="Default" ColorFactor="1.8" Color="#C7A672FF"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <!-- ==================== INDICATORS ==================== -->
+  <Brush Name="FaceLearner.Indicator.Green">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#4CAF50FF"/>
+      <BrushLayer Name="Glow" Sprite="BlankWhiteSquare_9" Color="#7CDF80FF" ExtendLeft="1" ExtendRight="1"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+        <BrushLayer Name="Glow" ColorFactor="0.4"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Indicator.Red">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#E53935FF"/>
+      <BrushLayer Name="Glow" Sprite="BlankWhiteSquare_9" Color="#FF6659FF" ExtendLeft="1" ExtendRight="1"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+        <BrushLayer Name="Glow" ColorFactor="0.4"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Indicator.Blue">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#2196F3FF"/>
+      <BrushLayer Name="Glow" Sprite="BlankWhiteSquare_9" Color="#64B5F6FF" ExtendLeft="1" ExtendRight="1"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+        <BrushLayer Name="Glow" ColorFactor="0.4"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <!-- ==================== PROGRESS BAR ==================== -->
+  <Brush Name="FaceLearner.Progress.Track">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#1A1512FF"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Progress.Fill">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#C7A672FF"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <!-- ==================== SLIDER (for Edit page) ==================== -->
+  <!-- Based on TaleWorlds SPOptions slider pattern -->
+  <Brush Name="FaceLearner.Slider.Handle">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#D4B896FF"/>
+      <BrushLayer Name="Hovered" Sprite="BlankWhiteSquare_9" Color="#E8CCA8FF"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+      </Style>
+      <Style Name="Hovered">
+        <BrushLayer Name="Hovered"/>
+      </Style>
+      <Style Name="Pressed">
+        <BrushLayer Name="Hovered" ColorFactor="0.8"/>
+      </Style>
+      <Style Name="Disabled">
+        <BrushLayer Name="Default" ColorFactor="0.3" AlphaFactor="0.5"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Slider.Background">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#3A3530FF"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Slider.Filler">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#C7A672FF"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceLearner.Slider.Handle">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" Color="#D4B896FF"/>
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+        <BrushLayer Name="Default" ColorFactor="1.0"/>
+      </Style>
+      <Style Name="Hovered">
+        <BrushLayer Name="Default" ColorFactor="1.3"/>
+      </Style>
+      <Style Name="Pressed">
+        <BrushLayer Name="Default" ColorFactor="0.8"/>
+      </Style>
+    </Styles>
+  </Brush>
+
+  <!-- ==================== SCORE TEXT ==================== -->
+  <Brush Name="FaceLearner.Score.Text" Font="Galahad" TextHorizontalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColor="#4CAF50FF" FontSize="22" TextGlowColor="#4CAF5044" TextGlowRadius="3"/>
+    </Styles>
+  </Brush>
+
+</Brushes>

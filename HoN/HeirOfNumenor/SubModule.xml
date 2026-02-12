@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name value="Heir of Numenor (Extension)" />
+  <Id value="HeirOfNumenor" />
+  <Version value="v2.0.0" />
+  <SingleplayerModule value="true" />
+  <MultiplayerModule value="false" />
+  <Official value="false"/>
+  <DependedModules>
+    <DependedModule Id="Native" DependentVersion="v1.3.0" Optional="false"/>
+    <DependedModule Id="SandBoxCore" DependentVersion="v1.3.0" Optional="false"/>
+    <DependedModule Id="Sandbox" DependentVersion="v1.3.0" Optional="false"/>
+    <DependedModule Id="StoryMode" DependentVersion="v1.3.0" Optional="true"/>
+    <DependedModule Id="Bannerlord.MBOptionScreen" DependentVersion="v5.0.0" Optional="true"/>
+    <!-- GUI assets (Prefabs, Brushes, Sprites) are in this module -->
+    <DependedModule Id="HeirOfNumenorGUI" DependentVersion="v1.0.0" Optional="false"/>
+  </DependedModules>
+  <SubModules>
+    <SubModule>
+      <Name value="HeirOfNumenor" />
+      <DLLName value="HeirOfNumenor.dll" />
+      <SubModuleClassType value="HeirOfNumenor.SubModule" />
+      <Tags>
+        <Tag key="DedicatedServerType" value="none" />
+        <Tag key="IsNoRenderModeElement" value="false" />
+      </Tags>
+    </SubModule>
+  </SubModules>
+  <Xmls>
+    <!-- Ring Item Modifiers for power progression -->
+    <XmlNode>
+      <XmlName id="ItemModifiers" path="ring_modifiers"/>
+      <IncludedGameTypes>
+        <GameType value="Campaign"/>
+        <GameType value="CampaignStoryMode"/>
+      </IncludedGameTypes>
+    </XmlNode>
+    <!-- Ring Item Modifier Groups -->
+    <XmlNode>
+      <XmlName id="ItemModifierGroups" path="ring_modifier_groups"/>
+      <IncludedGameTypes>
+        <GameType value="Campaign"/>
+        <GameType value="CampaignStoryMode"/>
+      </IncludedGameTypes>
+    </XmlNode>
+    <!-- Rings of Power Items -->
+    <XmlNode>
+      <XmlName id="Items" path="rings_of_power"/>
+      <IncludedGameTypes>
+        <GameType value="Campaign"/>
+        <GameType value="CampaignStoryMode"/>
+      </IncludedGameTypes>
+    </XmlNode>
+    <!-- Culture Resources Configuration -->
+    <XmlNode>
+      <XmlName id="CultureResources" path="culture_resources"/>
+      <IncludedGameTypes>
+        <GameType value="Campaign"/>
+        <GameType value="CampaignStoryMode"/>
+      </IncludedGameTypes>
+    </XmlNode>
+  </Xmls>
+</Module>

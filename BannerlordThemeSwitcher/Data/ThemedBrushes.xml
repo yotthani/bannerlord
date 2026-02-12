@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+═══════════════════════════════════════════════════════════════════════════════════════════════
+THEMED BRUSHES WITH COLOR SCHEME REFERENCES
+
+Uses ColorRef attributes to reference colors from the theme's ColorScheme.
+At runtime, ColorRef values are resolved to actual colors based on the active theme.
+
+Available ColorRef values:
+  Primary, Secondary, Tertiary
+  Text, TextMuted, TextHighlight, TextTitle, TextOnPrimary, TextDisabled
+  Background, BackgroundDark, BackgroundLight, BackgroundAccent, BackgroundHover, BackgroundSelected
+  Border, BorderMuted, BorderHighlight, BorderSecondary
+  ButtonBackground, ButtonHover, ButtonPressed, ButtonDisabled, ButtonBorder
+  Success, Warning, Error, Info
+  Gold, Experience, Health, Morale, Shadow, Glow
+
+Usage with ColorRef (recommended - adapts to theme):
+  <BrushLayer Name="Default" ColorRef="Primary" />
+  <Style Name="Default" FontColorRef="Text" />
+
+Usage with direct Color (for special one-off colors not in scheme):
+  <BrushLayer Name="Default" Color="#FF0000" />
+  <BrushLayer Name="Default" Color="#FF0000AA" />  (with alpha)
+  <Style Name="Default" FontColor="#FFFFFF" />
+
+Note: ColorRef takes priority over Color if both are specified.
+Color format: #RRGGBB or #RRGGBBAA (6 or 8 hex chars)
+═══════════════════════════════════════════════════════════════════════════════════════════════
+-->
+<Brushes>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- CHARACTER CREATION -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Culture selection button frame -->
+  <Brush Name="CharacterCreation.Culture.Button.Frame" TransitionDuration="0.22">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="rounded_frame_9" ColorRef="Border" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Border" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BorderHighlight" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BorderHighlight" /></Style>
+    </Styles>
+  </Brush>
+
+  <!-- Culture selection button background -->
+  <Brush Name="CharacterCreation.Culture.Button" TransitionDuration="0.22">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="rounded_canvas_9" ColorRef="ButtonBackground" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="ButtonBackground" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="ButtonHover" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BackgroundSelected" /></Style>
+    </Styles>
+  </Brush>
+
+  <!-- Stage title -->
+  <Brush Name="Stage.Title.Text" Font="Galahad" TextHorizontalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextTitle" TextOutlineColorRef="Shadow" TextOutlineAmount="0.1" FontSize="42" />
+    </Styles>
+  </Brush>
+
+  <!-- Culture name text -->
+  <Brush Name="Culture.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" />
+      <Style Name="Hovered" FontColorRef="TextHighlight" />
+      <Style Name="Selected" FontColorRef="TextHighlight" />
+    </Styles>
+  </Brush>
+
+  <!-- Generic button text -->
+  <Brush Name="Generic.Button.Text" Font="FiraSansExtraCondensed-Regular">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="32" />
+      <Style Name="Hovered" FontColorRef="TextHighlight" FontSize="32" />
+      <Style Name="Pressed" FontColorRef="Primary" FontSize="32" />
+      <Style Name="Disabled" FontColorRef="TextDisabled" FontSize="32" />
+    </Styles>
+  </Brush>
+
+  <!-- Stage descriptions -->
+  <Brush Name="Stage.Description.Text" Font="FiraSansExtraCondensed-Regular">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="32" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Stage.Selection.Description.Text" Font="FiraSansExtraCondensed-Regular">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextMuted" FontSize="23" />
+    </Styles>
+  </Brush>
+
+  <!-- Positive/negative effects -->
+  <Brush Name="Stage.PositiveEffect.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Success" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Stage.NegativeEffect.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Error" />
+    </Styles>
+  </Brush>
+
+  <!-- Selection frame -->
+  <Brush Name="CharacterCreation.Selection.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <!-- Review texts -->
+  <Brush Name="Review.Title.Text" Font="Galahad">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextTitle" FontSize="28" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Review.Value.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="20" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Review.Description.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextMuted" FontSize="18" />
+    </Styles>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- POPUPS & DIALOGS -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="Popup.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Popup.Background">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Popup.Title.Text" Font="Galahad" TextHorizontalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextTitle" FontSize="36" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Popup.Description.Text" Font="FiraSansExtraCondensed-Regular">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="20" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Popup.Button.Text" Font="Galahad" TextHorizontalAlignment="Center">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="24" />
+      <Style Name="Hovered" FontColorRef="TextHighlight" FontSize="24" />
+      <Style Name="Pressed" FontColorRef="Primary" FontSize="24" />
+      <Style Name="Disabled" FontColorRef="TextDisabled" FontSize="24" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Popup.Button.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="button_frame_9" ColorRef="ButtonBorder" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="ButtonBorder" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BorderHighlight" /></Style>
+      <Style Name="Disabled"><BrushLayer Name="Default" ColorRef="BorderMuted" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="Popup.Button.Background">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="button_canvas_9" ColorRef="ButtonBackground" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="ButtonBackground" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="ButtonHover" /></Style>
+      <Style Name="Pressed"><BrushLayer Name="Default" ColorRef="ButtonPressed" /></Style>
+      <Style Name="Disabled"><BrushLayer Name="Default" ColorRef="ButtonDisabled" /></Style>
+    </Styles>
+  </Brush>
+
+  <!-- Info/Warning messages -->
+  <Brush Name="Popup.Info.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Info" FontSize="18" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Popup.Warning.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Warning" FontSize="18" />
+    </Styles>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- STANDARD UI ELEMENTS -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Back button -->
+  <Brush Name="Standard.BackButton">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="button_canvas_9" ColorRef="ButtonBackground" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="ButtonBackground" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="ButtonHover" /></Style>
+      <Style Name="Pressed"><BrushLayer Name="Default" ColorRef="ButtonPressed" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="Standard.BackButton.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" />
+      <Style Name="Hovered" FontColorRef="TextHighlight" />
+    </Styles>
+  </Brush>
+
+  <!-- Dropdown -->
+  <Brush Name="Standard.DropdownItem">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Background" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Background" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BackgroundHover" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BackgroundSelected" /></Style>
+    </Styles>
+  </Brush>
+
+  <!-- Headers -->
+  <Brush Name="Header.Text" Font="Galahad">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextTitle" FontSize="32" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="SubHeader.Text" Font="FiraSansExtraCondensed-Medium">
+    <Styles>
+      <Style Name="Default" FontColorRef="Primary" FontSize="24" />
+    </Styles>
+  </Brush>
+
+  <!-- Body/description text -->
+  <Brush Name="Body.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="18" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Muted.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextMuted" FontSize="16" />
+    </Styles>
+  </Brush>
+
+  <!-- Panel frame/background -->
+  <Brush Name="Panel.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Panel.Background">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteSquare_9" ColorRef="Background" />
+    </Layers>
+  </Brush>
+
+  <!-- Scrollbar -->
+  <Brush Name="Scrollbar.Track">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BackgroundLight" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Scrollbar.Thumb">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Border" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Border" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BorderHighlight" /></Style>
+    </Styles>
+  </Brush>
+
+  <!-- Divider -->
+  <Brush Name="Divider">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BorderMuted" />
+    </Layers>
+  </Brush>
+
+  <!-- Tabs -->
+  <Brush Name="Tab.Background">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Background" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Background" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BackgroundHover" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BackgroundSelected" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="Tab.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextMuted" />
+      <Style Name="Hovered" FontColorRef="Text" />
+      <Style Name="Selected" FontColorRef="TextHighlight" />
+    </Styles>
+  </Brush>
+
+  <!-- Checkbox -->
+  <Brush Name="Checkbox.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="rounded_frame_9" ColorRef="Border" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Border" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="Primary" /></Style>
+    </Styles>
+  </Brush>
+
+  <!-- Slider -->
+  <Brush Name="Slider.Track">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BackgroundLight" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Slider.Fill">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Primary" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Slider.Thumb">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="BlankWhiteCircle" ColorRef="Primary" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Primary" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="TextHighlight" /></Style>
+    </Styles>
+  </Brush>
+
+  <!-- Progress bar -->
+  <Brush Name="ProgressBar.Background">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="ProgressBar.Fill">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Primary" />
+    </Layers>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- ESCAPE MENU -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="EscapeMenu.Background">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="esc_menu_frame_canvas_9" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="EscapeMenu.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="EscapeMenu.Button">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="ButtonBackground" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="ButtonBackground" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="ButtonHover" /></Style>
+      <Style Name="Pressed"><BrushLayer Name="Default" ColorRef="ButtonPressed" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="EscapeMenu.Button.Text" Font="Galahad">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="28" />
+      <Style Name="Hovered" FontColorRef="TextHighlight" FontSize="28" />
+    </Styles>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- ENCYCLOPEDIA -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="Encyclopedia.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Encyclopedia.Title" Font="Galahad">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextTitle" FontSize="36" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Encyclopedia.Link">
+    <Styles>
+      <Style Name="Default" FontColorRef="Primary" />
+      <Style Name="Hovered" FontColorRef="TextHighlight" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Encyclopedia.Entry">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Background" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Background" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BackgroundHover" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="Encyclopedia.Divider">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="list_divider_9" ColorRef="BorderMuted" />
+    </Layers>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- CONVERSATIONS -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="Conversation.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="conversation_frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Conversation.Background">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="conversation_frame_canvas_9" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Conversation.NPCName" Font="Galahad">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextTitle" FontSize="28" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Conversation.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="20" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Conversation.Option">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="dialog_option_canvas_9" ColorRef="Background" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Background" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BackgroundHover" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="Conversation.Option.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="18" />
+      <Style Name="Hovered" FontColorRef="TextHighlight" FontSize="18" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Conversation.Persuasion.Success">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Success" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Conversation.Persuasion.Fail">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Error" />
+    </Layers>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- FACE GENERATION -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="FaceGen.Panel">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="FaceGen.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="FaceGen.Category">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Background" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Background" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BackgroundHover" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BackgroundSelected" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceGen.Slider">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Primary" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="FaceGen.Property.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="16" />
+    </Styles>
+  </Brush>
+
+  <!-- FaceGen category buttons -->
+  <Brush Name="FaceGenBodyButtonBrush">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="ButtonBackground" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="ButtonBackground" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="ButtonHover" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BackgroundSelected" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="FaceGenFaceButtonBrush">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="ButtonBackground" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="ButtonBackground" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="ButtonHover" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BackgroundSelected" /></Style>
+    </Styles>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- NOTIFICATIONS & CHAT -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="Notification.Background">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Notification.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Notification.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="16" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="GameNotification.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="16" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="ChatLog.Text">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="14" />
+    </Styles>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- INVENTORY -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="Inventory.Slot">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="rounded_canvas_9" ColorRef="Background" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Background" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BackgroundHover" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BackgroundSelected" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="Inventory.Slot.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="rounded_frame_9" ColorRef="BorderMuted" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="BorderMuted" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="Border" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BorderHighlight" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="Inventory.ItemName">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="18" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Inventory.Gold">
+    <Styles>
+      <Style Name="Default" FontColorRef="Gold" FontSize="18" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Inventory.Weight">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextMuted" FontSize="14" />
+    </Styles>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- PARTY SCREEN -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="Party.TroopCard">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Background" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="Background" /></Style>
+      <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="BackgroundHover" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="BackgroundSelected" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="Party.TroopCard.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="BorderMuted" />
+    </Layers>
+    <Styles>
+      <Style Name="Default"><BrushLayer Name="Default" ColorRef="BorderMuted" /></Style>
+      <Style Name="Selected"><BrushLayer Name="Default" ColorRef="Border" /></Style>
+    </Styles>
+  </Brush>
+
+  <Brush Name="Party.TroopName">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="16" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Party.TroopCount">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextMuted" FontSize="14" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Party.Morale">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Morale" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Party.Food.Positive">
+    <Styles>
+      <Style Name="Default" FontColorRef="Success" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Party.Food.Negative">
+    <Styles>
+      <Style Name="Default" FontColorRef="Error" />
+    </Styles>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- MAP UI -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="Map.Bar.Background">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Map.Bar.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Map.Tooltip">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Map.Tooltip.Frame">
+    <Layers>
+      <BrushLayer Name="Default" Sprite="frame_9" ColorRef="Border" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Map.Settlement.Name" Font="Galahad">
+    <Styles>
+      <Style Name="Default" FontColorRef="TextTitle" FontSize="20" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Map.Time">
+    <Styles>
+      <Style Name="Default" FontColorRef="Text" FontSize="16" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Map.Gold">
+    <Styles>
+      <Style Name="Default" FontColorRef="Gold" FontSize="18" />
+    </Styles>
+  </Brush>
+
+  <Brush Name="Map.Influence">
+    <Styles>
+      <Style Name="Default" FontColorRef="Experience" FontSize="18" />
+    </Styles>
+  </Brush>
+
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- HEALTH/XP BARS -->
+  <!-- ══════════════════════════════════════════════════════════════════════════════════════ -->
+
+  <Brush Name="Health.Bar.Fill">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Health" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Health.Bar.Background">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Experience.Bar.Fill">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="Experience" />
+    </Layers>
+  </Brush>
+
+  <Brush Name="Experience.Bar.Background">
+    <Layers>
+      <BrushLayer Name="Default" ColorRef="BackgroundDark" />
+    </Layers>
+  </Brush>
+
+</Brushes>

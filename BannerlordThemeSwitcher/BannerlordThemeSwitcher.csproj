@@ -1,0 +1,143 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <Platforms>x64</Platforms>
+    <Configurations>Debug;Release</Configurations>
+    <AssemblyName>BannerlordThemeSwitcher</AssemblyName>
+    <RootNamespace>BannerlordThemeSwitcher</RootNamespace>
+  </PropertyGroup>
+
+  <!-- 
+    Uses BANNERLORD_GAME_DIR environment variable.
+    Set it in your system environment variables, e.g.:
+    - Steam: C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord
+    - GOG: C:\GOG Games\Mount & Blade II Bannerlord
+    - Epic: C:\Program Files\Epic Games\MountBlade2Bannerlord
+  -->
+  <PropertyGroup>
+    <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
+    <GameBinaries>$(GameFolder)\bin\Win64_Shipping_Client</GameBinaries>
+    <NativeModule>$(GameFolder)\Modules\Native</NativeModule>
+    <SandBoxModule>$(GameFolder)\Modules\SandBox</SandBoxModule>
+    <SandBoxCoreModule>$(GameFolder)\Modules\SandBoxCore</SandBoxCoreModule>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+    <PackageReference Include="Bannerlord.MCM" Version="5.*" IncludeAssets="compile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Core TaleWorlds References from game binaries -->
+    <Reference Include="TaleWorlds.Core">
+      <HintPath>$(GameBinaries)\TaleWorlds.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Library">
+      <HintPath>$(GameBinaries)\TaleWorlds.Library.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Engine">
+      <HintPath>$(GameBinaries)\TaleWorlds.Engine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade">
+      <HintPath>$(GameBinaries)\TaleWorlds.MountAndBlade.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.CampaignSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.CampaignSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Localization">
+      <HintPath>$(GameBinaries)\TaleWorlds.Localization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ObjectSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.ObjectSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Engine.GauntletUI">
+      <HintPath>$(GameBinaries)\TaleWorlds.Engine.GauntletUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI">
+      <HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI.Data">
+      <HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.Data.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.TwoDimension">
+      <HintPath>$(GameBinaries)\TaleWorlds.TwoDimension.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.InputSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.InputSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    
+    <!-- SandBox Module References -->
+    <Reference Include="SandBox">
+      <HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Post-build: Deploy to Modules folder -->
+  <Target Name="DeployToModules" AfterTargets="Build">
+    <PropertyGroup>
+      <ModuleFolder>$(GameFolder)\Modules\BannerlordThemeSwitcher</ModuleFolder>
+      <ModuleBinFolder>$(ModuleFolder)\bin\Win64_Shipping_Client</ModuleBinFolder>
+    </PropertyGroup>
+
+    <!-- Create directory structure -->
+    <MakeDir Directories="$(ModuleFolder)" />
+    <MakeDir Directories="$(ModuleBinFolder)" />
+    <MakeDir Directories="$(ModuleFolder)\Themes" />
+    <MakeDir Directories="$(ModuleFolder)\Data" />
+
+    <!-- Copy DLL and PDB to bin folder -->
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+
+    <!-- Copy SubModule.xml to module root -->
+    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFolder="$(ModuleFolder)" SkipUnchangedFiles="true" />
+
+    <!-- Copy README if exists -->
+    <Copy SourceFiles="$(ProjectDir)README.md" DestinationFolder="$(ModuleFolder)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)README.md')" />
+
+    <!-- Copy Themes folder recursively -->
+    <ItemGroup>
+      <ThemeFiles Include="$(ProjectDir)Themes\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ThemeFiles)" DestinationFiles="@(ThemeFiles->'$(ModuleFolder)\Themes\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+    <!-- Copy Data folder recursively (brush definitions with ColorRef) -->
+    <ItemGroup>
+      <DataFiles Include="$(ProjectDir)Data\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DataFiles)" DestinationFiles="@(DataFiles->'$(ModuleFolder)\Data\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+    <!-- Output success message -->
+    <Message Text="&#xA;========================================" Importance="high" />
+    <Message Text="BannerlordThemeSwitcher deployed to:" Importance="high" />
+    <Message Text="  $(ModuleFolder)" Importance="high" />
+    <Message Text="  - DLL, SubModule.xml, Themes/, Data/" Importance="high" />
+    <Message Text="========================================&#xA;" Importance="high" />
+  </Target>
+
+  <!-- Clean target to remove deployed module -->
+  <Target Name="CleanModule" AfterTargets="Clean">
+    <PropertyGroup>
+      <ModuleFolder>$(GameFolder)\Modules\BannerlordThemeSwitcher</ModuleFolder>
+    </PropertyGroup>
+    <RemoveDir Directories="$(ModuleFolder)" Condition="Exists('$(ModuleFolder)')" />
+    <Message Text="Cleaned BannerlordThemeSwitcher module folder" Importance="high" />
+  </Target>
+
+</Project>

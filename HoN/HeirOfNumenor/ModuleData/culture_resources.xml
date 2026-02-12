@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  Culture Resources Configuration
+  ================================
+  This file defines cultural needs and requirements for different races/cultures.
+  
+  RESOURCE TYPES:
+  - Consumable: Items in inventory (beer, food, medicine)
+  - Location: Being in specific terrain/settlements
+  - Action: Performing actions (combat, trade, hunting)
+  - Social: Interactions with cultures/factions
+  - Temporal: Time-based needs (rest, rituals)
+  
+  SATISFACTION MODES:
+  - Decay: Value decreases daily, needs replenishment
+  - DaysSince: Counts days since last satisfied
+  - Accumulate: Value increases daily toward threshold
+  - Binary: Either satisfied or not
+  
+  TRIGGER CONDITIONS:
+  - Below: Triggers when value < threshold
+  - Above: Triggers when value > threshold
+  - Equals: Triggers when value ≈ threshold
+  - DaysExceeds: Triggers when days since > threshold
+-->
+<CultureResources>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- RESOURCE DEFINITIONS                                                     -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <Resources>
+    
+    <!-- CONSUMABLES -->
+    <Resource id="beer">
+      <DisplayName>Ale &amp; Beer</DisplayName>
+      <Description>Dwarves need their ale!</Description>
+      <Type>Consumable</Type>
+      <Mode>Decay</Mode>
+      <DailyRate>2.0</DailyRate>
+      <InitialValue>60</InitialValue>
+      <MaxValue>100</MaxValue>
+      <SatisfactionGain>15</SatisfactionGain>
+      <SatisfyingItems>
+        <Item>ale</Item>
+        <Item>beer</Item>
+        <Item>mead</Item>
+        <Item>dwarven_ale</Item>
+      </SatisfyingItems>
+      <SatisfyingSettlements>
+        <Settlement>tavern</Settlement>
+        <Settlement>town</Settlement>
+      </SatisfyingSettlements>
+    </Resource>
+    
+    <Resource id="meat">
+      <DisplayName>Fresh Meat</DisplayName>
+      <Description>Orcs prefer fresh meat... any kind.</Description>
+      <Type>Consumable</Type>
+      <Mode>Decay</Mode>
+      <DailyRate>2.5</DailyRate>
+      <InitialValue>40</InitialValue>
+      <SatisfactionGain>20</SatisfactionGain>
+      <SatisfyingItems>
+        <Item>meat</Item>
+        <Item>game</Item>
+        <Item>cattle</Item>
+      </SatisfyingItems>
+      <SatisfyingEvents>
+        <Event>hunt</Event>
+        <Event>raid</Event>
+        <Event>battle_won</Event>
+      </SatisfyingEvents>
+    </Resource>
+    
+    <Resource id="lembas">
+      <DisplayName>Lembas Bread</DisplayName>
+      <Description>Elven waybread sustains on long journeys.</Description>
+      <Type>Consumable</Type>
+      <Mode>Decay</Mode>
+      <DailyRate>0.5</DailyRate>
+      <InitialValue>80</InitialValue>
+      <SatisfactionGain>30</SatisfactionGain>
+      <SatisfyingItems>
+        <Item>lembas</Item>
+        <Item>elven_bread</Item>
+      </SatisfyingItems>
+    </Resource>
+    
+    <!-- LOCATIONS -->
+    <Resource id="forest">
+      <DisplayName>Forest Connection</DisplayName>
+      <Description>Elves draw strength from the forests.</Description>
+      <Type>Location</Type>
+      <Mode>Decay</Mode>
+      <DailyRate>1.5</DailyRate>
+      <InitialValue>70</InitialValue>
+      <SatisfactionGain>25</SatisfactionGain>
+      <SatisfyingTerrains>
+        <Terrain>forest</Terrain>
+        <Terrain>woodland</Terrain>
+        <Terrain>deep_forest</Terrain>
+      </SatisfyingTerrains>
+    </Resource>
+    
+    <Resource id="mountains">
+      <DisplayName>Mountain Homeland</DisplayName>
+      <Description>Dwarves feel at home in the mountains.</Description>
+      <Type>Location</Type>
+      <Mode>DaysSince</Mode>
+      <DailyRate>1.0</DailyRate>
+      <InitialValue>100</InitialValue>
+      <SatisfactionGain>30</SatisfactionGain>
+      <SatisfyingTerrains>
+        <Terrain>mountain</Terrain>
+        <Terrain>rocky</Terrain>
+        <Terrain>highland</Terrain>
+      </SatisfyingTerrains>
+    </Resource>
+    
+    <!-- ACTIONS -->
+    <Resource id="combat">
+      <DisplayName>Battle Lust</DisplayName>
+      <Description>Orcs crave violence and conflict.</Description>
+      <Type>Action</Type>
+      <Mode>Decay</Mode>
+      <DailyRate>3.0</DailyRate>
+      <InitialValue>50</InitialValue>
+      <SatisfactionGain>40</SatisfactionGain>
+      <SatisfyingEvents>
+        <Event>battle_won</Event>
+        <Event>battle_fought</Event>
+        <Event>raid</Event>
+        <Event>siege</Event>
+      </SatisfyingEvents>
+    </Resource>
+    
+    <Resource id="hunt">
+      <DisplayName>The Hunt</DisplayName>
+      <Description>Predatory instincts require occasional hunting.</Description>
+      <Type>Action</Type>
+      <Mode>Decay</Mode>
+      <DailyRate>1.5</DailyRate>
+      <InitialValue>60</InitialValue>
+      <SatisfactionGain>25</SatisfactionGain>
+      <SatisfyingEvents>
+        <Event>hunt</Event>
+        <Event>bandit_defeat</Event>
+        <Event>beast_killed</Event>
+      </SatisfyingEvents>
+    </Resource>
+    
+    <!-- TEMPORAL -->
+    <Resource id="pay">
+      <DisplayName>Fair Wages</DisplayName>
+      <Description>Soldiers expect to be paid regularly.</Description>
+      <Type>Temporal</Type>
+      <Mode>DaysSince</Mode>
+      <DailyRate>1.0</DailyRate>
+      <InitialValue>100</InitialValue>
+      <SatisfactionGain>100</SatisfactionGain>
+    </Resource>
+    
+    <Resource id="rest">
+      <DisplayName>Rest &amp; Recuperation</DisplayName>
+      <Description>Troops need time to rest in settlements.</Description>
+      <Type>Location</Type>
+      <Mode>Decay</Mode>
+      <DailyRate>1.0</DailyRate>
+      <InitialValue>80</InitialValue>
+      <SatisfactionGain>15</SatisfactionGain>
+      <SatisfyingSettlements>
+        <Settlement>town</Settlement>
+        <Settlement>castle</Settlement>
+        <Settlement>village</Settlement>
+      </SatisfyingSettlements>
+    </Resource>
+    
+  </Resources>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- CULTURE PROFILES                                                         -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <CultureProfiles>
+    
+    <!-- ═════════════════════════════════════════════════ -->
+    <!-- DWARVES                                           -->
+    <!-- ═════════════════════════════════════════════════ -->
+    <Culture id="erebor" name="Dwarves of Erebor">
+      <Requirement resource="beer" condition="Below" threshold="30" graceDays="3">
+        <Effect status="Frustration" daily="3" 
+                triggerMessage="Dwarves grumble about the lack of proper ale..." 
+                resolveMessage="The Dwarves cheer as ale flows again!"/>
+      </Requirement>
+      
+      <Requirement resource="mountains" condition="DaysExceeds" threshold="14">
+        <Effect status="Frustration" daily="1" 
+                triggerMessage="Dwarves long for the mountain halls..."/>
+        <Effect status="Bonding" daily="-0.3"/>
+      </Requirement>
+    </Culture>
+    
+    <!-- ═════════════════════════════════════════════════ -->
+    <!-- ELVES                                             -->
+    <!-- ═════════════════════════════════════════════════ -->
+    <Culture id="lothlorien" name="Galadhrim of Lothlórien">
+      <Requirement resource="forest" condition="Below" threshold="25" graceDays="5">
+        <Effect status="Frustration" daily="2" 
+                triggerMessage="The Elves grow weary far from the woods..."/>
+        <Effect status="Bonding" daily="-0.5"/>
+      </Requirement>
+    </Culture>
+    
+    <Culture id="rivendell" name="Elves of Rivendell" inherits="lothlorien">
+      <!-- Inherits forest requirement from Lothlórien -->
+    </Culture>
+    
+    <Culture id="mirkwood" name="Wood-elves of Mirkwood" inherits="lothlorien">
+      <!-- Wood-elves have even stronger forest connection -->
+      <Requirement resource="forest" condition="Below" threshold="35" graceDays="3">
+        <Effect status="Frustration" daily="3" 
+                triggerMessage="The Wood-elves yearn desperately for the trees!"/>
+        <Effect status="Fear" daily="1"/>
+      </Requirement>
+    </Culture>
+    
+    <!-- ═════════════════════════════════════════════════ -->
+    <!-- ORCS                                              -->
+    <!-- ═════════════════════════════════════════════════ -->
+    <Culture id="mordor" name="Orcs of Mordor">
+      <Requirement resource="combat" condition="Below" threshold="20" graceDays="2">
+        <Effect status="Frustration" daily="4" 
+                triggerMessage="The Orcs grow restless without bloodshed!"/>
+        <Effect status="Fear" daily="-2"/>
+        <!-- Note: Negative fear = combat REDUCES fear for orcs -->
+      </Requirement>
+      
+      <Requirement resource="meat" condition="Below" threshold="25">
+        <Effect status="Frustration" daily="2" 
+                triggerMessage="Orcs snarl about being fed 'maggoty bread'..."/>
+      </Requirement>
+    </Culture>
+    
+    <Culture id="isengard" name="Uruk-hai of Isengard" inherits="mordor">
+      <!-- Uruk-hai are more disciplined but still need combat -->
+      <Requirement resource="combat" condition="Below" threshold="25" graceDays="3">
+        <Effect status="Frustration" daily="3" 
+                triggerMessage="The Uruk-hai demand worthy opponents!"/>
+      </Requirement>
+    </Culture>
+    
+    <Culture id="gundabad" name="Orcs of Gundabad" inherits="mordor">
+      <!-- Gundabad orcs also want mountains -->
+      <Requirement resource="mountains" condition="DaysExceeds" threshold="21">
+        <Effect status="Frustration" daily="1" 
+                triggerMessage="Gundabad orcs miss their mountain lairs..."/>
+      </Requirement>
+    </Culture>
+    
+    <Culture id="dolguldur" name="Forces of Dol Guldur" inherits="mordor">
+      <!-- Add dark forest preference instead of generic forest avoidance -->
+    </Culture>
+    
+    <!-- ═════════════════════════════════════════════════ -->
+    <!-- HUMANS - GOOD                                     -->
+    <!-- ═════════════════════════════════════════════════ -->
+    <Culture id="gondor" name="Men of Gondor">
+      <Requirement resource="pay" condition="DaysExceeds" threshold="30">
+        <Effect status="Frustration" daily="2" 
+                triggerMessage="The soldiers mutter about unpaid wages..."/>
+        <Effect status="Loyalty" daily="-1"/>
+      </Requirement>
+      
+      <Requirement resource="rest" condition="Below" threshold="20" graceDays="7">
+        <Effect status="Frustration" daily="1.5" 
+                triggerMessage="The men are exhausted from constant marching..."/>
+      </Requirement>
+    </Culture>
+    
+    <Culture id="vlandia" name="Riders of Rohan" inherits="gondor">
+      <!-- Rohirrim have same basic needs as Gondor -->
+    </Culture>
+    
+    <!-- ═════════════════════════════════════════════════ -->
+    <!-- HUMANS - NEUTRAL/EVIL                             -->
+    <!-- ═════════════════════════════════════════════════ -->
+    <Culture id="umbar" name="Corsairs of Umbar">
+      <Requirement resource="pay" condition="DaysExceeds" threshold="21">
+        <Effect status="Frustration" daily="3" 
+                triggerMessage="The corsairs demand their gold!"/>
+        <Effect status="Loyalty" daily="-2"/>
+      </Requirement>
+      
+      <!-- Corsairs want plunder/raiding -->
+      <Requirement resource="combat" condition="Below" threshold="30">
+        <Effect status="Frustration" daily="2" 
+                triggerMessage="The corsairs grow bored without plunder..."/>
+      </Requirement>
+    </Culture>
+    
+  </CultureProfiles>
+  
+</CultureResources>

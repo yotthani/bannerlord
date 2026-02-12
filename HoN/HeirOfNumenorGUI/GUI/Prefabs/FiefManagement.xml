@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FiefManagement.xml
+  ==================
+  Remote fief management screen with carousel navigation.
+  Allows managing buildings in all owned fiefs from anywhere on the map.
+  
+  Features:
+  - Carousel navigation between fiefs (← →)
+  - Fief stats display (prosperity, loyalty, security, food, garrison)
+  - Building list with upgrade buttons
+  - Construction queue display
+  - Hotkey: F6 to open from map
+-->
+<Prefab>
+  <Constants>
+    <Constant Name="Screen.Width" Value="1200" />
+    <Constant Name="Screen.Height" Value="800" />
+    <Constant Name="Panel.Padding" Value="20" />
+    <Constant Name="Header.Height" Value="80" />
+    <Constant Name="Stats.Height" Value="100" />
+    <Constant Name="Building.Height" Value="60" />
+    <Constant Name="Queue.Height" Value="150" />
+    <Constant Name="Button.Width" Value="120" />
+    <Constant Name="Button.Height" Value="40" />
+    <Constant Name="NavButton.Size" Value="50" />
+  </Constants>
+
+  <Window>
+    <!-- Full screen darkened overlay -->
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#000000A0">
+      <Children>
+
+        <!-- Main panel -->
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="!Screen.Width" SuggestedHeight="!Screen.Height" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="StdAssets\inventory_background" Color="#2a2a2aFF">
+          <Children>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- HEADER with carousel navigation                                  -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="!Header.Height" HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="10">
+              <Children>
+
+                <!-- Close button -->
+                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="40" SuggestedHeight="40" HorizontalAlignment="Right" VerticalAlignment="Top" MarginRight="20" MarginTop="10" Brush="ButtonBrush1" Command.Click="ExecuteClose">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="MapBar.Text" Text="X" />
+                  </Children>
+                </ButtonWidget>
+
+                <!-- Title -->
+                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="5" Brush="Title.Center.Text" Brush.FontSize="28" Text="Fief Management" />
+
+                <!-- Carousel navigation -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="600" SuggestedHeight="50" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                  <Children>
+
+                    <!-- Previous button -->
+                    <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="!NavButton.Size" SuggestedHeight="!NavButton.Size" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="ButtonBrush1" Command.Click="ExecutePreviousFief" IsEnabled="@HasPreviousFief">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="MapBar.Text" Brush.FontSize="24" Text="◄" />
+                      </Children>
+                    </ButtonWidget>
+
+                    <!-- Current fief name and count -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="400" HorizontalAlignment="Center" VerticalAlignment="Center">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Popup.Text.Medium" Brush.FontSize="22" Brush.TextHorizontalAlignment="Center" Text="@FiefName" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" Brush="Popup.Text.Small" Brush.FontSize="14" Brush.TextHorizontalAlignment="Center">
+                          <Children>
+                            <!-- "Town 2 / 5" style counter -->
+                          </Children>
+                        </TextWidget>
+                        <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" Brush="Popup.Text.Small" Brush.FontSize="14" Brush.TextHorizontalAlignment="Center" Text="@FiefType" />
+                      </Children>
+                    </Widget>
+
+                    <!-- Next button -->
+                    <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="!NavButton.Size" SuggestedHeight="!NavButton.Size" HorizontalAlignment="Right" VerticalAlignment="Center" Brush="ButtonBrush1" Command.Click="ExecuteNextFief" IsEnabled="@HasNextFief">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="MapBar.Text" Brush.FontSize="24" Text="►" />
+                      </Children>
+                    </ButtonWidget>
+
+                  </Children>
+                </Widget>
+
+              </Children>
+            </Widget>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- No fiefs message                                                 -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="400" SuggestedHeight="100" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="Popup.Text.Medium" Brush.FontSize="18" Brush.TextHorizontalAlignment="Center" Text="You don't own any fiefs yet.&#xA;Conquer or be granted towns and castles to manage them here." IsVisible="@HasAnyFiefs" IsHidden="@HasAnyFiefs" />
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- STATS BAR                                                        -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="!Stats.Height" HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="90" MarginLeft="!Panel.Padding" MarginRight="!Panel.Padding" IsVisible="@HasAnyFiefs">
+              <Children>
+                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" LayoutImp.LayoutMethod="HorizontalLeftToRight" HorizontalAlignment="Center">
+                  <Children>
+
+                    <!-- Prosperity -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="150" MarginLeft="10" MarginRight="10">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="25" VerticalAlignment="Top" Brush="Popup.Text.Small" Brush.FontSize="12" Brush.TextHorizontalAlignment="Center" Text="PROSPERITY" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" VerticalAlignment="Center" Brush="Popup.Text.Medium" Brush.FontSize="24" Brush.TextHorizontalAlignment="Center" Text="@ProsperityText" />
+                      </Children>
+                    </Widget>
+
+                    <!-- Loyalty -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="150" MarginLeft="10" MarginRight="10">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="25" VerticalAlignment="Top" Brush="Popup.Text.Small" Brush.FontSize="12" Brush.TextHorizontalAlignment="Center" Text="LOYALTY" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" VerticalAlignment="Center" Brush="Popup.Text.Medium" Brush.FontSize="24" Brush.TextHorizontalAlignment="Center" Text="@LoyaltyText" />
+                      </Children>
+                    </Widget>
+
+                    <!-- Security -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="150" MarginLeft="10" MarginRight="10">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="25" VerticalAlignment="Top" Brush="Popup.Text.Small" Brush.FontSize="12" Brush.TextHorizontalAlignment="Center" Text="SECURITY" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" VerticalAlignment="Center" Brush="Popup.Text.Medium" Brush.FontSize="24" Brush.TextHorizontalAlignment="Center" Text="@SecurityText" />
+                      </Children>
+                    </Widget>
+
+                    <!-- Food -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="150" MarginLeft="10" MarginRight="10">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="25" VerticalAlignment="Top" Brush="Popup.Text.Small" Brush.FontSize="12" Brush.TextHorizontalAlignment="Center" Text="FOOD" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" VerticalAlignment="Center" Brush="Popup.Text.Medium" Brush.FontSize="24" Brush.TextHorizontalAlignment="Center" Text="@FoodText" />
+                      </Children>
+                    </Widget>
+
+                    <!-- Garrison -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="150" MarginLeft="10" MarginRight="10">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="25" VerticalAlignment="Top" Brush="Popup.Text.Small" Brush.FontSize="12" Brush.TextHorizontalAlignment="Center" Text="GARRISON" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" VerticalAlignment="Center" Brush="Popup.Text.Medium" Brush.FontSize="24" Brush.TextHorizontalAlignment="Center" Text="@GarrisonText" />
+                      </Children>
+                    </Widget>
+
+                    <!-- Income -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="150" MarginLeft="10" MarginRight="10">
+                      <Children>
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="25" VerticalAlignment="Top" Brush="Popup.Text.Small" Brush.FontSize="12" Brush.TextHorizontalAlignment="Center" Text="INCOME" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" VerticalAlignment="Center" Brush="Popup.Text.Medium" Brush.FontSize="24" Brush.TextHorizontalAlignment="Center" Text="@GoldIncomeText" />
+                      </Children>
+                    </Widget>
+
+                  </Children>
+                </ListPanel>
+              </Children>
+            </Widget>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- MAIN CONTENT: Buildings and Queue                                -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="500" HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="200" MarginLeft="!Panel.Padding" MarginRight="!Panel.Padding" IsVisible="@HasAnyFiefs">
+              <Children>
+
+                <!-- Left panel: Available Buildings -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="550" HorizontalAlignment="Left" VerticalAlignment="Top">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30" VerticalAlignment="Top" Brush="Popup.Text.Medium" Brush.FontSize="18" Text="Available Buildings" />
+                    
+                    <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="450" VerticalAlignment="Bottom" ClipRect="BuildingsClipRect" InnerPanel="BuildingsInnerPanel" VerticalScrollbar="BuildingsScrollbar">
+                      <Children>
+                        <Widget Id="BuildingsClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" ClipContents="true">
+                          <Children>
+                            <ListPanel Id="BuildingsInnerPanel" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                              <ItemTemplate>
+                                <!-- Building item template -->
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="!Building.Height" Brush="ButtonBrush2" Command.Click="ExecuteAddToQueue" IsEnabled="@CanUpgrade" MarginBottom="5">
+                                  <Children>
+                                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="200" HorizontalAlignment="Left" VerticalAlignment="Center" MarginLeft="15" Brush="Popup.Text.Small" Brush.FontSize="14" Brush.TextHorizontalAlignment="Left" Text="@Name" />
+                                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="80" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="Popup.Text.Small" Brush.FontSize="14" Brush.TextHorizontalAlignment="Center" Text="@LevelText" />
+                                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="150" HorizontalAlignment="Right" VerticalAlignment="Center" MarginRight="15" Brush="Popup.Text.Small" Brush.FontSize="12" Brush.TextHorizontalAlignment="Right" Text="@CostText" />
+                                    
+                                    <!-- In queue indicator -->
+                                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="80" SuggestedHeight="20" HorizontalAlignment="Right" VerticalAlignment="Top" MarginRight="10" MarginTop="5" Brush="Popup.Text.Small" Brush.FontSize="10" Brush.TextHorizontalAlignment="Center" Color="#FFD700FF" Text="IN QUEUE" IsVisible="@IsInQueue" />
+                                    
+                                    <!-- Max level indicator -->
+                                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="50" SuggestedHeight="20" HorizontalAlignment="Right" VerticalAlignment="Top" MarginRight="10" MarginTop="5" Brush="Popup.Text.Small" Brush.FontSize="10" Brush.TextHorizontalAlignment="Center" Color="#00FF00FF" Text="MAX" IsVisible="@IsMaxLevel" />
+                                    
+                                    <HintWidget DataSource="{Hint}" DoNotAcceptEvents="false" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint"/>
+                                  </Children>
+                                </ButtonWidget>
+                              </ItemTemplate>
+                            </ListPanel>
+                          </Children>
+                        </Widget>
+                        <Standard.VerticalScrollbar Id="BuildingsScrollbar" />
+                      </Children>
+                    </ScrollablePanel>
+                  </Children>
+                </Widget>
+
+                <!-- Right panel: Construction Queue -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="550" HorizontalAlignment="Right" VerticalAlignment="Top">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="30" VerticalAlignment="Top" Brush="Popup.Text.Medium" Brush.FontSize="18" Text="Construction Queue" />
+                    
+                    <!-- Current building info -->
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" VerticalAlignment="Top" MarginTop="35" Sprite="BlankWhiteSquare_9" Color="#1a1a1aFF">
+                      <Children>
+                        <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="120" SuggestedHeight="20" HorizontalAlignment="Left" VerticalAlignment="Top" MarginLeft="10" MarginTop="5" Brush="Popup.Text.Small" Brush.FontSize="12" Text="Currently Building:" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" MarginLeft="10" MarginBottom="10" Brush="Popup.Text.Medium" Brush.FontSize="16" Text="@CurrentBuildingText" />
+                        <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="20" HorizontalAlignment="Right" VerticalAlignment="Center" MarginRight="10" Brush="Popup.Text.Small" Brush.FontSize="14" Brush.TextHorizontalAlignment="Right" Text="@QueueCountText" />
+                      </Children>
+                    </Widget>
+                    
+                    <!-- Queue list -->
+                    <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="380" VerticalAlignment="Bottom" ClipRect="QueueClipRect" InnerPanel="QueueInnerPanel" VerticalScrollbar="QueueScrollbar">
+                      <Children>
+                        <Widget Id="QueueClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" ClipContents="true">
+                          <Children>
+                            <ListPanel Id="QueueInnerPanel" DataSource="{BuildQueue}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                              <ItemTemplate>
+                                <!-- Queue item template -->
+                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="50" Brush="ButtonBrush2" Command.Click="ExecuteAddToQueue" MarginBottom="5">
+                                  <Children>
+                                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="250" HorizontalAlignment="Left" VerticalAlignment="Center" MarginLeft="15" Brush="Popup.Text.Small" Brush.FontSize="14" Brush.TextHorizontalAlignment="Left" Text="@Name" />
+                                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="150" HorizontalAlignment="Right" VerticalAlignment="Center" MarginRight="15" Brush="Popup.Text.Small" Brush.FontSize="12" Brush.TextHorizontalAlignment="Right" Text="@ProgressText" />
+                                  </Children>
+                                </ButtonWidget>
+                              </ItemTemplate>
+                            </ListPanel>
+                          </Children>
+                        </Widget>
+                        <Standard.VerticalScrollbar Id="QueueScrollbar" />
+                      </Children>
+                    </ScrollablePanel>
+                  </Children>
+                </Widget>
+
+              </Children>
+            </Widget>
+
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <!-- FOOTER: Refresh and Close buttons                                -->
+            <!-- ═══════════════════════════════════════════════════════════════ -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="10">
+              <Children>
+
+                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="!Button.Width" SuggestedHeight="!Button.Height" HorizontalAlignment="Left" VerticalAlignment="Center" MarginLeft="20" Brush="ButtonBrush1" Command.Click="ExecuteRefresh">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Text.Medium" Brush.FontSize="14" Brush.TextHorizontalAlignment="Center" Text="Refresh" />
+                  </Children>
+                </ButtonWidget>
+
+                <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="30" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="Popup.Text.Small" Brush.FontSize="12" Brush.TextHorizontalAlignment="Center" Text="Press F6 on map to open | ESC to close" />
+
+                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="!Button.Width" SuggestedHeight="!Button.Height" HorizontalAlignment="Right" VerticalAlignment="Center" MarginRight="20" Brush="ButtonBrush1" Command.Click="ExecuteClose">
+                  <Children>
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="Popup.Text.Medium" Brush.FontSize="14" Brush.TextHorizontalAlignment="Center" Text="Close" />
+                  </Children>
+                </ButtonWidget>
+
+              </Children>
+            </Widget>
+
+          </Children>
+        </Widget>
+
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

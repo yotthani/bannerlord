@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/BUTR/Bannerlord.XmlSchemas/master/SubModule.xsd">
+  <Id value="FaceLearner.ML" />
+  <Name value="FaceLearner ML Addon" />
+  <Version value="v3.0.21" />
+  <DefaultModule value="false" />
+  <ModuleCategory value="Singleplayer"/>
+  <ModuleType value="Community" />
+  <DependedModules>
+    <DependedModule Id="Bannerlord.Harmony" DependentVersion="v2.3.0" />
+    <DependedModule Id="Native" DependentVersion="v1.3.0" />
+    <DependedModule Id="SandBoxCore" DependentVersion="v1.3.0" />
+    <!-- REQUIRED: FaceLearner Core must load first -->
+    <DependedModule Id="FaceLearner" DependentVersion="v1.3.0" />
+  </DependedModules>
+  <DependedModuleMetadatas>
+    <DependedModuleMetadata id="Bannerlord.Harmony" order="LoadBeforeThis" version="v2.3.0" />
+    <DependedModuleMetadata id="Native" order="LoadBeforeThis" version="v1.3.0.*" />
+    <DependedModuleMetadata id="SandBoxCore" order="LoadBeforeThis" version="v1.3.0.*" />
+    <DependedModuleMetadata id="FaceLearner" order="LoadBeforeThis" version="v1.3.0.*" />
+  </DependedModuleMetadatas>
+  <SubModules>
+    <SubModule>
+      <Name value="FaceLearner.ML" />
+      <DLLName value="FaceLearner.ML.dll" />
+      <SubModuleClassType value="FaceLearner.ML.SubModule" />
+      <Tags />
+    </SubModule>
+  </SubModules>
+</Module>

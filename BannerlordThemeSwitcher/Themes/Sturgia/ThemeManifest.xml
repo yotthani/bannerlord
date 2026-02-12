@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Sturgian Theme</Name>
+  <Description>Ice blue and silver of the frozen north</Description>
+  <Author>BannerlordThemeSwitcher</Author>
+  <Version>2.0.0</Version>
+  <BaseCulture>sturgia</BaseCulture>
+  <AutoTheme>true</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>sturgia</Kingdom>
+  </BoundKingdoms>
+  <ColorScheme>
+    <Primary>#00BFFF</Primary>
+    <Secondary>#C0C0C0</Secondary>
+    <Tertiary>#708090</Tertiary>
+    <Text>#FFFFFFEE</Text>
+    <TextMuted>#A8B8C8</TextMuted>
+    <TextHighlight>#00BFFF</TextHighlight>
+    <TextTitle>#00BFFF</TextTitle>
+    <TextOnPrimary>#0A1520</TextOnPrimary>
+    <TextDisabled>#607080</TextDisabled>
+    <Background>#0A151F99</Background>
+    <BackgroundDark>#050A0FBB</BackgroundDark>
+    <BackgroundLight>#152535AA</BackgroundLight>
+    <BackgroundAccent>#00BFFF20</BackgroundAccent>
+    <BackgroundHover>#00BFFF40</BackgroundHover>
+    <BackgroundSelected>#00BFFF60</BackgroundSelected>
+    <Border>#C0C0C0AA</Border>
+    <BorderMuted>#C0C0C055</BorderMuted>
+    <BorderHighlight>#00BFFFFF</BorderHighlight>
+    <BorderSecondary>#708090AA</BorderSecondary>
+    <ButtonBackground>#00BFFF25</ButtonBackground>
+    <ButtonHover>#00BFFF50</ButtonHover>
+    <ButtonPressed>#00BFFF80</ButtonPressed>
+    <ButtonDisabled>#40506044</ButtonDisabled>
+    <ButtonBorder>#C0C0C0CC</ButtonBorder>
+    <Success>#90EE90</Success>
+    <Warning>#FFD700</Warning>
+    <Error>#FF6B6B</Error>
+    <Info>#87CEEB</Info>
+    <Gold>#FFD700</Gold>
+    <Experience>#87CEEB</Experience>
+    <Health>#FF6B6B</Health>
+    <Morale>#90EE90</Morale>
+    <Shadow>#0A152088</Shadow>
+    <Glow>#00BFFF66</Glow>
+  </ColorScheme>
+</Theme>

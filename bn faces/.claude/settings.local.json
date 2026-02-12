@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\\\Work\\\\Sources\\\\github\\\\bn faces\" /s /b)",
+      "Bash(dir \"C:\\\\Work\\\\Sources\\\\github\\\\bn faces\" /s)",
+      "Bash(dir:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(du:*)",
+      "Bash(xargs:*)",
+      "Bash(dotnet build:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(wc:*)",
+      "Bash(git -C \"C:/Work/Sources/github/bn faces\" status)",
+      "Bash(git -C \"C:\\\\Work\\\\Sources\\\\github\\\\bn faces\" status)"
+    ]
+  }
+}

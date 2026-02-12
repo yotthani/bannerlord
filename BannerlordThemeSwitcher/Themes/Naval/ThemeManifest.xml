@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Naval Theme</Name>
+  <Description>Royal blue and silver</Description>
+  <Author>BannerlordThemeSwitcher</Author>
+  <Version>2.0.0</Version>
+  <BaseCulture>naval</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>naval</Kingdom>
+  </BoundKingdoms>
+  <ColorScheme>
+    <Primary>#4169E1</Primary>
+    <Secondary>#C0C0C0</Secondary>
+    <Tertiary>#20B2AA</Tertiary>
+    <Text>#FFFFFFEE</Text>
+    <TextMuted>#A8B8C8</TextMuted>
+    <TextHighlight>#4169E1</TextHighlight>
+    <TextTitle>#4169E1</TextTitle>
+    <TextOnPrimary>#0A0A20</TextOnPrimary>
+    <TextDisabled>#506070</TextDisabled>
+    <Background>#0A0F1A99</Background>
+    <BackgroundDark>#05070DBB</BackgroundDark>
+    <BackgroundLight>#151A2AAA</BackgroundLight>
+    <BackgroundAccent>#4169E120</BackgroundAccent>
+    <BackgroundHover>#4169E140</BackgroundHover>
+    <BackgroundSelected>#4169E160</BackgroundSelected>
+    <Border>#C0C0C0AA</Border>
+    <BorderMuted>#C0C0C055</BorderMuted>
+    <BorderHighlight>#4169E1FF</BorderHighlight>
+    <BorderSecondary>#20B2AAAA</BorderSecondary>
+    <ButtonBackground>#4169E125</ButtonBackground>
+    <ButtonHover>#4169E150</ButtonHover>
+    <ButtonPressed>#4169E180</ButtonPressed>
+    <ButtonDisabled>#40506044</ButtonDisabled>
+    <ButtonBorder>#C0C0C0CC</ButtonBorder>
+    <Success>#20B2AA</Success>
+    <Warning>#FFD700</Warning>
+    <Error>#FF6347</Error>
+    <Info>#4169E1</Info>
+    <Gold>#FFD700</Gold>
+    <Experience>#20B2AA</Experience>
+    <Health>#FF6347</Health>
+    <Morale>#20B2AA</Morale>
+    <Shadow>#0A0F1A88</Shadow>
+    <Glow>#4169E166</Glow>
+  </ColorScheme>
+</Theme>

@@ -1,0 +1,191 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <Platforms>x64</Platforms>
+    <Configurations>Debug;Release</Configurations>
+    <AssemblyName>HeirOfNumenor</AssemblyName>
+    <RootNamespace>HeirOfNumenor</RootNamespace>
+  </PropertyGroup>
+
+  <!-- 
+    Uses BANNERLORD_GAME_DIR environment variable.
+    Set it in your system environment variables, e.g.:
+    - Steam: C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord
+    - GOG: C:\GOG Games\Mount & Blade II Bannerlord
+    - Epic: C:\Program Files\Epic Games\MountBlade2Bannerlord
+  -->
+  <PropertyGroup>
+    <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
+    <GameBinaries>$(GameFolder)\bin\Win64_Shipping_Client</GameBinaries>
+    <NativeModule>$(GameFolder)\Modules\Native</NativeModule>
+    <SandBoxModule>$(GameFolder)\Modules\SandBox</SandBoxModule>
+    <SandBoxCoreModule>$(GameFolder)\Modules\SandBoxCore</SandBoxCoreModule>
+    <StoryModeModule>$(GameFolder)\Modules\StoryMode</StoryModeModule>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+    <PackageReference Include="Bannerlord.MCM" Version="5.*" IncludeAssets="compile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Core TaleWorlds References from game binaries -->
+    <Reference Include="TaleWorlds.Core">
+      <HintPath>$(GameBinaries)\TaleWorlds.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Library">
+      <HintPath>$(GameBinaries)\TaleWorlds.Library.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Engine">
+      <HintPath>$(GameBinaries)\TaleWorlds.Engine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade">
+      <HintPath>$(GameBinaries)\TaleWorlds.MountAndBlade.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.CampaignSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.CampaignSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.CampaignSystem.ViewModelCollection">
+      <HintPath>$(GameBinaries)\TaleWorlds.CampaignSystem.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Core.ViewModelCollection">
+      <HintPath>$(GameBinaries)\TaleWorlds.Core.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Localization">
+      <HintPath>$(GameBinaries)\TaleWorlds.Localization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ObjectSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.ObjectSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.SaveSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.SaveSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Engine.GauntletUI">
+      <HintPath>$(GameBinaries)\TaleWorlds.Engine.GauntletUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI">
+      <HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI.Data">
+      <HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.Data.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ScreenSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.ScreenSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.TwoDimension">
+      <HintPath>$(GameBinaries)\TaleWorlds.TwoDimension.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.ViewModelCollection">
+      <HintPath>$(GameBinaries)\TaleWorlds.MountAndBlade.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.InputSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.InputSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.DotNet">
+      <HintPath>$(GameBinaries)\TaleWorlds.DotNet.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    
+    <!-- Native Module References -->
+    <Reference Include="TaleWorlds.MountAndBlade.View">
+      <HintPath>$(NativeModule)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.View.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.GauntletUI">
+      <HintPath>$(NativeModule)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.GauntletUI.Widgets">
+      <HintPath>$(GameBinaries)\TaleWorlds.MountAndBlade.GauntletUI.Widgets.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    
+    <!-- SandBox Module References -->
+    <Reference Include="SandBox">
+      <HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SandBox.ViewModelCollection">
+      <HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SandBox.GauntletUI">
+      <HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SandBox.View">
+      <HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.View.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Post-build: Deploy to Modules folder -->
+  <Target Name="DeployToModules" AfterTargets="Build">
+    <PropertyGroup>
+      <ModuleFolder>$(GameFolder)\Modules\HeirOfNumenor</ModuleFolder>
+      <ModuleBinFolder>$(ModuleFolder)\bin\Win64_Shipping_Client</ModuleBinFolder>
+    </PropertyGroup>
+
+    <!-- Create directory structure -->
+    <MakeDir Directories="$(ModuleFolder)" />
+    <MakeDir Directories="$(ModuleBinFolder)" />
+    <MakeDir Directories="$(ModuleFolder)\ModuleData" />
+    <MakeDir Directories="$(ModuleFolder)\ModuleData\Languages" />
+
+    <!-- Copy DLL and PDB to bin folder -->
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+
+    <!-- Copy SubModule.xml to module root -->
+    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFolder="$(ModuleFolder)" SkipUnchangedFiles="true" />
+
+    <!-- Copy README if exists -->
+    <Copy SourceFiles="$(ProjectDir)README.md" DestinationFolder="$(ModuleFolder)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)README.md')" />
+
+    <!-- Copy ModuleData XML files -->
+    <ItemGroup>
+      <ModuleDataFiles Include="$(ProjectDir)ModuleData\*.xml" />
+      <LanguageFiles Include="$(ProjectDir)ModuleData\Languages\*.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ModuleDataFiles)" DestinationFolder="$(ModuleFolder)\ModuleData" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(LanguageFiles)" DestinationFolder="$(ModuleFolder)\ModuleData\Languages" SkipUnchangedFiles="true" />
+
+    <!-- Output success message -->
+    <Message Text="&#xA;========================================" Importance="high" />
+    <Message Text="HeirOfNumenor (Code Module) deployed to:" Importance="high" />
+    <Message Text="  $(ModuleFolder)" Importance="high" />
+    <Message Text="  - DLL, ModuleData, SubModule.xml" Importance="high" />
+    <Message Text="  - GUI assets are in HeirOfNumenorGUI module" Importance="high" />
+    <Message Text="========================================&#xA;" Importance="high" />
+  </Target>
+
+  <!-- Clean target to remove deployed module -->
+  <Target Name="CleanModule" AfterTargets="Clean">
+    <PropertyGroup>
+      <ModuleFolder>$(GameFolder)\Modules\HeirOfNumenor</ModuleFolder>
+    </PropertyGroup>
+    <RemoveDir Directories="$(ModuleFolder)" Condition="Exists('$(ModuleFolder)')" />
+    <Message Text="Cleaned HeirOfNumenor module folder" Importance="high" />
+  </Target>
+
+</Project>

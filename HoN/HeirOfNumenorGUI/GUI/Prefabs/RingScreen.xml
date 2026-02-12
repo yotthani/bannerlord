@@ -1,0 +1,1365 @@
+<Prefab>
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- RINGS OF POWER - Orbital Planetary System                              -->
+  <!-- Rings orbit The One Ring like planets around the sun                   -->
+  <!-- Updated to match React mock with smooth animations                     -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <Constants>
+    <!-- Orbital container dimensions -->
+    <Constant Name="Orbital.Width" Value="600" />
+    <Constant Name="Orbital.Height" Value="400" />
+    <Constant Name="Orbital.CenterX" Value="300" />
+    <Constant Name="Orbital.CenterY" Value="150" />
+    
+    <!-- Table dimensions -->
+    <Constant Name="Table.Width" Value="1200" />
+    <Constant Name="Table.Height" Value="642" />
+  </Constants>
+  
+  <VisualDefinitions>
+    <!-- Ring selection glow animation -->
+    <VisualDefinition Name="RingGlow" TransitionDuration="0.2" EaseFunction="Cubic">
+      <VisualState State="Default" AlphaFactor="0.4" />
+      <VisualState State="Hovered" AlphaFactor="0.7" />
+      <VisualState State="Pressed" AlphaFactor="1.0" />
+    </VisualDefinition>
+    
+    <!-- Panel fade in -->
+    <VisualDefinition Name="PanelFade" TransitionDuration="0.3" EaseFunction="Quint">
+      <VisualState State="Default" AlphaFactor="1" />
+    </VisualDefinition>
+    
+    <!-- Button feedback -->
+    <VisualDefinition Name="ButtonPress" TransitionDuration="0.1">
+      <VisualState State="Default" MarginTop="0" />
+      <VisualState State="Pressed" MarginTop="2" />
+    </VisualDefinition>
+  </VisualDefinitions>
+  
+  <Window>
+    <!-- Root widget - no margin so 3D scene shows through -->
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+      <Children>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- BACKGROUND - Transparent to show 3D scene                          -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" 
+                Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0" />
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- FORGE TABLE BACKGROUND                                              -->
+        <!-- Custom sprite from ui_ring_system category                          -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                SuggestedWidth="2400" SuggestedHeight="900"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                Sprite="ring_table_complete" MarginBottom="80" />
+        
+        <!-- Subtle vignette overlay for depth -->
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="120"
+                VerticalAlignment="Top" 
+                Sprite="BlankWhiteSquare_9" Color="#00000088" />
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- HEADER - Using standard game tabbar popup style                     -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="590" SuggestedHeight="100"
+                HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="-10"
+                Sprite="StdAssets\tabbar_popup">
+          <Children>
+            <!-- Title -->
+            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" MarginBottom="25"
+                        Brush="Recruitment.Popup.Title.Text" Brush.FontSize="42" 
+                        Text="@ScreenTitle" />
+            
+            <!-- Ring count -->
+            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" MarginTop="35"
+                        Brush="Popup.Text.Small" Brush.FontSize="14" 
+                        Brush.FontColor="#A09080FF" Text="@RingCountText" />
+          </Children>
+        </Widget>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- EQUIPPED RING PREVIEW (Floating above orbits)                       -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="140"
+                HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="85"
+                IsVisible="@HasEquippedRing">
+          <Children>
+            <!-- Animated glow backdrop (pulses) -->
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="160" SuggestedHeight="160"
+                    HorizontalAlignment="Center" VerticalAlignment="Top"
+                    Sprite="BlankWhiteSquare_9" Color="#FFD700FF" AlphaFactor="@PreviewGlowOpacity" />
+            
+            <!-- Ring preview container (bobs gently) -->
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="130" SuggestedHeight="150"
+                    HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="5"
+                    MarginBottom="@PreviewBobOffset">
+              <Children>
+                <!-- Outer mystical glow ring -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="140" SuggestedHeight="140"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Sprite="MapBar\mapbar_center_circle_frame" Color="#FFD700FF" AlphaFactor="@PreviewGlowOpacity" />
+                <!-- Actual ring sprite - using real sprite -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="100" SuggestedHeight="115"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Sprite="@PreviewRingSprite" />
+                <!-- Inner glow accent -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="140" SuggestedHeight="140"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Sprite="MapBar\mapbar_center_circle_frame" Color="#FF8800FF" AlphaFactor="@PreviewGlowOpacity" />
+              </Children>
+            </Widget>
+            
+            <!-- Label -->
+            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        Brush="Popup.Text.Small" Brush.FontSize="11" 
+                        Brush.FontColor="#FF8800FF" Text="@EquippedRingName" />
+          </Children>
+        </Widget>
+        
+        <!-- EQUIP ANIMATION RING (floats from table to preview) -->
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                SuggestedWidth="@EquipAnimSize" SuggestedHeight="@EquipAnimSize"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                MarginLeft="@EquipAnimPosX" MarginTop="@EquipAnimPosY"
+                AlphaFactor="@EquipAnimOpacity"
+                IsVisible="@IsEquipAnimating">
+          <Children>
+            <!-- Glow trail -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Sprite="MapBar\mapbar_center_circle_frame" Color="#FFD70066" />
+            <!-- Ring -->
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="60" SuggestedHeight="60"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Sprite="MapBar\mapbar_center_circle_frame" Color="#FFD700FF" />
+          </Children>
+        </Widget>
+        
+        <!-- "No Ring Equipped" placeholder -->
+        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="80"
+                HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="100"
+                IsVisible="@Not(HasEquippedRing)">
+          <Children>
+            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Brush="Popup.Text.Small" Brush.FontSize="12" 
+                        Brush.FontColor="#4A4A4AFF" Text="@LabelNoRingWorn" />
+          </Children>
+        </Widget>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- LEFT PANEL - Selected Ring Details (Using game Frame style)         -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <BrushWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="400"
+                HorizontalAlignment="Left" VerticalAlignment="Center" MarginLeft="10" MarginTop="30"
+                Brush="Frame1.Broken.Left">
+          <Children>
+            <!-- Panel header sprite -->
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="60"
+                    HorizontalAlignment="Left" VerticalAlignment="Top" MarginLeft="-3" MarginTop="-3"
+                    Sprite="Inventory\header_left" />
+            
+            <!-- Header text -->
+            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                        HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="15"
+                        Brush="InventoryHeaderFontBrush" Brush.FontSize="24" 
+                        Brush.TextHorizontalAlignment="Center" Text="@LabelRingLore" />
+            
+            <!-- Content area -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" 
+                    MarginLeft="20" MarginRight="20" MarginTop="60" MarginBottom="20">
+              <Children>
+                <!-- Ring Name -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top"
+                            Brush="InventoryHeaderFontBrush" Brush.FontSize="20" 
+                            Brush.FontColor="#FFD700FF" Text="@SelectedRingName" 
+                            IsVisible="@HasSelectedRing" />
+                
+                <!-- Ring Type -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="28"
+                            Brush="Popup.Text.Small" Brush.FontSize="14"
+                            Brush.FontColor="#7B9971FF" Text="@SelectedRingType" 
+                            IsVisible="@HasSelectedRing" />
+                
+                <!-- Divider -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="220" SuggestedHeight="2"
+                        HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="52"
+                        Sprite="horizontal_gradient_divider" IsVisible="@HasSelectedRing" />
+                
+                <!-- Effect Label -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="62"
+                            Brush="TownManagement.Item.Title.Text" Brush.FontSize="12" 
+                            Text="@LabelPower" IsVisible="@HasSelectedRing" />
+                
+                <!-- Effect -->
+                <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="250"
+                                HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="80"
+                                Brush="Popup.Text.Small" Brush.FontSize="13" 
+                                Brush.FontColor="#88DD88FF" Text="@SelectedRingEffect" 
+                                IsVisible="@HasSelectedRing" />
+                
+                <!-- Lore Label -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="145"
+                            Brush="TownManagement.Item.Title.Text" Brush.FontSize="12" 
+                            Text="@LabelHistory" IsVisible="@HasSelectedRing" />
+                
+                <!-- Lore -->
+                <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="250"
+                                HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="163"
+                                Brush="Popup.Text.Small" Brush.FontSize="11" 
+                                Brush.FontColor="#9A8A7AFF" Text="@SelectedRingLore" 
+                                IsVisible="@HasSelectedRing" />
+                
+                <!-- Status -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                        VerticalAlignment="Bottom" MarginBottom="5" IsVisible="@HasSelectedRing">
+                  <Children>
+                    <!-- Owned -->
+                    <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                               HorizontalAlignment="Center"
+                               StackLayout.LayoutMethod="HorizontalLeftToRight"
+                               IsVisible="@IsSelectedRingOwned">
+                      <Children>
+                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                SuggestedWidth="18" SuggestedHeight="18" MarginRight="8"
+                                VerticalAlignment="Center"
+                                Sprite="General\Icons\Checked" Color="#FFD700FF" />
+                        <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                                    VerticalAlignment="Center"
+                                    Brush="Popup.Text.Small" Brush.FontSize="13" 
+                                    Brush.FontColor="#FFD700FF" Text="@LabelInPossession" />
+                      </Children>
+                    </ListPanel>
+                    
+                    <!-- Not Owned -->
+                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                                HorizontalAlignment="Center"
+                                Brush="Popup.Text.Small" Brush.FontSize="13" 
+                                Brush.FontColor="#5C4A3AFF" Text="@LabelLostToShadow"
+                                IsVisible="@Not(IsSelectedRingOwned)" />
+                    
+                    <!-- Equipped badge -->
+                    <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                                HorizontalAlignment="Center" MarginTop="25"
+                                Brush="Popup.Text.Small" Brush.FontSize="13" 
+                                Brush.FontColor="#FF8800FF" Text="@LabelBearingRing"
+                                IsVisible="@IsSelectedRingEquipped" />
+                  </Children>
+                </Widget>
+                
+                <!-- Empty state -->
+                <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Brush="Popup.Text.Medium" Brush.FontSize="16" 
+                            Brush.FontColor="#6A6A6AFF" Text="@LabelSelectRing"
+                            IsVisible="@Not(HasSelectedRing)" />
+              </Children>
+            </Widget>
+          </Children>
+        </BrushWidget>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- RIGHT PANEL - Bearer Status (Using game Frame style)                -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <BrushWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="400"
+                HorizontalAlignment="Right" VerticalAlignment="Center" MarginRight="10" MarginTop="30"
+                Brush="Frame1.Broken.Right">
+          <Children>
+            <!-- Panel header sprite -->
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="300" SuggestedHeight="60"
+                    HorizontalAlignment="Right" VerticalAlignment="Top" MarginRight="-3" MarginTop="-3"
+                    Sprite="Inventory\header_right" />
+            
+            <!-- Header text -->
+            <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                        HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="15"
+                        Brush="InventoryHeaderFontBrush" Brush.FontSize="24" 
+                        Brush.TextHorizontalAlignment="Center" Text="@LabelBearerStatus" />
+            
+            <!-- Content area -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" 
+                    MarginLeft="20" MarginRight="20" MarginTop="60" MarginBottom="20">
+              <Children>
+                <!-- Corruption Section Label -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top"
+                            Brush="TownManagement.Item.Title.Text" Brush.FontSize="12" 
+                            Text="@LabelCorruption" />
+                
+                <!-- Corruption Bar Background -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="230" SuggestedHeight="22"
+                        HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="20"
+                        Sprite="SPGeneral\SPBars\xpbar_background">
+                  <Children>
+                    <!-- Corruption Bar Fill -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="@CorruptionBarWidth" SuggestedHeight="18"
+                            HorizontalAlignment="Left" VerticalAlignment="Center" MarginLeft="2"
+                            Sprite="BlankWhiteSquare_9" Color="#8B0000DD" />
+                  </Children>
+                </Widget>
+                
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="46"
+                            Brush="Popup.Text.Small" Brush.FontSize="13" 
+                            Brush.FontColor="#AA6666FF" Text="@CorruptionText" />
+                
+                <!-- Divider -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="220" SuggestedHeight="2"
+                        HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="72"
+                        Sprite="horizontal_gradient_divider" />
+                
+                <!-- Threat Section Label -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="82"
+                            Brush="TownManagement.Item.Title.Text" Brush.FontSize="12" 
+                            Text="@LabelThreatLevel" />
+                
+                <!-- Threat Display -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="100"
+                            Brush="InventoryHeaderFontBrush" Brush.FontSize="22" 
+                            Brush.FontColor="#FF6600FF" Text="@ThreatLevelDisplay" />
+                
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="128"
+                            Brush="Popup.Text.Small" Brush.FontSize="12" 
+                            Brush.FontColor="#888888FF" Text="@ThreatDescription" />
+                
+                <!-- Divider -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="220" SuggestedHeight="2"
+                        HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="155"
+                        Sprite="horizontal_gradient_divider" />
+                
+                <!-- Active Powers Label -->
+                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="165"
+                            Brush="TownManagement.Item.Title.Text" Brush.FontSize="12" 
+                            Text="@LabelActivePowers" />
+                
+                <!-- Active Powers -->
+                <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="250"
+                                HorizontalAlignment="Center" VerticalAlignment="Top" MarginTop="185"
+                                Brush="Popup.Text.Small" Brush.FontSize="12" 
+                                Brush.FontColor="#88CC88FF" Text="@ActiveEffectsText" />
+              </Children>
+            </Widget>
+          </Children>
+        </BrushWidget>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- CENTER - SIMPLIFIED RING DISPLAY                                    -->
+        <!-- One Ring in center, Elven rings in ellipse around it                -->
+        <!-- Table is 2400x900, MarginBottom=80, so table center ~530 from bottom -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Widget Id="RingDisplayContainer" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                SuggestedWidth="800" SuggestedHeight="500"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="190">
+          <Children>
+            
+            <!-- Debug: Container boundary (toggled via MCM) -->
+            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                    Sprite="BlankWhiteSquare_9" Color="#FF000020" IsVisible="@ShowDebugBoundary" />
+            
+            <!-- Elven orbit ellipse indicator -->
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="400" SuggestedHeight="160"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Sprite="MapBar\mapbar_center_circle_frame" Color="#90EE9030" />
+            
+            <!-- Mortal orbit ellipse indicator (outer) -->
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="760" SuggestedHeight="300"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Sprite="MapBar\mapbar_center_circle_frame" Color="#FFA50020" />
+            
+            <!-- Dwarven orbit ellipse indicator (middle) -->
+            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="600" SuggestedHeight="240"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Sprite="MapBar\mapbar_center_circle_frame" Color="#C0D4E820" />
+            
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <!-- MORTAL RINGS - 9 rings on outer ellipse (back rings first)          -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <Widget AcceptDrop="false" DataSource="{MortalRing1}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="85" SuggestedHeight="120"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="62" SuggestedHeight="25"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="50" SuggestedHeight="58"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{MortalRing2}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="85" SuggestedHeight="120"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="62" SuggestedHeight="25"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="50" SuggestedHeight="58"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{MortalRing3}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="85" SuggestedHeight="120"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="62" SuggestedHeight="25"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="50" SuggestedHeight="58"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{MortalRing4}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="85" SuggestedHeight="120"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="62" SuggestedHeight="25"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="50" SuggestedHeight="58"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{MortalRing5}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="85" SuggestedHeight="120"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="62" SuggestedHeight="25"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="50" SuggestedHeight="58"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <!-- DWARVEN RINGS - 7 rings on middle ellipse (rendered first = back)   -->
+            <!-- Using circle placeholder until proper transparent sprites ready     -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <Widget AcceptDrop="false" DataSource="{DwarvenRing1}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="70" SuggestedHeight="28"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="58" SuggestedHeight="67"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="78" SuggestedHeight="78"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{DwarvenRing2}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="70" SuggestedHeight="28"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="58" SuggestedHeight="67"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="78" SuggestedHeight="78"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{DwarvenRing3}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="70" SuggestedHeight="28"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="58" SuggestedHeight="67"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="78" SuggestedHeight="78"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{DwarvenRing4}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="70" SuggestedHeight="28"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="58" SuggestedHeight="67"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="78" SuggestedHeight="78"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <!-- ELVEN RINGS - 3 rings on inner ellipse                              -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            
+            <!-- Ring 1 (Narya): Position from VM - typically starts at top/back -->
+            <!-- Wrapper for position, inner wrapper for bobbing, shadow below -->
+            <Widget AcceptDrop="false" DataSource="{ElvenRing1}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <!-- Shadow (ellipse below ring) -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="82" SuggestedHeight="33"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <!-- Ring button with bobbing -->
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="70" SuggestedHeight="80"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="95" SuggestedHeight="95"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <!-- ═══ THE ONE RING - Center with floating animation ═══ -->
+            <!-- Wrapper for shadow and bobbing -->
+            <Widget AcceptDrop="false" DataSource="{OneRing}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="140" SuggestedHeight="200"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+              <Children>
+                <!-- Shadow (ellipse below ring) -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="120" SuggestedHeight="48"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <!-- Ring button with bobbing -->
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="100" SuggestedHeight="115"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="135" SuggestedHeight="135"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="95" SuggestedHeight="95"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <!-- MORTAL RINGS (FRONT) - Rings 6-9                                    -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <Widget AcceptDrop="false" DataSource="{MortalRing6}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="85" SuggestedHeight="120"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="62" SuggestedHeight="25"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="50" SuggestedHeight="58"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{MortalRing7}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="85" SuggestedHeight="120"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="62" SuggestedHeight="25"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="50" SuggestedHeight="58"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{MortalRing8}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="85" SuggestedHeight="120"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="62" SuggestedHeight="25"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="50" SuggestedHeight="58"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{MortalRing9}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="85" SuggestedHeight="120"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="62" SuggestedHeight="25"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="50" SuggestedHeight="58"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            
+            <!-- DWARVEN RINGS (FRONT) - Rings 5-7 (rendered after Mortal) -->
+            <Widget AcceptDrop="false" DataSource="{DwarvenRing5}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="70" SuggestedHeight="28"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="58" SuggestedHeight="67"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="78" SuggestedHeight="78"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{DwarvenRing6}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="70" SuggestedHeight="28"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="58" SuggestedHeight="67"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="78" SuggestedHeight="78"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{DwarvenRing7}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="70" SuggestedHeight="28"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="58" SuggestedHeight="67"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="78" SuggestedHeight="78"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="70" SuggestedHeight="80"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            
+                        <!-- ELVEN FRONT RINGS - Declared last so they're clickable on top      -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <Widget AcceptDrop="false" DataSource="{ElvenRing2}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="82" SuggestedHeight="33"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="70" SuggestedHeight="80"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="95" SuggestedHeight="95"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+            <Widget AcceptDrop="false" DataSource="{ElvenRing3}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                    SuggestedWidth="105" SuggestedHeight="155"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MarginLeft="@MarginLeft" MarginRight="@MarginRight"
+                    MarginTop="@MarginTop" MarginBottom="@MarginBottom">
+              <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                        SuggestedWidth="82" SuggestedHeight="33"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        MarginBottom="@ShadowMarginTop"
+                        IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                        AlphaFactor="@ShadowOpacityValue" />
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="70" SuggestedHeight="80"
+                              HorizontalAlignment="Center" VerticalAlignment="Top"
+                              MarginTop="@BobMarginTop" MarginBottom="@BobMarginBottom"
+                              AlphaFactor="@Opacity"
+                              Command.Click="ExecuteSelect" Command.AlternateClick="ExecuteRightClick" UpdateChildrenStates="true">
+                  <Children>
+                    <!-- Ring Aura (glows when floating up) -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="95" SuggestedHeight="95"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            IsHitTestVisible="false" Sprite="MapBar\mapbar_center_circle_frame" Color="@TableGlowColor"
+                            AlphaFactor="@RingAuraOpacity" />
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="@SpriteName" />
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" 
+                            SuggestedWidth="65" SuggestedHeight="65"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="@SelectionGlowColor" 
+                            IsVisible="@IsSelected" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </Widget>
+            
+          </Children>
+        </Widget>
+        
+        <!-- Simple legend - positioned at table edge -->
+        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="28" 
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginBottom="220">
+          <Children>
+            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       StackLayout.LayoutMethod="HorizontalLeftToRight">
+              <Children>
+                <!-- One Ring -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="14" SuggestedHeight="14"
+                        VerticalAlignment="Center" MarginLeft="8"
+                        Sprite="MapBar\mapbar_center_circle_frame" Color="#FFD700FF" />
+                <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                            VerticalAlignment="Center" MarginLeft="5" MarginRight="20"
+                            Brush="Popup.Text.Small" Brush.FontSize="15" 
+                            Brush.FontColor="#FFD700CC" Text="@LabelTheOne" />
+                <!-- Elven -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="14" SuggestedHeight="14"
+                        VerticalAlignment="Center"
+                        Sprite="MapBar\mapbar_center_circle_frame" Color="#98FB98FF" />
+                <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                            VerticalAlignment="Center" MarginLeft="5" MarginRight="20"
+                            Brush="Popup.Text.Small" Brush.FontSize="15" 
+                            Brush.FontColor="#90EE90CC" Text="@LabelElven" />
+                <!-- Dwarven -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="14" SuggestedHeight="14"
+                        VerticalAlignment="Center"
+                        Sprite="MapBar\mapbar_center_circle_frame" Color="#D0E8FFFF" />
+                <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                            VerticalAlignment="Center" MarginLeft="5" MarginRight="20"
+                            Brush="Popup.Text.Small" Brush.FontSize="15" 
+                            Brush.FontColor="#C0D4E8CC" Text="@LabelDwarven" />
+                <!-- Mortal -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="14" SuggestedHeight="14"
+                        VerticalAlignment="Center"
+                        Sprite="MapBar\mapbar_center_circle_frame" Color="#FFB84DFF" />
+                <TextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                            VerticalAlignment="Center" MarginLeft="5" MarginRight="8"
+                            Brush="Popup.Text.Small" Brush.FontSize="15" 
+                            Brush.FontColor="#FFA500CC" Text="@LabelMortal" />
+              </Children>
+            </ListPanel>
+          </Children>
+        </Widget>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- ROTATION CONTROLS WITH CENTER EQUIP BUTTON                          -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                      SuggestedWidth="100" SuggestedHeight="40"
+                      HorizontalAlignment="Center" VerticalAlignment="Bottom" 
+                      MarginBottom="120" MarginRight="280"
+                      Brush="ButtonBrush2" Command.Click="ExecuteRotateLeft" UpdateChildrenStates="true"
+                      IsEnabled="@CanRotate">
+          <Children>
+            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Brush="Popup.Text.Medium" Brush.FontSize="14" Text="@LabelRotateLeft" />
+          </Children>
+        </ButtonWidget>
+        
+        <!-- ═══ EQUIP/UNEQUIP BUTTON (same style as rotate) ═══ -->
+        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                      SuggestedWidth="120" SuggestedHeight="40"
+                      HorizontalAlignment="Center" VerticalAlignment="Bottom" 
+                      MarginBottom="120"
+                      Brush="ButtonBrush2" Command.Click="ExecuteEquipSelected" UpdateChildrenStates="true"
+                      IsEnabled="@CanEquipOrUnequipSelected">
+          <Children>
+            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Brush="Popup.Text.Medium" Brush.FontSize="14" 
+                        Text="@EquipButtonText" />
+          </Children>
+        </ButtonWidget>
+        
+        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                      SuggestedWidth="100" SuggestedHeight="40"
+                      HorizontalAlignment="Center" VerticalAlignment="Bottom" 
+                      MarginBottom="120" MarginLeft="280"
+                      Brush="ButtonBrush2" Command.Click="ExecuteRotateRight" UpdateChildrenStates="true"
+                      IsEnabled="@CanRotate">
+          <Children>
+            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Brush="Popup.Text.Medium" Brush.FontSize="14" Text="@LabelRotateRight" />
+          </Children>
+        </ButtonWidget>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- BOTTOM ACTION BAR - Using Standard Triple Dialog Buttons           -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Standard.TripleDialogCloseButtons 
+            HorizontalAlignment="Center" VerticalAlignment="Bottom"
+            Parameter.CancelButtonAction="ExecuteCancel" 
+            Parameter.CancelButtonText="@ButtonLeave" 
+            Parameter.CancelInputKeyDataSource="{CancelInputKey}" 
+            Parameter.DoneButtonAction="ExecuteDone" 
+            Parameter.DoneButtonText="@ButtonDone" 
+            Parameter.DoneInputKeyDataSource="{DoneInputKey}" 
+            Parameter.ResetButtonAction="ExecuteEquipSelected" 
+            Parameter.ResetButtonText="@EquipButtonText"
+            Parameter.ResetInputKeyDataSource="{ResetInputKey}"
+            Parameter.ResetButtonHintDataSource="{EquipHint}" />
+        
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- CONTEXT MENU - Inventory Icon Style                                 -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" 
+                IsVisible="@IsContextMenuVisible">
+          <Children>
+            <!-- Click-away to close -->
+            <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                          Command.Click="ExecuteCloseContextMenu" />
+            
+            <!-- Context menu popup - compact icon buttons -->
+            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       MarginLeft="@ContextMenuPosX" MarginTop="@ContextMenuPosY"
+                       StackLayout.LayoutMethod="HorizontalLeftToRight">
+              <Children>
+                <!-- Equip button -->
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="36" SuggestedHeight="36"
+                              Brush="Inventory.Tuple.Left.Button"
+                              Command.Click="ExecuteContextEquip" UpdateChildrenStates="true"
+                              IsVisible="@ContextCanEquip"
+                              HintText="@HintBearRing">
+                  <Children>
+                    <!-- Icon background -->
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="General\Icons\MapOverlay\settlement_icon_bgs" Color="#22442266" />
+                    <!-- Ring icon -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="24" SuggestedHeight="24"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="#88DD88FF" />
+                  </Children>
+                </ButtonWidget>
+                
+                <!-- Unequip button -->
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="36" SuggestedHeight="36"
+                              Brush="Inventory.Tuple.Left.Button"
+                              Command.Click="ExecuteContextUnequip" UpdateChildrenStates="true"
+                              IsVisible="@ContextCanUnequip"
+                              HintText="@HintRemoveRing">
+                  <Children>
+                    <!-- Icon background -->
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="General\Icons\MapOverlay\settlement_icon_bgs" Color="#44222266" />
+                    <!-- Ring icon with X -->
+                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                            SuggestedWidth="24" SuggestedHeight="24"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Sprite="MapBar\mapbar_center_circle_frame" Color="#FF8844FF" />
+                  </Children>
+                </ButtonWidget>
+                
+                <!-- Info/Close button -->
+                <ButtonWidget DoNotPassEventsToChildren="true" 
+                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                              SuggestedWidth="36" SuggestedHeight="36"
+                              Brush="Inventory.Tuple.Left.Button"
+                              Command.Click="ExecuteCloseContextMenu" UpdateChildrenStates="true"
+                              HintText="@HintClose">
+                  <Children>
+                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                            Sprite="General\Icons\MapOverlay\settlement_icon_bgs" Color="#33333366" />
+                    <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Brush="Popup.Text.Small" Brush.FontSize="18" 
+                                Brush.FontColor="#AAAAAAFF" Text="✕" />
+                  </Children>
+                </ButtonWidget>
+              </Children>
+            </ListPanel>
+          </Children>
+        </Widget>
+        
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

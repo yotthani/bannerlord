@@ -1,0 +1,21 @@
+<Prefab>
+  <!-- Morph category accordion section -->
+  <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginBottom="4">
+    <Children>
+      <!-- Category Header (clickable to expand/collapse) -->
+      <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24" Command.Click="ExecuteToggle" DoNotPassEventsToChildren="true" UpdateChildrenStates="true">
+        <Children>
+          <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#2A2520FF"/>
+          <TextWidget Text="@HeaderText" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginLeft="8" VerticalAlignment="Center" Brush="FaceLearner.Section.Label"/>
+        </Children>
+      </ButtonWidget>
+      
+      <!-- Category Content (morphs list) - only visible when expanded -->
+      <ListPanel DataSource="{Morphs}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="28" MarginLeft="4" StackLayout.LayoutMethod="VerticalBottomToTop" IsVisible="@IsExpanded">
+        <ItemTemplate>
+          <FaceLearner.MorphSlider/>
+        </ItemTemplate>
+      </ListPanel>
+    </Children>
+  </Widget>
+</Prefab>

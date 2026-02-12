@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heir of Numenor - Extension for The Age of Men</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: linear-gradient(180deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px;
+        }
+        
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(180deg, rgba(201,162,39,0.2) 0%, transparent 100%);
+            border-bottom: 3px solid #c9a227;
+            position: relative;
+        }
+        
+        .coming-banner {
+            background: linear-gradient(90deg, #8b0000, #dc143c, #8b0000);
+            color: #ffd700;
+            padding: 15px 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            display: inline-block;
+            border: 2px solid #ffd700;
+            text-shadow: 2px 2px 4px #000;
+            box-shadow: 0 0 20px rgba(220,20,60,0.5);
+        }
+        
+        .crown-symbol {
+            font-size: 70px;
+            display: block;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));
+        }
+        
+        h1 {
+            font-size: 4em;
+            color: #ffd700;
+            text-shadow: 
+                3px 3px 0 #8b6914,
+                0 0 30px rgba(255,215,0,0.6),
+                0 0 60px rgba(255,215,0,0.3);
+            letter-spacing: 6px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 1.5em;
+            color: #c9a227;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        
+        .tagline {
+            font-style: italic;
+            color: #87ceeb;
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px rgba(135,206,235,0.5);
+        }
+        
+        .for-mod {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
+            border: 3px solid #ffd700;
+            font-size: 1.1em;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #ffd700;
+            text-shadow: 1px 1px 2px #000;
+            box-shadow: 0 0 25px rgba(255,215,0,0.4);
+        }
+        
+        /* Section styling */
+        .section {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border: 2px solid;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 25px 0;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+        
+        .section-rings { border-color: #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.2); }
+        .section-army { border-color: #dc143c; box-shadow: 0 0 30px rgba(220,20,60,0.2); }
+        .section-realm { border-color: #4169e1; box-shadow: 0 0 30px rgba(65,105,225,0.2); }
+        .section-forge { border-color: #ff6b35; box-shadow: 0 0 30px rgba(255,107,53,0.2); }
+        .section-battle { border-color: #32cd32; box-shadow: 0 0 30px rgba(50,205,50,0.2); }
+        
+        .section-header {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid currentColor;
+            text-shadow: 0 0 15px currentColor;
+        }
+        
+        .section-rings .section-header { color: #ffd700; }
+        .section-army .section-header { color: #ff6b6b; }
+        .section-realm .section-header { color: #87ceeb; }
+        .section-forge .section-header { color: #ff8c42; }
+        .section-battle .section-header { color: #90ee90; }
+        
+        .section-icon { font-size: 1.2em; margin-right: 10px; }
+        
+        .section-quote {
+            text-align: center;
+            font-style: italic;
+            color: #b0b0b0;
+            margin-bottom: 20px;
+        }
+        
+        /* Feature grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            padding: 18px;
+            border-left: 4px solid;
+        }
+        
+        .section-rings .feature-card { border-left-color: #ffd700; }
+        .section-army .feature-card { border-left-color: #dc143c; }
+        .section-realm .feature-card { border-left-color: #4169e1; }
+        .section-forge .feature-card { border-left-color: #ff6b35; }
+        .section-battle .feature-card { border-left-color: #32cd32; }
+        
+        .feature-card h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .feature-card ul {
+            list-style: none;
+            padding: 0;
+            font-size: 0.9em;
+        }
+        
+        .feature-card li {
+            padding: 5px 0 5px 18px;
+            position: relative;
+            color: #d0d0d0;
+        }
+        
+        .feature-card li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: inherit;
+        }
+        
+        .section-rings .feature-card li::before { color: #ffd700; }
+        .section-army .feature-card li::before { color: #ff6b6b; }
+        .section-realm .feature-card li::before { color: #87ceeb; }
+        .section-forge .feature-card li::before { color: #ff8c42; }
+        .section-battle .feature-card li::before { color: #90ee90; }
+        
+        /* Tags */
+        .tags { text-align: center; margin-top: 15px; }
+        
+        .tag {
+            display: inline-block;
+            padding: 5px 15px;
+            margin: 3px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .tag-gold { background: linear-gradient(135deg, #ffd700, #b8860b); color: #000; }
+        .tag-silver { background: linear-gradient(135deg, #c0c0c0, #808080); color: #000; }
+        .tag-bronze { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
+        .tag-red { background: linear-gradient(135deg, #dc143c, #8b0000); color: #fff; }
+        
+        /* Wide feature */
+        .feature-wide {
+            grid-column: 1 / -1;
+        }
+        
+        .inner-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .inner-grid > div h4 {
+            color: #87ceeb;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+        
+        /* Rarity bar */
+        .rarity-bar {
+            display: flex;
+            gap: 3px;
+            margin: 10px 0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .rarity-bar span {
+            flex: 1;
+            padding: 6px;
+            text-align: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .rarity-common { background: #708090; }
+        .rarity-rare { background: #4169e1; }
+        .rarity-epic { background: #9932cc; }
+        .rarity-legendary { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; }
+        
+        /* Lore quote */
+        .lore-quote {
+            background: rgba(255,215,0,0.1);
+            border-left: 4px solid #ffd700;
+            padding: 12px 15px;
+            margin: 10px 0;
+            font-style: italic;
+            color: #ffd700;
+        }
+        
+        /* Config section */
+        .config-section {
+            background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3));
+            border: 2px solid #c9a227;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .config-section h2 {
+            color: #ffd700;
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255,215,0,0.5);
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 5px;
+        }
+        
+        .checkbox {
+            width: 22px;
+            height: 22px;
+            background: #228b22;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(0deg, rgba(201,162,39,0.1) 0%, transparent 100%);
+            border-top: 3px solid #c9a227;
+            margin-top: 30px;
+        }
+        
+        footer h3 {
+            color: #ffd700;
+            font-size: 2em;
+            margin-bottom: 25px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+        
+        .install-steps {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            flex-wrap: wrap;
+            margin: 25px 0;
+        }
+        
+        .install-step {
+            text-align: center;
+        }
+        
+        .install-step .num {
+            display: block;
+            width: 60px;
+            height: 60px;
+            line-height: 56px;
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: #000;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+        
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 25px 0;
+        }
+        
+        .badge {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
+            border: 2px solid #ffd700;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #ffd700;
+            box-shadow: 0 0 15px rgba(255,215,0,0.3);
+        }
+        
+        .final-quote {
+            font-style: italic;
+            color: #87ceeb;
+            font-size: 1.2em;
+            margin: 30px 0 20px;
+            text-shadow: 0 0 10px rgba(135,206,235,0.5);
+        }
+        
+        .version {
+            color: #c9a227;
+            font-size: 1em;
+        }
+        
+        .coming-footer {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 40px;
+            background: linear-gradient(90deg, #8b0000, #dc143c, #8b0000);
+            color: #ffd700;
+            font-size: 1.2em;
+            font-weight: bold;
+            letter-spacing: 3px;
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 25px rgba(220,20,60,0.5);
+        }
+        
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 2em;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="coming-banner">★ Coming Soon to The Age of Men ★</div>
+            <span class="crown-symbol">👑</span>
+            <h1>HEIR OF NUMENOR</h1>
+            <div class="subtitle">Extension</div>
+            <p class="tagline">"From the ashes of Numenor, the Dunedain endure"</p>
+            <div class="for-mod">◆ FOR AGES OF MIDDLE-EARTH ◆</div>
+        </header>
+
+        <!-- RINGS OF POWER -->
+        <div class="section section-rings">
+            <div class="section-header">
+                <span class="section-icon">💍</span> THE RINGS OF POWER
+            </div>
+            <p class="section-quote">"Three Rings for the Elven-kings under the sky, Seven for the Dwarf-lords in their halls of stone..."</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>⚪ The Twenty Rings</h3>
+                    <ul>
+                        <li>3 Elven Rings of preservation</li>
+                        <li>7 Dwarven Rings of craft</li>
+                        <li>9 Rings for mortal Men</li>
+                        <li>1 Ring to rule them all</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>✨ Ring Powers</h3>
+                    <ul>
+                        <li>Race-specific abilities</li>
+                        <li>Elven Grace & Starlight</li>
+                        <li>Dwarven Fortitude</li>
+                        <li>Mortal Dominion</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>🌑 Corruption</h3>
+                    <ul>
+                        <li>Rings corrupt over time</li>
+                        <li>Effects build and decay</li>
+                        <li>Fading & Shadow afflictions</li>
+                        <li>The One accelerates all</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>👁 The Hunt</h3>
+                    <ul>
+                        <li>Dark forces sense bearers</li>
+                        <li>Threat level increases</li>
+                        <li>Nazgul pursue you</li>
+                        <li>The One draws ALL foes</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tags">
+                <span class="tag tag-silver">Elven Grace</span>
+                <span class="tag tag-bronze">Dwarven Might</span>
+                <span class="tag tag-gold">Mortal Dominion</span>
+                <span class="tag tag-red">Corruption</span>
+            </div>
+        </div>
+
+        <!-- COMMAND YOUR HOST -->
+        <div class="section section-army">
+            <div class="section-header">
+                <span class="section-icon">⚔️</span> COMMAND YOUR HOST
+            </div>
+            <p class="section-quote">Know your warriors. Lead them wisely. Remember the fallen.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>📊 Troop Status</h3>
+                    <ul>
+                        <li>😨 Fear — causes desertion</li>
+                        <li>😤 Frustration — unmet needs</li>
+                        <li>💚 Bonding — loyalty to you</li>
+                        <li>⚔️ Battle Experience</li>
+                        <li>🏅 Loyalty — commitment</li>
+                        <li>👁 Ring Exposure</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>⭐ Virtual Captains</h3>
+                    <div class="lore-quote">"Thorgrim Ironhand emerges as captain of your Heavy Lancers!"</div>
+                    <ul>
+                        <li>Emerge at 75%+ bonding</li>
+                        <li>Culture-specific names</li>
+                        <li>Morale & combat bonuses</li>
+                        <li>Heroic battle deaths</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🍺 Cultural Needs</h3>
+                    <ul>
+                        <li>🧝 Elves — forests, starlight</li>
+                        <li>🧔 Dwarves — ale, mountains</li>
+                        <li>🗡️ Orcs — combat, meat</li>
+                        <li>👤 Men — pay, rest, victories</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- RULE YOUR REALM -->
+        <div class="section section-realm">
+            <div class="section-header">
+                <span class="section-icon">🏰</span> RULE YOUR REALM
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card feature-wide">
+                    <h3>🗺️ Remote Fief Management — Press F6</h3>
+                    <p style="color:#87ceeb; margin-bottom:10px;">Command your holdings from anywhere in Middle-earth!</p>
+                    <div class="inner-grid">
+                        <div>
+                            <h4>📋 Overview</h4>
+                            <ul>
+                                <li>Carousel navigation</li>
+                                <li>All stats at a glance</li>
+                                <li>Garrison monitoring</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>📈 Statistics</h4>
+                            <ul>
+                                <li>Prosperity & Loyalty</li>
+                                <li>Security & Food</li>
+                                <li>Tax income tracking</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>🏗️ Construction</h4>
+                            <ul>
+                                <li>Queue buildings remotely</li>
+                                <li>View progress</li>
+                                <li>Manage priorities</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- THE FORGE -->
+        <div class="section section-forge">
+            <div class="section-header">
+                <span class="section-icon">⚒️</span> THE FORGE
+            </div>
+            <p class="section-quote">Master the ancient arts of smithing. Craft weapons of legend.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🔧 Stamina Control</h3>
+                    <ul>
+                        <li>Disable stamina entirely</li>
+                        <li>Adjust via multiplier</li>
+                        <li>MCM configurable</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🛠️ Repair Shop</h3>
+                    <ul>
+                        <li>Basic Repair</li>
+                        <li>Fine Quality (+10%)</li>
+                        <li>Masterwork (+20%)</li>
+                        <li>Legendary Reforge (+40%)</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🛡️ Armor Smithing</h3>
+                    <ul>
+                        <li>Craft armor from parts</li>
+                        <li>Helm, Cuirass, Gauntlets</li>
+                        <li>Iron, Steel, Leather costs</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>⭐ Unique Items</h3>
+                    <div class="rarity-bar">
+                        <span class="rarity-common">Common</span>
+                        <span class="rarity-rare">Rare</span>
+                        <span class="rarity-epic">Epic</span>
+                        <span class="rarity-legendary">Legend</span>
+                    </div>
+                    <ul>
+                        <li>24 unique bonus types</li>
+                        <li>Dynamic name generation</li>
+                        <li>Lore for legendaries</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- PREPARE FOR BATTLE -->
+        <div class="section section-battle">
+            <div class="section-header">
+                <span class="section-icon">📋</span> PREPARE FOR BATTLE
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🗡️ Formation Presets</h3>
+                    <ul>
+                        <li>Save Order of Battle</li>
+                        <li>Load before any battle</li>
+                        <li>Auto-assign companions</li>
+                        <li>Captain scoring</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🎒 Equipment Presets</h3>
+                    <ul>
+                        <li>Save loadouts per character</li>
+                        <li>Up to 10 presets each</li>
+                        <li>Quick-swap in inventory</li>
+                        <li>Battle, Siege, Cavalry</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🏷️ Companion Roles</h3>
+                    <ul>
+                        <li>Visual role indicators</li>
+                        <li>Surgeon, Engineer, Scout</li>
+                        <li>Combat roles on portraits</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📦 Quick Inventory</h3>
+                    <ul>
+                        <li>🔍 Search boxes enabled</li>
+                        <li>Sell damaged items</li>
+                        <li>Sell low-value items</li>
+                        <li>Store/Retrieve all</li>
+                        <li>Configurable thresholds</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider">⚜</div>
+
+        <!-- Config -->
+        <div class="config-section">
+            <h2>⚙️ Fully Configurable via MCM</h2>
+            <div class="config-grid">
+                <div class="config-item"><div class="checkbox">✓</div> Ring System</div>
+                <div class="config-item"><div class="checkbox">✓</div> Troop Status</div>
+                <div class="config-item"><div class="checkbox">✓</div> Virtual Captains</div>
+                <div class="config-item"><div class="checkbox">✓</div> Cultural Needs</div>
+                <div class="config-item"><div class="checkbox">✓</div> Fief Management</div>
+                <div class="config-item"><div class="checkbox">✓</div> Smithing Extended</div>
+                <div class="config-item"><div class="checkbox">✓</div> Formation Presets</div>
+                <div class="config-item"><div class="checkbox">✓</div> Equipment Presets</div>
+                <div class="config-item"><div class="checkbox">✓</div> Companion Roles</div>
+                <div class="config-item"><div class="checkbox">✓</div> Quick Inventory</div>
+                <div class="config-item"><div class="checkbox">✓</div> Inventory Search</div>
+            </div>
+            <p style="text-align:center; margin-top:15px; color:#87ceeb;">All features independently toggleable</p>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <h3>⚔️ INSTALLATION ⚔️</h3>
+            
+            <div class="install-steps">
+                <div class="install-step">
+                    <span class="num">I</span>
+                    <p>Extract to<br><strong>Modules/</strong></p>
+                </div>
+                <div class="install-step">
+                    <span class="num">II</span>
+                    <p>Enable in<br><strong>Launcher</strong></p>
+                </div>
+                <div class="install-step">
+                    <span class="num">III</span>
+                    <p>Requires<br><strong>Harmony + MCM</strong></p>
+                </div>
+            </div>
+            
+            <div class="badges">
+                <div class="badge">📊 11 Features</div>
+                <div class="badge">🛡️ Error-Safe</div>
+                <div class="badge">💾 Save Compatible</div>
+                <div class="badge">🌍 Multi-language</div>
+            </div>
+            
+            <p class="final-quote">"The hands of the king are the hands of a healer"</p>
+            
+            <p class="version">
+                <strong>Heir of Numenor (Extension)</strong><br>
+                Version 2.0 — December 2025
+            </p>
+            
+            <div class="coming-footer">★ COMING SOON TO THE AGE OF MEN ★</div>
+        </footer>
+    </div>
+</body>
+</html>

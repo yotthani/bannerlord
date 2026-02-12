@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Battanian Theme</Name>
+  <Description>Forest green and earthy tones</Description>
+  <Author>BannerlordThemeSwitcher</Author>
+  <Version>2.0.0</Version>
+  <BaseCulture>battania</BaseCulture>
+  <AutoTheme>true</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>battania</Kingdom>
+  </BoundKingdoms>
+  <ColorScheme>
+    <Primary>#228B22</Primary>
+    <Secondary>#8B4513</Secondary>
+    <Tertiary>#DAA520</Tertiary>
+    <Text>#FFFFFFEE</Text>
+    <TextMuted>#A8C8A8</TextMuted>
+    <TextHighlight>#228B22</TextHighlight>
+    <TextTitle>#228B22</TextTitle>
+    <TextOnPrimary>#0A200A</TextOnPrimary>
+    <TextDisabled>#607060</TextDisabled>
+    <Background>#0A1F0A99</Background>
+    <BackgroundDark>#050F05BB</BackgroundDark>
+    <BackgroundLight>#153515AA</BackgroundLight>
+    <BackgroundAccent>#228B2220</BackgroundAccent>
+    <BackgroundHover>#228B2240</BackgroundHover>
+    <BackgroundSelected>#228B2260</BackgroundSelected>
+    <Border>#8B4513AA</Border>
+    <BorderMuted>#8B451355</BorderMuted>
+    <BorderHighlight>#228B22FF</BorderHighlight>
+    <BorderSecondary>#DAA520AA</BorderSecondary>
+    <ButtonBackground>#228B2225</ButtonBackground>
+    <ButtonHover>#228B2250</ButtonHover>
+    <ButtonPressed>#228B2280</ButtonPressed>
+    <ButtonDisabled>#40504044</ButtonDisabled>
+    <ButtonBorder>#8B4513CC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#DAA520</Warning>
+    <Error>#CD5C5C</Error>
+    <Info>#6B8E23</Info>
+    <Gold>#DAA520</Gold>
+    <Experience>#6B8E23</Experience>
+    <Health>#CD5C5C</Health>
+    <Morale>#32CD32</Morale>
+    <Shadow>#0A200A88</Shadow>
+    <Glow>#228B2266</Glow>
+  </ColorScheme>
+</Theme>

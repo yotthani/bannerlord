@@ -1,0 +1,81 @@
+<Prefab>
+  <Window>
+    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="400" SuggestedHeight="500"
+            HorizontalAlignment="Right" VerticalAlignment="Center" MarginRight="20">
+      <Children>
+        <!-- Background -->
+        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent">
+          <Children>
+            <BrushWidget Brush="Popup.Background.Tiled" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"/>
+          </Children>
+        </Widget>
+        
+        <!-- Content -->
+        <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" 
+                   StackLayout.LayoutMethod="VerticalBottomToTop" MarginAll="20">
+          <Children>
+            <!-- Title -->
+            <TextWidget Text="@TitleText" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" 
+                        SuggestedHeight="40" Brush="Title.Center.Text" MarginBottom="20"/>
+            
+            <!-- Slot List -->
+            <ListPanel DataSource="{ArmorSlots}" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed"
+                       SuggestedHeight="350" StackLayout.LayoutMethod="VerticalBottomToTop">
+              <ItemTemplate>
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="65" MarginBottom="5">
+                  <Children>
+                    <BrushWidget Brush="MapBar.Tuple.Background" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"/>
+                    
+                    <!-- Slot Name -->
+                    <TextWidget Text="@SlotName" WidthSizePolicy="Fixed" SuggestedWidth="100" 
+                                HeightSizePolicy="StretchToParent" Brush="MapBar.Notification.ItemText"
+                                HorizontalAlignment="Left" MarginLeft="10"/>
+                    
+                    <!-- Current Item -->
+                    <TextWidget Text="@CurrentItemName" WidthSizePolicy="Fixed" SuggestedWidth="150"
+                                HeightSizePolicy="StretchToParent" Brush="SPOptions.Text"
+                                HorizontalAlignment="Center"/>
+                    
+                    <!-- Toggle Visibility Button -->
+                    <ButtonWidget Command.Click="ExecuteToggleVisibility" 
+                                  WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                  SuggestedWidth="50" SuggestedHeight="40"
+                                  HorizontalAlignment="Right" MarginRight="70"
+                                  Brush="@VisibilityBrush">
+                      <Children>
+                        <TextWidget Text="@VisibilityIcon" Brush="MapBar.Notification.ItemText"
+                                    WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"/>
+                      </Children>
+                    </ButtonWidget>
+                    
+                    <!-- Transmog Button -->
+                    <ButtonWidget Command.Click="ExecuteSelectCosmetic"
+                                  WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                  SuggestedWidth="50" SuggestedHeight="40"
+                                  HorizontalAlignment="Right" MarginRight="10"
+                                  Brush="ButtonBrush2">
+                      <Children>
+                        <TextWidget Text="⚙" Brush="MapBar.Notification.ItemText"
+                                    WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"/>
+                      </Children>
+                    </ButtonWidget>
+                  </Children>
+                </Widget>
+              </ItemTemplate>
+            </ListPanel>
+            
+            <!-- Close Button -->
+            <ButtonWidget Command.Click="ExecuteClose" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                          SuggestedWidth="120" SuggestedHeight="40" HorizontalAlignment="Center"
+                          MarginTop="20" Brush="ButtonBrush1">
+              <Children>
+                <TextWidget Text="@CloseText" Brush="MapBar.Notification.ItemText"
+                            WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"/>
+              </Children>
+            </ButtonWidget>
+          </Children>
+        </ListPanel>
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

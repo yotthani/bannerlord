@@ -1,0 +1,15 @@
+<Prefab>
+  <!-- Single morph slider row - used by ItemTemplate -->
+  <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="24">
+    <Children>
+      <TextWidget Text="@Name" WidthSizePolicy="Fixed" SuggestedWidth="65" HeightSizePolicy="StretchToParent" VerticalAlignment="Center" Brush="FaceLearner.Text.Small"/>
+      <SliderWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="16" MarginLeft="70" MarginRight="6" VerticalAlignment="Center" ValueFloat="@Value" MinValueFloat="0" MaxValueFloat="1" IsDiscrete="false">
+        <Children>
+          <Widget Id="Background" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="6" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#3A3530FF"/>
+          <Widget Id="Filler" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="6" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#C7A672FF"/>
+          <Widget Id="Handle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="14" SuggestedHeight="14" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#D4B896FF"/>
+        </Children>
+      </SliderWidget>
+    </Children>
+  </Widget>
+</Prefab>

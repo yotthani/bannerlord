@@ -1,0 +1,279 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <Platforms>x64</Platforms>
+    <Configurations>Debug;Release</Configurations>
+    <AssemblyName>LOTRAOM.FactionMap</AssemblyName>
+    <RootNamespace>LOTRAOM.FactionMap</RootNamespace>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Version Info -->
+    <Version>0.2.0</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
+    <Product>LOTRAOM Faction Map</Product>
+    <Company>LOTRAOM Team</Company>
+    <Description>Interactive Middle-earth map for faction selection during character creation in Bannerlord 1.3</Description>
+    <Copyright>MIT License 2026</Copyright>
+  </PropertyGroup>
+
+  <!--
+    Uses BANNERLORD_GAME_DIR environment variable.
+    Set it in your system environment variables, e.g.:
+    - Steam: C:\Program Files (x86)\Steam\steamapps\common\Mount & Blade II Bannerlord
+    - GOG: C:\GOG Games\Mount & Blade II Bannerlord
+  -->
+  <PropertyGroup>
+    <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
+    <GameFolder Condition="'$(GameFolder)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
+    <GameBinaries>$(GameFolder)\bin\Win64_Shipping_Client</GameBinaries>
+    <NativeModule>$(GameFolder)\Modules\Native</NativeModule>
+    <SandBoxModule>$(GameFolder)\Modules\SandBox</SandBoxModule>
+    <StoryModeModule>$(GameFolder)\Modules\StoryMode</StoryModeModule>
+    <HarmonyModule>$(GameFolder)\Modules\Bannerlord.Harmony</HarmonyModule>
+  </PropertyGroup>
+
+  <!-- Core TaleWorlds References from game binaries -->
+  <ItemGroup>
+    <Reference Include="TaleWorlds.Core">
+      <HintPath>$(GameBinaries)\TaleWorlds.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Library">
+      <HintPath>$(GameBinaries)\TaleWorlds.Library.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Core.ViewModelCollection">
+      <HintPath>$(GameBinaries)\TaleWorlds.Core.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Engine">
+      <HintPath>$(GameBinaries)\TaleWorlds.Engine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade">
+      <HintPath>$(GameBinaries)\TaleWorlds.MountAndBlade.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Localization">
+      <HintPath>$(GameBinaries)\TaleWorlds.Localization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ObjectSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.ObjectSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.InputSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ScreenSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.ScreenSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.DotNet">
+      <HintPath>$(GameBinaries)\TaleWorlds.DotNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Gauntlet UI -->
+    <Reference Include="TaleWorlds.Engine.GauntletUI">
+      <HintPath>$(GameBinaries)\TaleWorlds.Engine.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI">
+      <HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI.Data">
+      <HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.GauntletUI.PrefabSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.PrefabSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.TwoDimension">
+      <HintPath>$(GameBinaries)\TaleWorlds.TwoDimension.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Campaign System -->
+    <Reference Include="TaleWorlds.CampaignSystem">
+      <HintPath>$(GameBinaries)\TaleWorlds.CampaignSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.CampaignSystem.ViewModelCollection">
+      <HintPath>$(GameBinaries)\TaleWorlds.CampaignSystem.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.ViewModelCollection">
+      <HintPath>$(GameBinaries)\TaleWorlds.MountAndBlade.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Native Module References -->
+  <ItemGroup>
+    <Reference Include="TaleWorlds.MountAndBlade.View">
+      <HintPath>$(NativeModule)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.View.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.GauntletUI">
+      <HintPath>$(NativeModule)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- SandBox Module References (for character creation) -->
+  <ItemGroup>
+    <Reference Include="SandBox">
+      <HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SandBox.View">
+      <HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.View.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SandBox.GauntletUI">
+      <HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SandBox.ViewModelCollection">
+      <HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- StoryMode Module References (for character creation) -->
+  <ItemGroup>
+    <Reference Include="StoryMode">
+      <HintPath>$(StoryModeModule)\bin\Win64_Shipping_Client\StoryMode.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="StoryMode.GauntletUI">
+      <HintPath>$(StoryModeModule)\bin\Win64_Shipping_Client\StoryMode.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="StoryMode.View">
+      <HintPath>$(StoryModeModule)\bin\Win64_Shipping_Client\StoryMode.View.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="StoryMode.ViewModelCollection">
+      <HintPath>$(StoryModeModule)\bin\Win64_Shipping_Client\StoryMode.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Harmony (from Bannerlord.Harmony mod) -->
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(HarmonyModule)\bin\Win64_Shipping_Client\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- System References -->
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(GameBinaries)\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <!-- Use the game's own System.Numerics.Vectors (v4.1.3.0) to avoid version mismatch at runtime -->
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>$(GameBinaries)\System.Numerics.Vectors.dll</HintPath>
+      <Private>False</Private>
+      <Aliases>SNV</Aliases>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Exclude Tools from compilation (standalone utilities) -->
+  <ItemGroup>
+    <Compile Remove="Tools\**\*.cs" />
+    <None Include="Tools\**\*" />
+  </ItemGroup>
+
+  <!-- ============================================ -->
+  <!-- POST-BUILD: Deploy to Modules folder        -->
+  <!-- ============================================ -->
+  <Target Name="DeployToModules" AfterTargets="Build">
+    <PropertyGroup>
+      <ModuleFolder>$(GameFolder)\Modules\LOTRAOM.FactionMap</ModuleFolder>
+      <ModuleBinFolder>$(ModuleFolder)\bin\Win64_Shipping_Client</ModuleBinFolder>
+    </PropertyGroup>
+
+    <!-- Clean deploy: remove content folders to prevent stale files.
+         bin/ is skipped because the game may lock the DLL while running. -->
+    <RemoveDir Directories="$(ModuleFolder)\GUI" Condition="Exists('$(ModuleFolder)\GUI')" ContinueOnError="true" />
+    <RemoveDir Directories="$(ModuleFolder)\ModuleData" Condition="Exists('$(ModuleFolder)\ModuleData')" ContinueOnError="true" />
+
+    <!-- Create directory structure -->
+    <MakeDir Directories="$(ModuleFolder)" />
+    <MakeDir Directories="$(ModuleBinFolder)" />
+    <MakeDir Directories="$(ModuleFolder)\GUI" />
+    <MakeDir Directories="$(ModuleFolder)\GUI\Brushes" />
+    <MakeDir Directories="$(ModuleFolder)\GUI\Prefabs" />
+    <MakeDir Directories="$(ModuleFolder)\GUI\Prefabs\CharacterCreation" />
+    <MakeDir Directories="$(ModuleFolder)\ModuleData" />
+    <MakeDir Directories="$(ModuleFolder)\GUI\SpriteData" />
+    <MakeDir Directories="$(ModuleFolder)\GUI\SpriteData\FactionMap" />
+    <MakeDir Directories="$(ModuleFolder)\GUI\SpriteData\ui_factionmap" />
+
+    <!-- Copy DLL and PDB to bin folder -->
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+
+    <!-- Copy SubModule.xml to module root -->
+    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFolder="$(ModuleFolder)" SkipUnchangedFiles="true" />
+
+    <!-- Copy README if exists -->
+    <Copy SourceFiles="$(ProjectDir)README.md" DestinationFolder="$(ModuleFolder)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)README.md')" />
+
+    <!-- Define GUI file groups -->
+    <ItemGroup>
+      <BrushFiles Include="$(ProjectDir)GUI\Brushes\*.xml" />
+      <PrefabFiles Include="$(ProjectDir)GUI\Prefabs\*.xml" />
+      <CharacterCreationPrefabs Include="$(ProjectDir)GUI\Prefabs\CharacterCreation\*.xml" />
+      <SpriteDataFiles Include="$(ProjectDir)GUI\SpriteData\ui_factionmap\*.xml" />
+      <FactionMapFiles Include="$(ProjectDir)GUI\SpriteData\FactionMap\*.*" />
+      <ModuleDataFiles Include="$(ProjectDir)ModuleData\*.*" />
+    </ItemGroup>
+
+    <!-- Copy ModuleData files (factions.json etc.) -->
+    <Copy SourceFiles="@(ModuleDataFiles)" DestinationFolder="$(ModuleFolder)\ModuleData" SkipUnchangedFiles="true" />
+
+    <!-- Copy GUI files -->
+    <Copy SourceFiles="@(BrushFiles)" DestinationFolder="$(ModuleFolder)\GUI\Brushes" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(PrefabFiles)" DestinationFolder="$(ModuleFolder)\GUI\Prefabs" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(CharacterCreationPrefabs)" DestinationFolder="$(ModuleFolder)\GUI\Prefabs\CharacterCreation" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(SpriteDataFiles)" DestinationFolder="$(ModuleFolder)\GUI\SpriteData\ui_factionmap" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FactionMapFiles)" DestinationFolder="$(ModuleFolder)\GUI\SpriteData\FactionMap" SkipUnchangedFiles="true" />
+
+    <!-- Output success message -->
+    <Message Text="&#xA;========================================" Importance="high" />
+    <Message Text="LOTRAOM.FactionMap deployed to:" Importance="high" />
+    <Message Text="  $(ModuleFolder)" Importance="high" />
+    <Message Text="Contents:" Importance="high" />
+    <Message Text="  - bin/Win64_Shipping_Client/ (DLL)" Importance="high" />
+    <Message Text="  - SubModule.xml" Importance="high" />
+    <Message Text="  - GUI/Prefabs/ (Gauntlet XML)" Importance="high" />
+    <Message Text="  - ModuleData/ (factions.json)" Importance="high" />
+    <Message Text="  - GUI/SpriteData/FactionMap/ (region textures)" Importance="high" />
+    <Message Text="========================================&#xA;" Importance="high" />
+  </Target>
+
+  <!-- Clean target to remove deployed module -->
+  <Target Name="CleanModule" AfterTargets="Clean">
+    <PropertyGroup>
+      <ModuleFolder>$(GameFolder)\Modules\LOTRAOM.FactionMap</ModuleFolder>
+    </PropertyGroup>
+    <RemoveDir Directories="$(ModuleFolder)" Condition="Exists('$(ModuleFolder)')" />
+    <Message Text="Cleaned LOTRAOM.FactionMap module folder" Importance="high" />
+  </Target>
+
+</Project>

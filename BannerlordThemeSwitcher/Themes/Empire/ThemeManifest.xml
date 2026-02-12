@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Imperial Theme</Name>
+  <Description>Imperial purple and gold</Description>
+  <Author>BannerlordThemeSwitcher</Author>
+  <Version>2.0.0</Version>
+  <BaseCulture>empire</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>empire</Kingdom>
+  </BoundKingdoms>
+  <ColorScheme>
+    <Primary>#800080</Primary>
+    <Secondary>#FFD700</Secondary>
+    <Tertiary>#DC143C</Tertiary>
+    <Text>#FFFFFFEE</Text>
+    <TextMuted>#C8A8C8</TextMuted>
+    <TextHighlight>#FFD700</TextHighlight>
+    <TextTitle>#FFD700</TextTitle>
+    <TextOnPrimary>#200020</TextOnPrimary>
+    <TextDisabled>#706070</TextDisabled>
+    <Background>#1A0A1A99</Background>
+    <BackgroundDark>#0D050DBB</BackgroundDark>
+    <BackgroundLight>#2A152AAA</BackgroundLight>
+    <BackgroundAccent>#80008020</BackgroundAccent>
+    <BackgroundHover>#80008040</BackgroundHover>
+    <BackgroundSelected>#80008060</BackgroundSelected>
+    <Border>#FFD700AA</Border>
+    <BorderMuted>#FFD70055</BorderMuted>
+    <BorderHighlight>#FFD700FF</BorderHighlight>
+    <BorderSecondary>#800080AA</BorderSecondary>
+    <ButtonBackground>#80008025</ButtonBackground>
+    <ButtonHover>#80008050</ButtonHover>
+    <ButtonPressed>#80008080</ButtonPressed>
+    <ButtonDisabled>#50405044</ButtonDisabled>
+    <ButtonBorder>#FFD700CC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#FFA500</Warning>
+    <Error>#DC143C</Error>
+    <Info>#4169E1</Info>
+    <Gold>#FFD700</Gold>
+    <Experience>#9370DB</Experience>
+    <Health>#DC143C</Health>
+    <Morale>#32CD32</Morale>
+    <Shadow>#20002088</Shadow>
+    <Glow>#80008066</Glow>
+  </ColorScheme>
+</Theme>

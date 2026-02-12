@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteData>
+  <!-- Ring System Custom Sprites -->
+  <SpriteCategory Name="ui_ring_system">
+    <SpriteSheet Name="ui_ring_system" />
+    <SpritePart Name="ring_table_with_tools">
+      <Width>1200</Width>
+      <Height>642</Height>
+    </SpritePart>
+    <SpritePart Name="ring_table_clean">
+      <Width>1200</Width>
+      <Height>642</Height>
+    </SpritePart>
+    <SpritePart Name="ring_table_complete">
+      <Width>2000</Width>
+      <Height>840</Height>
+    </SpritePart>
+  </SpriteCategory>
+</SpriteData>

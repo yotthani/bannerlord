@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ItemModifiers>
+  
+  <!-- ==================== RING POWER MODIFIERS ==================== -->
+  <!-- These modifiers represent the power progression of wearing rings -->
+  
+  <!-- Elven Ring Modifiers - Wisdom and Protection -->
+  <ItemModifier id="hon_elven_awakening"
+                name="{=ring_mod_elven1}Awakening"
+                damage="0" speed="0" armor="2"
+                price_factor="1.5" />
+  <ItemModifier id="hon_elven_radiance"
+                name="{=ring_mod_elven2}Radiant"
+                damage="0" speed="0" armor="4"
+                price_factor="2.5" />
+  <ItemModifier id="hon_elven_mastery"
+                name="{=ring_mod_elven3}Mastered"
+                damage="0" speed="0" armor="6"
+                price_factor="4.0" />
+  
+  <!-- Dwarven Ring Modifiers - Wealth and Endurance -->
+  <ItemModifier id="hon_dwarven_gleaming"
+                name="{=ring_mod_dwarf1}Gleaming"
+                damage="0" speed="0" armor="3"
+                price_factor="1.5" />
+  <ItemModifier id="hon_dwarven_forged"
+                name="{=ring_mod_dwarf2}Forge-Blessed"
+                damage="0" speed="0" armor="5"
+                price_factor="2.5" />
+  <ItemModifier id="hon_dwarven_ancient"
+                name="{=ring_mod_dwarf3}Ancient Power"
+                damage="0" speed="0" armor="8"
+                price_factor="4.0" />
+  
+  <!-- Mortal Ring Modifiers - Power and Dominion (but also corruption) -->
+  <ItemModifier id="hon_mortal_empowered"
+                name="{=ring_mod_mortal1}Empowered"
+                damage="3" speed="0" armor="1"
+                price_factor="1.5" />
+  <ItemModifier id="hon_mortal_dominating"
+                name="{=ring_mod_mortal2}Dominating"
+                damage="6" speed="0" armor="2"
+                price_factor="2.5" />
+  <ItemModifier id="hon_mortal_wraith"
+                name="{=ring_mod_mortal3}Wraith-touched"
+                damage="10" speed="5" armor="3"
+                price_factor="4.0" />
+  
+  <!-- One Ring Modifiers - Ultimate Power -->
+  <ItemModifier id="hon_one_whispers"
+                name="{=ring_mod_one1}Whispering"
+                damage="5" speed="5" armor="5"
+                price_factor="2.0" />
+  <ItemModifier id="hon_one_dominating"
+                name="{=ring_mod_one2}Dominating"
+                damage="10" speed="10" armor="10"
+                price_factor="5.0" />
+  <ItemModifier id="hon_one_ruling"
+                name="{=ring_mod_one3}One Ring to Rule"
+                damage="20" speed="15" armor="15"
+                price_factor="10.0" />
+  
+  <!-- ==================== SMITHING UNIQUE ITEM MODIFIERS ==================== -->
+  <!-- These modifiers are applied to crafted unique items -->
+  
+  <ItemModifier id="hon_crafted_fine"
+                name="{=smith_fine}Fine"
+                damage="2" speed="1" armor="0"
+                price_factor="1.3" />
+  <ItemModifier id="hon_crafted_masterwork"
+                name="{=smith_master}Masterwork"
+                damage="4" speed="2" armor="0"
+                price_factor="2.0" />
+  <ItemModifier id="hon_crafted_legendary"
+                name="{=smith_legend}Legendary"
+                damage="8" speed="4" armor="0"
+                price_factor="4.0" />
+  
+  <ItemModifier id="hon_armor_fine"
+                name="{=armor_fine}Reinforced"
+                damage="0" speed="0" armor="3"
+                price_factor="1.3" />
+  <ItemModifier id="hon_armor_masterwork"
+                name="{=armor_master}Mastercraft"
+                damage="0" speed="0" armor="6"
+                price_factor="2.0" />
+  <ItemModifier id="hon_armor_legendary"
+                name="{=armor_legend}Numenorean"
+                damage="0" speed="0" armor="10"
+                price_factor="4.0" />
+  
+</ItemModifiers>

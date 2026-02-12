@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Vlandian Theme</Name>
+  <Description>Royal gold and crimson colors</Description>
+  <Author>BannerlordThemeSwitcher</Author>
+  <Version>2.0.0</Version>
+  <BaseCulture>vlandia</BaseCulture>
+  <AutoTheme>true</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>vlandia</Kingdom>
+  </BoundKingdoms>
+  <ColorScheme>
+    <Primary>#FFD700</Primary>
+    <Secondary>#8B0000</Secondary>
+    <Tertiary>#4682B4</Tertiary>
+    <Text>#FFFFFFEE</Text>
+    <TextMuted>#B8B8B8</TextMuted>
+    <TextHighlight>#FFD700</TextHighlight>
+    <TextTitle>#FFD700</TextTitle>
+    <TextOnPrimary>#1A0A00</TextOnPrimary>
+    <TextDisabled>#666666</TextDisabled>
+    <Background>#1A150A99</Background>
+    <BackgroundDark>#0D0A05BB</BackgroundDark>
+    <BackgroundLight>#2A2215AA</BackgroundLight>
+    <BackgroundAccent>#FFD70020</BackgroundAccent>
+    <BackgroundHover>#FFD70040</BackgroundHover>
+    <BackgroundSelected>#FFD70060</BackgroundSelected>
+    <Border>#FFD700AA</Border>
+    <BorderMuted>#FFD70055</BorderMuted>
+    <BorderHighlight>#FFD700FF</BorderHighlight>
+    <BorderSecondary>#8B0000AA</BorderSecondary>
+    <ButtonBackground>#FFD70025</ButtonBackground>
+    <ButtonHover>#FFD70050</ButtonHover>
+    <ButtonPressed>#FFD70080</ButtonPressed>
+    <ButtonDisabled>#44444444</ButtonDisabled>
+    <ButtonBorder>#FFD700CC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#FFA500</Warning>
+    <Error>#DC143C</Error>
+    <Info>#4682B4</Info>
+    <Gold>#FFD700</Gold>
+    <Experience>#9370DB</Experience>
+    <Health>#DC143C</Health>
+    <Morale>#32CD32</Morale>
+    <Shadow>#1A0A0088</Shadow>
+    <Glow>#FFD70066</Glow>
+  </ColorScheme>
+</Theme>

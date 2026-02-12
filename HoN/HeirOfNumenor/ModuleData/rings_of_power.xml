@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Items>
+  
+  <!-- ==================== THE ONE RING ==================== -->
+  <Item id="hon_ring_one_ring"
+        name="{=ring_one}The One Ring"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="999999">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_one_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <!-- ==================== THREE ELVEN RINGS ==================== -->
+  
+  <!-- Narya - Ring of Fire (Gandalf) -->
+  <Item id="hon_ring_narya"
+        name="{=ring_narya}Narya, Ring of Fire"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="500000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_elven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <!-- Nenya - Ring of Water (Galadriel) -->
+  <Item id="hon_ring_nenya"
+        name="{=ring_nenya}Nenya, Ring of Water"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="500000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_elven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <!-- Vilya - Ring of Air (Elrond) -->
+  <Item id="hon_ring_vilya"
+        name="{=ring_vilya}Vilya, Ring of Air"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="500000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_elven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <!-- ==================== SEVEN DWARF RINGS ==================== -->
+  
+  <Item id="hon_ring_dwarf_1"
+        name="{=ring_dwarf1}Ring of Durin's Folk"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="300000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_dwarven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_dwarf_2"
+        name="{=ring_dwarf2}Ring of the Firebeards"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="300000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_dwarven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_dwarf_3"
+        name="{=ring_dwarf3}Ring of the Broadbeams"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="300000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_dwarven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_dwarf_4"
+        name="{=ring_dwarf4}Ring of the Ironfists"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="300000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_dwarven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_dwarf_5"
+        name="{=ring_dwarf5}Ring of the Stiffbeards"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="300000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_dwarven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_dwarf_6"
+        name="{=ring_dwarf6}Ring of the Blacklocks"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="300000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_dwarven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_dwarf_7"
+        name="{=ring_dwarf7}Ring of the Stonefoots"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="300000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_dwarven_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <!-- ==================== NINE RINGS FOR MORTAL MEN ==================== -->
+  
+  <Item id="hon_ring_nazgul_1"
+        name="{=ring_nazgul1}Ring of the Witch-king"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="400000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_mortal_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_nazgul_2"
+        name="{=ring_nazgul2}Ring of Khamûl"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="400000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_mortal_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_nazgul_3"
+        name="{=ring_nazgul3}Ring of the Shadow"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="400000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_mortal_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_nazgul_4"
+        name="{=ring_nazgul4}Ring of the Dark Marshal"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="400000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_mortal_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_nazgul_5"
+        name="{=ring_nazgul5}Ring of the Betrayer"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="400000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_mortal_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_nazgul_6"
+        name="{=ring_nazgul6}Ring of the Undying"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="400000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_mortal_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_nazgul_7"
+        name="{=ring_nazgul7}Ring of the Dwimmerlaik"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="400000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_mortal_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_nazgul_8"
+        name="{=ring_nazgul8}Ring of the Tainted"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="400000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_mortal_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+  <Item id="hon_ring_nazgul_9"
+        name="{=ring_nazgul9}Ring of the Knight of Umbar"
+        mesh="leather_gloves"
+        culture="Culture.neutral"
+        weight="0.01"
+        difficulty="0"
+        appearance="1"
+        Type="HandArmor"
+        value="400000">
+    <ItemComponent>
+      <Armor arm_armor="0" body_armor="0" leg_armor="0" modifier_group="hon_ring_mortal_modifiers" />
+    </ItemComponent>
+    <Flags IsNotUsable="true" NotUsableByFemale="false" NotUsableByMale="false" />
+  </Item>
+
+</Items>

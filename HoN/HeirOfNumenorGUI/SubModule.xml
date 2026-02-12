@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+  <Name value="Heir of Numenor GUI"/>
+  <Id value="HeirOfNumenorGUI"/>
+  <Version value="v1.0.0"/>
+  <SingleplayerModule value="true"/>
+  <MultiplayerModule value="false"/>
+  <Official value="false"/>
+  <DependedModules>
+    <DependedModule Id="Native" DependentVersion="v1.3.0" Optional="false"/>
+    <DependedModule Id="SandBoxCore" DependentVersion="v1.3.0" Optional="false"/>
+    <DependedModule Id="Sandbox" DependentVersion="v1.3.0" Optional="false"/>
+  </DependedModules>
+  
+  <!-- NO SubModules section - this module has no C# code -->
+  
+  <!-- NO Xmls section - just GUI assets -->
+  
+</Module>

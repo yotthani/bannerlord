@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ItemModifierGroups>
+  
+  <!-- ==================== RING POWER MODIFIER GROUPS ==================== -->
+  <!-- These groups define which modifiers can appear on ring items -->
+  
+  <!-- Elven Ring Modifier Group - Wisdom and Protection -->
+  <ItemModifierGroup id="hon_ring_elven_modifiers" 
+                     no_modifier_loot_score="0" 
+                     no_modifier_production_score="0">
+    <ItemModifier id="hon_elven_awakening" loot_drop_score="50" production_drop_score="50" />
+    <ItemModifier id="hon_elven_radiance" loot_drop_score="25" production_drop_score="25" />
+    <ItemModifier id="hon_elven_mastery" loot_drop_score="10" production_drop_score="10" />
+  </ItemModifierGroup>
+  
+  <!-- Dwarven Ring Modifier Group - Wealth and Endurance -->
+  <ItemModifierGroup id="hon_ring_dwarven_modifiers" 
+                     no_modifier_loot_score="0" 
+                     no_modifier_production_score="0">
+    <ItemModifier id="hon_dwarven_gleaming" loot_drop_score="50" production_drop_score="50" />
+    <ItemModifier id="hon_dwarven_forged" loot_drop_score="25" production_drop_score="25" />
+    <ItemModifier id="hon_dwarven_ancient" loot_drop_score="10" production_drop_score="10" />
+  </ItemModifierGroup>
+  
+  <!-- Mortal Ring Modifier Group - Power and Dominion (but also corruption) -->
+  <ItemModifierGroup id="hon_ring_mortal_modifiers" 
+                     no_modifier_loot_score="0" 
+                     no_modifier_production_score="0">
+    <ItemModifier id="hon_mortal_empowered" loot_drop_score="50" production_drop_score="50" />
+    <ItemModifier id="hon_mortal_dominating" loot_drop_score="25" production_drop_score="25" />
+    <ItemModifier id="hon_mortal_wraith" loot_drop_score="10" production_drop_score="10" />
+  </ItemModifierGroup>
+  
+  <!-- One Ring Modifier Group - Ultimate Power -->
+  <ItemModifierGroup id="hon_ring_one_modifiers" 
+                     no_modifier_loot_score="0" 
+                     no_modifier_production_score="0">
+    <ItemModifier id="hon_one_whispers" loot_drop_score="50" production_drop_score="50" />
+    <ItemModifier id="hon_one_dominating" loot_drop_score="25" production_drop_score="25" />
+    <ItemModifier id="hon_one_ruling" loot_drop_score="5" production_drop_score="5" />
+  </ItemModifierGroup>
+  
+  <!-- ==================== SMITHING UNIQUE ITEM MODIFIER GROUPS ==================== -->
+  
+  <ItemModifierGroup id="hon_unique_weapon_modifiers" 
+                     no_modifier_loot_score="100" 
+                     no_modifier_production_score="100">
+    <ItemModifier id="hon_crafted_fine" loot_drop_score="40" production_drop_score="40" />
+    <ItemModifier id="hon_crafted_masterwork" loot_drop_score="15" production_drop_score="15" />
+    <ItemModifier id="hon_crafted_legendary" loot_drop_score="3" production_drop_score="3" />
+  </ItemModifierGroup>
+  
+  <ItemModifierGroup id="hon_unique_armor_modifiers" 
+                     no_modifier_loot_score="100" 
+                     no_modifier_production_score="100">
+    <ItemModifier id="hon_armor_fine" loot_drop_score="40" production_drop_score="40" />
+    <ItemModifier id="hon_armor_masterwork" loot_drop_score="15" production_drop_score="15" />
+    <ItemModifier id="hon_armor_legendary" loot_drop_score="3" production_drop_score="3" />
+  </ItemModifierGroup>
+  
+</ItemModifierGroups>

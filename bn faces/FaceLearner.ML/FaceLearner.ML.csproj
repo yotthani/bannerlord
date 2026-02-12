@@ -1,0 +1,143 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Platforms>x64</Platforms>
+    <AssemblyName>FaceLearner.ML</AssemblyName>
+    <RootNamespace>FaceLearner.ML</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendPlatformToOutputPath>false</AppendPlatformToOutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <!-- x64 Debug Configuration -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <!-- x64 Release Configuration -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
+    <GameBinaries>$(GameFolder)\bin\Win64_Shipping_Client</GameBinaries>
+    <NativeModuleBin>$(GameFolder)\Modules\Native\bin\Win64_Shipping_Client</NativeModuleBin>
+    <DlibNativePath>$(NuGetPackageRoot)dlibdotnet\19.21.0.20220724\runtimes\win-x64\native</DlibNativePath>
+    <OnnxNativePath>$(NuGetPackageRoot)microsoft.ml.onnxruntime\1.16.3\runtimes\win-x64\native</OnnxNativePath>
+  </PropertyGroup>
+
+  <!-- Reference Core project (required dependency) -->
+  <ItemGroup>
+    <ProjectReference Include="..\FaceLearner\FaceLearner.csproj" />
+  </ItemGroup>
+
+  <!-- Bannerlord References -->
+  <ItemGroup>
+    <Reference Include="TaleWorlds.Core"><HintPath>$(GameBinaries)\TaleWorlds.Core.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.DotNet"><HintPath>$(GameBinaries)\TaleWorlds.DotNet.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.Library"><HintPath>$(GameBinaries)\TaleWorlds.Library.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.Engine"><HintPath>$(GameBinaries)\TaleWorlds.Engine.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.MountAndBlade"><HintPath>$(GameBinaries)\TaleWorlds.MountAndBlade.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.GauntletUI"><HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>$(GameBinaries)\Newtonsoft.Json.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+
+  <!-- ML NuGet Packages -->
+  <ItemGroup>
+    <PackageReference Include="DlibDotNet" Version="19.21.0.20220724" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.16.3" />
+    <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+  </ItemGroup>
+
+  <!-- Deploy to Modules folder -->
+  <Target Name="DeployToModules" AfterTargets="Build">
+    <PropertyGroup>
+      <ModuleFolder>$(GameFolder)\Modules\FaceLearner.ML</ModuleFolder>
+      <ModuleBinFolder>$(ModuleFolder)\bin\Win64_Shipping_Client</ModuleBinFolder>
+    </PropertyGroup>
+    <MakeDir Directories="$(ModuleBinFolder)" />
+    
+    <!-- Copy main DLL and PDB -->
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+    
+    <!-- Copy managed DLLs -->
+    <Copy SourceFiles="$(TargetDir)DlibDotNet.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)DlibDotNet.dll')" />
+    <Copy SourceFiles="$(TargetDir)ICSharpCode.SharpZipLib.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)ICSharpCode.SharpZipLib.dll')" />
+    <Copy SourceFiles="$(TargetDir)System.Memory.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)System.Memory.dll')" />
+    <Copy SourceFiles="$(TargetDir)System.Buffers.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)System.Buffers.dll')" />
+    <Copy SourceFiles="$(TargetDir)System.Numerics.Vectors.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)System.Numerics.Vectors.dll')" />
+    <Copy SourceFiles="$(TargetDir)System.Runtime.CompilerServices.Unsafe.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)System.Runtime.CompilerServices.Unsafe.dll')" />
+    
+    <!-- ONNX Runtime DLLs -->
+    <Copy SourceFiles="$(TargetDir)Microsoft.ML.OnnxRuntime.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)Microsoft.ML.OnnxRuntime.dll')" />
+    <Copy SourceFiles="$(OnnxNativePath)\onnxruntime.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(OnnxNativePath)\onnxruntime.dll')" />
+    <Copy SourceFiles="$(OnnxNativePath)\onnxruntime_providers_shared.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(OnnxNativePath)\onnxruntime_providers_shared.dll')" />
+    
+    <!-- Native DLLs (Dlib) -->
+    <Copy SourceFiles="$(DlibNativePath)\DlibDotNetNative.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(DlibNativePath)\DlibDotNetNative.dll')" />
+    <Copy SourceFiles="$(DlibNativePath)\DlibDotNetNativeDnn.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(DlibNativePath)\DlibDotNetNativeDnn.dll')" />
+    
+    <!-- Copy SubModule.xml -->
+    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFolder="$(ModuleFolder)" SkipUnchangedFiles="true" />
+    
+    <!-- Copy Models -->
+    <MakeDir Directories="$(ModuleFolder)\Data\Models" />
+    <ItemGroup>
+      <ModelFiles Include="$(ProjectDir)Models\*.onnx" />
+      <ModelFiles Include="$(ProjectDir)Models\*.task" />
+      <ModelFiles Include="$(ProjectDir)Data\Models\*.onnx" />
+      <ModelFiles Include="$(ProjectDir)Data\Models\*.task" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ModelFiles)" DestinationFiles="@(ModelFiles->'$(ModuleFolder)\Data\Models\%(Filename)%(Extension)')" SkipUnchangedFiles="true" Condition="'@(ModelFiles)' != ''" />
+    
+    <!-- Copy Datasets -->
+    <MakeDir Directories="$(ModuleFolder)\Data\datasets" />
+    <MakeDir Directories="$(ModuleFolder)\Data\datasets\celeba" />
+    <MakeDir Directories="$(ModuleFolder)\Data\datasets\UTKFace" />
+    <MakeDir Directories="$(ModuleFolder)\Data\datasets\lfw-deepfunneled" />
+    
+    <!-- UTKFace dataset -->
+    <ItemGroup>
+      <UTKFaceFiles Include="$(ProjectDir)Datasets\UTKFace\**\*.jpg" />
+      <UTKFaceFiles Include="$(ProjectDir)Datasets\UTKFace\**\*.png" />
+    </ItemGroup>
+    <Copy SourceFiles="@(UTKFaceFiles)" DestinationFiles="@(UTKFaceFiles->'$(ModuleFolder)\Data\datasets\UTKFace\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" Condition="'@(UTKFaceFiles)' != ''" />
+    
+    <!-- LFW dataset -->
+    <ItemGroup>
+      <LFWFiles Include="$(ProjectDir)Datasets\lfw-deepfunneled\**\*.jpg" />
+    </ItemGroup>
+    <Copy SourceFiles="@(LFWFiles)" DestinationFiles="@(LFWFiles->'$(ModuleFolder)\Data\datasets\lfw-deepfunneled\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" Condition="'@(LFWFiles)' != ''" />
+    
+    <!-- CelebA dataset: Datasets\celeba\** -> Data\datasets\celeba\** -->
+    <ItemGroup>
+      <CelebAFiles Include="$(ProjectDir)Datasets\celeba\**\*.jpg" />
+      <CelebAFiles Include="$(ProjectDir)Datasets\celeba\**\*.png" />
+      <CelebAFiles Include="$(ProjectDir)Datasets\celeba\**\*.txt" />
+      <CelebAFiles Include="$(ProjectDir)Datasets\celeba\**\*.csv" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CelebAFiles)" DestinationFiles="@(CelebAFiles->'$(ModuleFolder)\Data\datasets\celeba\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" Condition="'@(CelebAFiles)' != ''" />
+    
+    <!-- README -->
+    <Copy SourceFiles="$(ProjectDir)Datasets\README.md" DestinationFolder="$(ModuleFolder)\Data\datasets" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)Datasets\README.md')" />
+  </Target>
+</Project>

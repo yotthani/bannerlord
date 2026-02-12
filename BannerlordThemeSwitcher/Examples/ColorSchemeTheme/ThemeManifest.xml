@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+═══════════════════════════════════════════════════════════════════════════════════════════════
+THEME MANIFEST WITH COLOR SCHEME
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+This manifest demonstrates how to create a theme with a custom color scheme.
+
+HOW THEMING WORKS:
+1. Define your colors in <ColorScheme>
+2. Brush XMLs use ColorRef="SlotName" to reference your scheme colors
+3. At runtime, ColorRef values are resolved to actual hex colors
+4. AutoTheme mode automatically themes brushes not defined in XML
+
+TWO APPROACHES:
+
+A) XML-BASED (Precise Control):
+   - Create brush XML files in GUI/Brushes/ folder
+   - Use ColorRef attributes: <BrushLayer Name="Default" ColorRef="Primary" />
+   - Set <AutoTheme>false</AutoTheme> if you only want XML-defined brushes
+
+B) AUTO-THEME (Quick & Easy):
+   - Just define your <ColorScheme>
+   - Set <AutoTheme>true</AutoTheme>
+   - Pattern matching automatically applies colors to all brushes
+
+═══════════════════════════════════════════════════════════════════════════════════════════════
+COLOR SCHEME SLOTS (use these names in ColorRef attributes)
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+PRIMARY COLORS:
+  Primary, Secondary, Tertiary
+
+TEXT COLORS:
+  Text, TextMuted, TextHighlight, TextTitle, TextOnPrimary, TextDisabled
+
+BACKGROUND COLORS:
+  Background, BackgroundDark, BackgroundLight, BackgroundAccent, BackgroundHover, BackgroundSelected
+
+BORDER COLORS:
+  Border, BorderMuted, BorderHighlight, BorderSecondary
+
+BUTTON COLORS:
+  ButtonBackground, ButtonHover, ButtonPressed, ButtonDisabled, ButtonBorder
+
+STATE COLORS:
+  Success, Warning, Error, Info
+
+SPECIAL COLORS:
+  Gold, Experience, Health, Morale, Shadow, Glow
+
+═══════════════════════════════════════════════════════════════════════════════════════════════
+BRUSH XML SYNTAX (ColorRef attributes)
+═══════════════════════════════════════════════════════════════════════════════════════════════
+
+Instead of hardcoding colors:
+  <BrushLayer Name="Default" Color="#FFD700FF" />
+  <Style Name="Default" FontColor="#FFFFFFFF" />
+
+Use ColorRef to reference your scheme:
+  <BrushLayer Name="Default" ColorRef="Primary" />
+  <Style Name="Default" FontColorRef="Text" />
+
+Available attributes:
+  ColorRef         - For BrushLayer Color
+  FontColorRef     - For Style FontColor
+  TextGlowColorRef - For Style TextGlowColor
+  TextOutlineColorRef - For Style TextOutlineColor
+
+═══════════════════════════════════════════════════════════════════════════════════════════════
+-->
+
+<Theme>
+  <n>Custom Theme Example</n>
+  <Description>A fully customizable theme demonstrating the color scheme system</Description>
+  <Author>Your Name</Author>
+  <Version>1.0.0</Version>
+  
+  <!-- Base culture provides default colors (optional) -->
+  <!-- Valid values: vlandia, sturgia, battania, empire, aserai, khuzait, naval -->
+  <BaseCulture>vlandia</BaseCulture>
+  
+  <!-- AutoTheme: Pattern-based theming for brushes not in XML -->
+  <!-- Set to false if you want ONLY XML-defined brushes themed -->
+  <AutoTheme>true</AutoTheme>
+  
+  <!-- Auto-activate when joining these kingdoms -->
+  <BoundKingdoms>
+    <!-- <Kingdom>vlandia</Kingdom> -->
+  </BoundKingdoms>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- COLOR SCHEME - Your complete color palette -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+  
+  <ColorScheme>
+    <!-- PRIMARY COLORS - Your theme's main identity -->
+    <Primary>#FFD700</Primary>           <!-- Main accent - Royal Gold -->
+    <Secondary>#8B0000</Secondary>       <!-- Secondary - Dark Crimson -->
+    <Tertiary>#4682B4</Tertiary>         <!-- Tertiary - Steel Blue -->
+    
+    <!-- TEXT COLORS -->
+    <Text>#FFFFFFEE</Text>               <!-- White with slight transparency -->
+    <TextMuted>#B8B8B8</TextMuted>       <!-- Muted gray -->
+    <TextHighlight>#FFD700</TextHighlight> <!-- Gold highlight -->
+    <TextTitle>#FFD700</TextTitle>       <!-- Gold titles -->
+    <TextOnPrimary>#1A0A00</TextOnPrimary> <!-- Dark text on gold -->
+    <TextDisabled>#666666</TextDisabled> <!-- Disabled gray -->
+    
+    <!-- BACKGROUND COLORS -->
+    <Background>#1A150A99</Background>           <!-- Dark with warm tint, semi-transparent -->
+    <BackgroundDark>#0D0A05BB</BackgroundDark>   <!-- Darker, more opaque -->
+    <BackgroundLight>#2A2215AA</BackgroundLight> <!-- Lighter, for elevation -->
+    <BackgroundAccent>#FFD70020</BackgroundAccent> <!-- Gold tinted, subtle -->
+    <BackgroundHover>#FFD70040</BackgroundHover>   <!-- Gold tinted, hover -->
+    <BackgroundSelected>#FFD70060</BackgroundSelected> <!-- Gold tinted, selected -->
+    
+    <!-- BORDER COLORS -->
+    <Border>#FFD700AA</Border>           <!-- Gold, semi-transparent -->
+    <BorderMuted>#FFD70055</BorderMuted> <!-- Gold, subtle -->
+    <BorderHighlight>#FFD700FF</BorderHighlight> <!-- Gold, full opacity -->
+    <BorderSecondary>#8B0000AA</BorderSecondary> <!-- Crimson secondary -->
+    
+    <!-- BUTTON COLORS -->
+    <ButtonBackground>#FFD70025</ButtonBackground> <!-- Very subtle gold -->
+    <ButtonHover>#FFD70050</ButtonHover>           <!-- Noticeable gold -->
+    <ButtonPressed>#FFD70080</ButtonPressed>       <!-- Strong gold -->
+    <ButtonDisabled>#44444444</ButtonDisabled>     <!-- Neutral gray -->
+    <ButtonBorder>#FFD700CC</ButtonBorder>         <!-- Gold frame -->
+    
+    <!-- STATE COLORS -->
+    <Success>#32CD32</Success>   <!-- Lime Green -->
+    <Warning>#FFA500</Warning>   <!-- Orange -->
+    <Error>#DC143C</Error>       <!-- Crimson -->
+    <Info>#4682B4</Info>         <!-- Steel Blue -->
+    
+    <!-- SPECIAL COLORS -->
+    <Gold>#FFD700</Gold>         <!-- Currency display -->
+    <Experience>#9370DB</Experience> <!-- Purple for XP -->
+    <Health>#DC143C</Health>     <!-- Red for health -->
+    <Morale>#32CD32</Morale>     <!-- Green for morale -->
+    <Shadow>#1A0A0088</Shadow>   <!-- Dark shadow -->
+    <Glow>#FFD70066</Glow>       <!-- Gold glow effect -->
+  </ColorScheme>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- CUSTOM BRUSHES (Optional) -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+  
+  <!-- 
+  Place brush XML files in GUI/Brushes/ folder relative to this manifest.
+  Use ColorRef attributes to reference your scheme colors.
+  
+  Example brush file (GUI/Brushes/CustomBrushes.xml):
+  
+  <Brushes>
+    <Brush Name="MyCustomButton">
+      <Layers>
+        <BrushLayer Name="Default" Sprite="button_canvas_9" ColorRef="ButtonBackground" />
+      </Layers>
+      <Styles>
+        <Style Name="Default"><BrushLayer Name="Default" ColorRef="ButtonBackground" /></Style>
+        <Style Name="Hovered"><BrushLayer Name="Default" ColorRef="ButtonHover" /></Style>
+        <Style Name="Pressed"><BrushLayer Name="Default" ColorRef="ButtonPressed" /></Style>
+      </Styles>
+    </Brush>
+    
+    <Brush Name="MyCustomText">
+      <Styles>
+        <Style Name="Default" FontColorRef="Text" FontSize="20" />
+        <Style Name="Hovered" FontColorRef="TextHighlight" FontSize="20" />
+      </Styles>
+    </Brush>
+  </Brushes>
+  -->
+  
+</Theme>

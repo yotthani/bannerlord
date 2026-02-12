@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Inventory Quick Actions - English Localization
+  
+  To create translations:
+  1. Copy this file to a new folder (e.g., ModuleData/Languages/DE/ for German)
+  2. Translate the text content within each <string> tag
+  3. Keep the id attributes unchanged
+  4. Register the language in SubModule.xml if needed
+-->
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+      type="string">
+  <tags>
+    <tag language="English" />
+  </tags>
+  <strings>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- GENERAL / SYSTEM -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_mod_loaded" text="[{FEATURE}] Loaded. {DETAILS}" />
+    <string id="str_feature_disabled" text="[{FEATURE}] is disabled in settings." />
+    <string id="str_error" text="[{FEATURE}] Error: {MESSAGE}" />
+    <string id="str_no_fiefs" text="You don't own any fiefs yet!" />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- RING SYSTEM -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_rings_title" text="Rings of Power" />
+    <string id="str_ring_equipped" text="Equipped {RING_NAME}" />
+    <string id="str_ring_unequipped" text="Unequipped {RING_NAME}" />
+    <string id="str_max_rings" text="Cannot equip more than 1 ring!" />
+    <string id="str_all_rings" text="All Rings of Power have been granted!" />
+    <string id="str_dark_forces" text="Dark forces stir... You feel eyes watching you from the shadows." />
+    <string id="str_corruption_warning" text="The ring's corruption grows stronger... ({LEVEL}%)" />
+    <string id="str_corruption_fading" text="The ring's influence fades as you part with it..." />
+    <string id="str_ring_power" text="The {RING_NAME}'s power grows within you..." />
+    <string id="str_cannot_swap" text="You must wait for the previous ring's effects to fade before equipping another." />
+    <string id="str_elven_grace" text="Elven grace flows through you..." />
+    <string id="str_dwarven_fortitude" text="Dwarven fortitude hardens your resolve..." />
+    <string id="str_dark_dominion" text="A dark dominion clouds your thoughts..." />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- RING SCREEN UI -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="ring_screen_title" text="Rings of Power" />
+    <string id="ring_lore_quote" text="One Ring to rule them all, One Ring to find them" />
+    <string id="ring_bear" text="Bear Ring" />
+    <string id="ring_remove" text="Remove Ring" />
+    <string id="ring_bear_hint" text="Wear this ring and claim its power" />
+    <string id="ring_remove_hint" text="Remove this ring from your finger" />
+    <string id="ring_count" text="{OWNED} of 20 Rings Found" />
+    <string id="ring_corruption" text="{PERCENT}% Corruption" />
+    <string id="ring_no_worn" text="No rings worn" />
+    
+    <!-- Threat Levels -->
+    <string id="threat_0" text="Hidden from the Enemy" />
+    <string id="threat_1" text="Faint whispers" />
+    <string id="threat_2" text="The Eye stirs" />
+    <string id="threat_3" text="Servants seek you" />
+    <string id="threat_4" text="Nazgûl are hunting" />
+    <string id="threat_5" text="SAURON KNOWS" />
+    
+    <!-- Ring Screen Labels -->
+    <string id="ring_no_ring_worn" text="No Ring Worn" />
+    <string id="ring_lore_header" text="Ring Lore" />
+    <string id="ring_power" text="POWER" />
+    <string id="ring_history" text="HISTORY" />
+    <string id="ring_possessed" text="In Your Possession" />
+    <string id="ring_lost" text="Lost to Shadow" />
+    <string id="ring_bearing" text="✧ BEARING THIS RING ✧" />
+    <string id="ring_select" text="Select a Ring" />
+    <string id="ring_bearer_status" text="Bearer Status" />
+    <string id="ring_corruption_label" text="CORRUPTION" />
+    <string id="ring_threat_label" text="THREAT LEVEL" />
+    <string id="ring_active_powers" text="ACTIVE POWERS" />
+    
+    <!-- Ring Legend -->
+    <string id="ring_legend_one" text="The One" />
+    <string id="ring_legend_elven" text="Elven (3)" />
+    <string id="ring_legend_dwarven" text="Dwarven (7)" />
+    <string id="ring_legend_mortal" text="Mortal (9)" />
+    
+    <!-- Ring Controls -->
+    <string id="ring_rotate_left" text="◄ Rotate" />
+    <string id="ring_rotate_right" text="Rotate ►" />
+    <string id="ring_hint_bear" text="Bear this Ring" />
+    <string id="ring_hint_remove" text="Remove this Ring" />
+    <string id="ring_hint_close" text="Close" />
+    <string id="ring_btn_leave" text="Leave" />
+    <string id="ring_btn_done" text="Done" />
+    
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- RING DEFINITIONS - The One Ring -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="hon_ring_one_ring_name" text="The One Ring" />
+    <string id="hon_ring_one_ring_short" text="One" />
+    <string id="hon_ring_one_ring_effect" text="Dominion over all ring-bearers. Invisibility. Accelerated corruption." />
+    <string id="hon_ring_one_ring_lore" text="Forged by Sauron in the fires of Mount Doom. One Ring to rule them all." />
+    
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- RING DEFINITIONS - Elven Rings -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="hon_ring_narya_name" text="Narya" />
+    <string id="hon_ring_narya_short" text="Fire" />
+    <string id="hon_ring_narya_effect" text="Ring of Fire. +15% party morale, resistance to despair." />
+    <string id="hon_ring_narya_lore" text="The Ring of Fire, set with a ruby. Worn by Gandalf." />
+    
+    <string id="hon_ring_nenya_name" text="Nenya" />
+    <string id="hon_ring_nenya_short" text="Water" />
+    <string id="hon_ring_nenya_effect" text="Ring of Water. +20% healing rate, protection from corruption." />
+    <string id="hon_ring_nenya_lore" text="The Ring of Adamant, made of mithril with a diamond. Worn by Galadriel." />
+    
+    <string id="hon_ring_vilya_name" text="Vilya" />
+    <string id="hon_ring_vilya_short" text="Air" />
+    <string id="hon_ring_vilya_effect" text="Ring of Air. +25% movement speed, weather influence." />
+    <string id="hon_ring_vilya_lore" text="The Ring of Sapphire, mightiest of the Three. Worn by Elrond." />
+    
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- RING DEFINITIONS - Dwarven Rings -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="hon_ring_dwarf_1_name" text="Ring of Durin" />
+    <string id="hon_ring_dwarf_1_short" text="Durin" />
+    <string id="hon_ring_dwarf_1_effect" text="Amplifies gold-finding. +30% trade profit." />
+    <string id="hon_ring_dwarf_1_lore" text="Greatest of the Seven, worn by the Kings of Khazad-dûm." />
+    
+    <string id="hon_ring_dwarf_2_name" text="Ring of Thráin" />
+    <string id="hon_ring_dwarf_2_short" text="Thráin" />
+    <string id="hon_ring_dwarf_2_effect" text="Enhances crafting. +20% smithing quality." />
+    <string id="hon_ring_dwarf_2_lore" text="Last of the Seven to remain with the Dwarves." />
+    
+    <string id="hon_ring_dwarf_3_name" text="Ring of the Firebeards" />
+    <string id="hon_ring_dwarf_3_short" text="Firebeard" />
+    <string id="hon_ring_dwarf_3_effect" text="Fire resistance. +15% siege effectiveness." />
+    <string id="hon_ring_dwarf_3_lore" text="Given to the Lords of Nogrod." />
+    
+    <string id="hon_ring_dwarf_4_name" text="Ring of the Broadbeams" />
+    <string id="hon_ring_dwarf_4_short" text="Broadbeam" />
+    <string id="hon_ring_dwarf_4_effect" text="Stone mastery. +25% construction speed." />
+    <string id="hon_ring_dwarf_4_lore" text="Worn by the Kings of Belegost." />
+    
+    <string id="hon_ring_dwarf_5_name" text="Ring of the Ironfists" />
+    <string id="hon_ring_dwarf_5_short" text="Ironfist" />
+    <string id="hon_ring_dwarf_5_effect" text="Battle fury. +20% melee damage." />
+    <string id="hon_ring_dwarf_5_lore" text="Lost in wars with dragons." />
+    
+    <string id="hon_ring_dwarf_6_name" text="Ring of the Stiffbeards" />
+    <string id="hon_ring_dwarf_6_short" text="Stiffbeard" />
+    <string id="hon_ring_dwarf_6_effect" text="Endurance. +30% fatigue resistance." />
+    <string id="hon_ring_dwarf_6_lore" text="Hidden in the deeps of the East." />
+    
+    <string id="hon_ring_dwarf_7_name" text="Ring of the Blacklocks" />
+    <string id="hon_ring_dwarf_7_short" text="Blacklock" />
+    <string id="hon_ring_dwarf_7_effect" text="Shadow sight. Reveals hidden enemies." />
+    <string id="hon_ring_dwarf_7_lore" text="Consumed by dragon fire." />
+    
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- RING DEFINITIONS - Mortal Rings (Nine) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="hon_ring_nazgul_1_name" text="Ring of the Witch-King" />
+    <string id="hon_ring_nazgul_1_short" text="Witch-King" />
+    <string id="hon_ring_nazgul_1_effect" text="Terror aura. Enemies flee in fear. High corruption." />
+    <string id="hon_ring_nazgul_1_lore" text="Chief of the Nazgûl, Lord of Angmar." />
+    
+    <string id="hon_ring_nazgul_2_name" text="Ring of Khamûl" />
+    <string id="hon_ring_nazgul_2_short" text="Khamûl" />
+    <string id="hon_ring_nazgul_2_effect" text="Shadow sense. Track enemies across great distances." />
+    <string id="hon_ring_nazgul_2_lore" text="The Black Easterling, second of the Nine." />
+    
+    <string id="hon_ring_nazgul_3_name" text="Ring of the Dark Marshal" />
+    <string id="hon_ring_nazgul_3_short" text="Marshal" />
+    <string id="hon_ring_nazgul_3_effect" text="Command undead. +40% undead troop effectiveness." />
+    <string id="hon_ring_nazgul_3_lore" text="General of Sauron's armies." />
+    
+    <string id="hon_ring_nazgul_4_name" text="Ring of the Betrayer" />
+    <string id="hon_ring_nazgul_4_short" text="Betrayer" />
+    <string id="hon_ring_nazgul_4_effect" text="Sow discord. Enemy parties have -20% cohesion." />
+    <string id="hon_ring_nazgul_4_lore" text="A Black Númenórean who served Sauron." />
+    
+    <string id="hon_ring_nazgul_5_name" text="Ring of the Shadow Lord" />
+    <string id="hon_ring_nazgul_5_short" text="Shadow" />
+    <string id="hon_ring_nazgul_5_effect" text="Move unseen. +50% stealth, invisibility at night." />
+    <string id="hon_ring_nazgul_5_lore" text="Master of shadows and deception." />
+    
+    <string id="hon_ring_nazgul_6_name" text="Ring of the Undying" />
+    <string id="hon_ring_nazgul_6_short" text="Undying" />
+    <string id="hon_ring_nazgul_6_effect" text="Defy death. Survive fatal blows once per battle." />
+    <string id="hon_ring_nazgul_6_lore" text="Cheated death itself through dark power." />
+    
+    <string id="hon_ring_nazgul_7_name" text="Ring of the Tainted" />
+    <string id="hon_ring_nazgul_7_short" text="Tainted" />
+    <string id="hon_ring_nazgul_7_effect" text="Poison mastery. Attacks inflict corruption." />
+    <string id="hon_ring_nazgul_7_lore" text="Spreader of plague and corruption." />
+    
+    <string id="hon_ring_nazgul_8_name" text="Ring of the Knight of Umbar" />
+    <string id="hon_ring_nazgul_8_short" text="Umbar" />
+    <string id="hon_ring_nazgul_8_effect" text="Naval supremacy. +35% ship speed and combat." />
+    <string id="hon_ring_nazgul_8_lore" text="Once a great captain of the Corsairs." />
+    
+    <string id="hon_ring_nazgul_9_name" text="Ring of the Dwimmerlaik" />
+    <string id="hon_ring_nazgul_9_short" text="Dwimmerlaik" />
+    <string id="hon_ring_nazgul_9_effect" text="Spectral form. Immune to normal weapons at night." />
+    <string id="hon_ring_nazgul_9_lore" text="The most wraith-like of the Nine." />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- TROOP STATUS -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_troops_deserted" text="{COUNT} {TROOP_NAME} have deserted in fear!" />
+    <string id="str_bonding_diluted" text="{TROOP_NAME} bonding diluted by new recruits ({OLD}% → {NEW}%)" />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MEMORY SYSTEM (Virtual Captains) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_captain_promoted" text="★ {CAPTAIN_NAME} has emerged as captain of your {TROOP_NAME}!" />
+    <string id="str_captain_fallen" text="† Captain {CAPTAIN_NAME} has fallen with the last of the {TROOP_NAME}!" />
+    <string id="str_captain_battle" text="† Captain {CAPTAIN_NAME} fell leading the {TROOP_NAME} in desperate battle!" />
+    <string id="str_captain_disbanded" text="Captain {CAPTAIN_NAME} disbands as the last troops are released." />
+    <string id="str_troops_abandoned" text="Your {TROOP_NAME} feel abandoned... (Bonding -{LOSS}%)" />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- FIEF MANAGEMENT -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_fief_management" text="Fief Management" />
+    <string id="str_opening_fief" text="Opening remote fief management..." />
+    <string id="str_building_queued" text="Queued {BUILDING} for construction." />
+    <string id="str_queue_full" text="Construction queue is full!" />
+    <string id="str_no_buildings" text="No buildings available to construct." />
+    <string id="str_building_removed" text="Removed {BUILDING} from queue." />
+    <string id="str_not_in_queue" text="Building is not in queue." />
+    <string id="str_remote_disabled" text="Remote building management is disabled in settings." />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SMITHING EXTENDED -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_repair_shop" text="Visit the Repair Shop" />
+    <string id="str_repair_shop_desc" text="The smithy's repair shop. Here you can repair damaged equipment or upgrade items with better modifiers." />
+    <string id="str_view_repair" text="View items for repair" />
+    <string id="str_leave" text="Leave" />
+    <string id="str_select_repair" text="Select Item to Repair" />
+    <string id="str_select_repair_desc" text="Choose an item from your inventory to repair or upgrade." />
+    <string id="str_no_repairable" text="You have no items that can be repaired or upgraded." />
+    <string id="str_no_repair_options" text="No repair options available for your current items." />
+    <string id="str_not_enough_gold" text="Not enough gold! Need {AMOUNT} gold." />
+    <string id="str_repair_failed" text="The repair attempt failed! Lost {COST} gold." />
+    <string id="str_repair_success" text="Successfully {QUALITY} the item for {COST} gold!" />
+    <string id="str_unique_crafted" text="★ You crafted a unique item: {ITEM_NAME}!" />
+    <string id="str_legendary_unique" text="Legendary success! Created unique item: {ITEM_NAME}" />
+    <string id="str_basic_repair" text="Basic Repair" />
+    <string id="str_basic_repair_desc" text="Remove any damage or negative modifiers" />
+    <string id="str_fine_quality" text="Fine Quality" />
+    <string id="str_fine_quality_desc" text="Upgrade to Fine quality (+10% effectiveness)" />
+    <string id="str_masterwork" text="Masterwork Quality" />
+    <string id="str_masterwork_desc" text="Upgrade to Masterwork quality (+20% effectiveness)" />
+    <string id="str_legendary_reforge" text="Legendary Reforge" />
+    <string id="str_legendary_desc" text="Attempt to create a legendary quality item (+40% effectiveness)" />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- FORMATION PRESETS -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_formation_presets" text="Formation Presets" />
+    <string id="str_save_preset" text="Save Preset" />
+    <string id="str_load_preset" text="Load Preset" />
+    <string id="str_delete_preset" text="Delete Preset" />
+    <string id="str_preset_saved" text="Preset '{NAME}' saved successfully!" />
+    <string id="str_preset_loaded" text="Preset '{NAME}' loaded!" />
+    <string id="str_max_presets" text="Maximum presets ({MAX}) reached for this character!" />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- EQUIPMENT PRESETS -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_equipment_presets" text="Equipment Presets" />
+    <string id="str_save_equipment" text="Save Current Equipment" />
+    <string id="str_equip_preset" text="Equip Preset" />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- CULTURAL NEEDS -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_need_triggered" text="[{CULTURE}] {MESSAGE}" />
+    <string id="str_need_resolved" text="[{CULTURE}] {MESSAGE}" />
+    <string id="str_dwarves_beer" text="Your dwarven troops grow irritable without ale..." />
+    <string id="str_dwarves_beer_ok" text="Your dwarven troops are satisfied with their ale rations." />
+    <string id="str_elves_forest" text="Your elven troops long for the woods..." />
+    <string id="str_orcs_combat" text="Your orc troops grow restless without battle..." />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- COMPANION ROLES -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_role_surgeon" text="Surgeon" />
+    <string id="str_role_engineer" text="Engineer" />
+    <string id="str_role_scout" text="Scout" />
+    <string id="str_role_quartermaster" text="Quartermaster" />
+    <string id="str_role_archer" text="Archer" />
+    <string id="str_role_cavalry" text="Cavalry" />
+    <string id="str_role_infantry" text="Infantry" />
+    <string id="str_role_horse_archer" text="Horse Archer" />
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- UI LABELS -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="str_select" text="Select" />
+    <string id="str_cancel" text="Cancel" />
+    <string id="str_apply" text="Apply" />
+    <string id="str_close" text="Close" />
+    <string id="str_confirm" text="Confirm" />
+    <string id="str_yes" text="Yes" />
+    <string id="str_no" text="No" />
+    <string id="str_gold" text="Gold" />
+    <string id="str_cost" text="Cost" />
+    <string id="str_success" text="Success" />
+    <string id="str_chance" text="Chance" />
+    <string id="str_prosperity" text="Prosperity" />
+    <string id="str_loyalty" text="Loyalty" />
+    <string id="str_security" text="Security" />
+    <string id="str_food" text="Food Stocks" />
+    <string id="str_garrison" text="Garrison" />
+    <string id="str_tax" text="Tax Income" />
+  </strings>
+</base>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- BATTLE ACTION BAR -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="action_hold_fire" text="Hold Fire" />
+    <string id="action_free_fire" text="Free Fire" />
+    <string id="action_volley" text="Volley Fire" />
+    <string id="action_brace" text="Brace for Cavalry" />
+    <string id="action_pike_wall" text="Pike Wall" />
+    <string id="action_shield_wall" text="Shield Wall" />
+    <string id="action_testudo" text="Testudo" />
+    <string id="action_charge" text="Line Charge" />
+    <string id="action_skirmish" text="Skirmish" />
+    
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SIEGE DISMOUNT -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="siege_dismount_map" text="Mount will spawn on map but you will be on foot." />
+    <string id="siege_dismount_inv" text="Mount moved to inventory for siege duration." />
+    <string id="siege_remount" text="Mount restored after siege." />
+    
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- LAYERED ARMOR -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="armor_layer_inner" text="Inner Layer (Padding)" />
+    <string id="armor_layer_middle" text="Middle Layer (Mail)" />
+    <string id="armor_layer_outer" text="Outer Layer (Plate)" />
+    
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MIXED FORMATIONS -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="formation_infantry_front" text="Infantry Front, Ranged Back" />
+    <string id="formation_ranged_front" text="Ranged Front, Infantry Back" />
+    <string id="formation_ranged_wings" text="Ranged Wings, Infantry Center" />
+    <string id="formation_checkerboard" text="Checkerboard" />
+    
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SMART CAVALRY -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <string id="cavalry_forming" text="Cavalry forming charge line..." />
+    <string id="cavalry_charging" text="CHARGE!" />
+    <string id="cavalry_reforming" text="Cavalry reforming..." />

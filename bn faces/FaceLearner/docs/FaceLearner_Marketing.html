@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceLearner - AI Face Recreation for Bannerlord</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e8e8e8;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%);
+        }
+        .hero h1 {
+            font-size: 3.5em;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        .hero .tagline { font-size: 1.5em; color: #a8a8a8; margin-bottom: 40px; }
+        
+        .hero-diagram {
+            background: #0d1b2a;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 800px;
+            border: 1px solid #1b3a4b;
+        }
+        .flow-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .flow-item {
+            background: linear-gradient(135deg, #1b3a4b, #162447);
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 150px;
+            border: 1px solid #e94560;
+        }
+        .flow-item .icon { font-size: 2.5em; margin-bottom: 10px; }
+        .flow-arrow { font-size: 2em; color: #e94560; }
+        
+        /* Sections */
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #e94560;
+        }
+        
+        /* Features */
+        .features { padding: 60px 20px; }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #1b3a4b;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(233, 69, 96, 0.2);
+        }
+        .feature-card h3 {
+            color: #e94560;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        .feature-card p { color: #a8a8a8; margin-bottom: 15px; }
+        .feature-card ul { list-style: none; }
+        .feature-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #1b3a4b;
+            color: #c8c8c8;
+        }
+        .feature-card li:before { content: "✓ "; color: #4ecca3; }
+        
+        /* Steps */
+        .how-it-works { padding: 60px 20px; background: rgba(0,0,0,0.2); }
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .step {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            background: linear-gradient(135deg, #0d1b2a, #162447);
+            padding: 30px;
+            border-radius: 20px;
+            border-left: 4px solid #e94560;
+        }
+        .step-number {
+            background: #e94560;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .step-content h4 { color: #fff; font-size: 1.3em; margin-bottom: 10px; }
+        .step-content p { color: #a8a8a8; }
+        
+        /* Tree */
+        .tree-section { padding: 60px 20px; }
+        .tree-diagram {
+            background: #0d1b2a;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            margin: 30px auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border: 1px solid #1b3a4b;
+            overflow-x: auto;
+        }
+        .tree-diagram pre { color: #4ecca3; white-space: pre; }
+        .tree-node { color: #e94560; }
+        .tree-leaf { color: #4ecca3; }
+        .tree-value { color: #f9ed69; }
+        
+        /* Code */
+        .code-section { padding: 60px 20px; background: rgba(0,0,0,0.2); }
+        .code-block {
+            background: #0a0a0a;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 1px solid #333;
+        }
+        .code-block pre { color: #e8e8e8; font-family: 'Courier New', monospace; font-size: 0.9em; }
+        .code-block .comment { color: #6a9955; }
+        .code-block .tag { color: #569cd6; }
+        .code-block .attr { color: #9cdcfe; }
+        .code-block .value { color: #ce9178; }
+        
+        /* UI */
+        .ui-preview { padding: 60px 20px; }
+        .ui-mockup {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 900px;
+            margin: 30px auto;
+            border: 2px solid #333;
+        }
+        .ui-titlebar {
+            background: #2d2d2d;
+            padding: 10px 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            gap: 8px;
+        }
+        .ui-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .ui-dot.red { background: #ff5f56; }
+        .ui-dot.yellow { background: #ffbd2e; }
+        .ui-dot.green { background: #27ca3f; }
+        .ui-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .ui-face-preview {
+            background: #0a0a0a;
+            border-radius: 15px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #444;
+        }
+        .ui-face-icon { font-size: 8em; opacity: 0.3; }
+        .ui-panel { display: flex; flex-direction: column; gap: 15px; }
+        .ui-log {
+            background: #0a0a0a;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            color: #4ecca3;
+            height: 150px;
+            border: 1px solid #333;
+        }
+        .ui-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+        .ui-btn {
+            background: linear-gradient(135deg, #e94560, #c73659);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .ui-btn.secondary {
+            background: linear-gradient(135deg, #1b3a4b, #162447);
+            border: 1px solid #e94560;
+        }
+        .ui-input-row { display: flex; gap: 10px; margin-top: 15px; }
+        .ui-input {
+            flex: 1;
+            background: #0a0a0a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 12px;
+            color: #888;
+        }
+        
+        /* Stats */
+        .stats { padding: 60px 20px; text-align: center; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .stat-item {
+            background: linear-gradient(135deg, #0d1b2a, #162447);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #1b3a4b;
+        }
+        .stat-number { font-size: 3em; font-weight: bold; color: #e94560; }
+        .stat-label { color: #a8a8a8; margin-top: 10px; }
+        
+        /* Requirements */
+        .requirements { padding: 60px 20px; background: rgba(0,0,0,0.2); }
+        .req-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .req-card {
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #1b3a4b;
+        }
+        .req-card h4 { color: #e94560; margin-bottom: 20px; font-size: 1.3em; }
+        .req-card ul { list-style: none; }
+        .req-card li { padding: 10px 0; color: #c8c8c8; border-bottom: 1px solid #1b3a4b; }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            border-top: 1px solid #1b3a4b;
+        }
+        footer a { color: #e94560; text-decoration: none; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5em; }
+            .flow-diagram { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+            .ui-content { grid-template-columns: 1fr; }
+            .step { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <div class="container">
+            <h1>🧠 FaceLearner</h1>
+            <p class="tagline">AI-Powered Face Recreation for Mount & Blade II: Bannerlord</p>
+            <p style="color: #888; max-width: 700px; margin: 0 auto;">
+                Transform real photos into game-ready character faces using machine learning. 
+                Generate unique NPCs, recreate historical figures, or bring your own face into the game.
+            </p>
+            
+            <div class="hero-diagram">
+                <div class="flow-diagram">
+                    <div class="flow-item">
+                        <div class="icon">📸</div>
+                        <div>Real Photo</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">
+                        <div class="icon">🧠</div>
+                        <div>AI Learning</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">
+                        <div class="icon">🎮</div>
+                        <div>Game Character</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">✨ Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🎯 Photo Matching</h3>
+                    <p>Upload photos and get matching Bannerlord characters automatically.</p>
+                    <ul>
+                        <li>68-point facial landmark detection</li>
+                        <li>Multiple suggestions per photo (ranked by accuracy)</li>
+                        <li>Works with any face photo</li>
+                        <li>Batch processing for folders</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🎲 Character Generation</h3>
+                    <p>Generate diverse, unique characters for your mods.</p>
+                    <ul>
+                        <li>Create 20+ unique variations in seconds</li>
+                        <li>Diversity control (subtle to extreme)</li>
+                        <li>Based on learned realistic face proportions</li>
+                        <li>Export directly to game XML format</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🌳 Living Knowledge Tree</h3>
+                    <p>Revolutionary learning approach - understands what each slider does.</p>
+                    <ul>
+                        <li>Learns slider→landmark relationships</li>
+                        <li>Gets smarter with every experiment</li>
+                        <li>Persistent knowledge across sessions</li>
+                        <li>Shareable knowledge files</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>👁️ Live Preview</h3>
+                    <p>Test any character code in real-time 3D preview.</p>
+                    <ul>
+                        <li>Paste any BodyProperties code</li>
+                        <li>Instant 3D face rendering</li>
+                        <li>Adjustable camera (zoom, rotate)</li>
+                        <li>Copy current face to clipboard</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>📦 Game-Ready Export</h3>
+                    <p>Output in formats you can use immediately.</p>
+                    <ul>
+                        <li>BodyProperties XML for mod files</li>
+                        <li>Character codes for in-game creator</li>
+                        <li>Direct copy-paste into lords.xml</li>
+                        <li>Works with any Bannerlord mod</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>🔧 Modular Data Sources</h3>
+                    <p>Support for multiple face datasets.</p>
+                    <ul>
+                        <li>LFW Dataset (13,000 faces)</li>
+                        <li>CelebA Dataset (200,000 faces)</li>
+                        <li>Custom datasets supported</li>
+                        <li>Auto-download missing models</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">🔬 How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Initialize & Load Data</h4>
+                        <p>Press <strong>Init</strong> to load the facial landmark model (dlib 68-point) and scan for training datasets. The mod automatically downloads the ~100MB landmark model if missing.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Learning Phase</h4>
+                        <p>Press <strong>Learn</strong> to start the AI learning loop. The system takes photos from your dataset, extracts facial landmarks, generates Bannerlord faces, compares them, and learns which morph sliders affect which facial features.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Knowledge Tree Growth</h4>
+                        <p>Every experiment grows the Knowledge Tree. It learns things like "Slider 47 increases nose width by 0.15" and "To create a wide nose, use Sliders 47+52 together". This knowledge compounds over time.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Generate or Match</h4>
+                        <p>Once trained, use <strong>Generate</strong> for random diverse characters, or <strong>Match</strong> to recreate specific photos. The AI uses its learned knowledge to produce realistic results quickly.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Export & Use</h4>
+                        <p>Export results to XML files with game-ready BodyProperties. Copy-paste directly into your mod's lords.xml, heroes.xml, or use in the character creator.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tree-section">
+        <div class="container">
+            <h2 class="section-title">🌳 The Living Knowledge Tree</h2>
+            <p style="text-align: center; color: #888; max-width: 700px; margin: 0 auto 30px;">
+                Unlike traditional machine learning which is a black box, FaceLearner builds an explainable knowledge structure that grows with every experiment.
+            </p>
+            <div class="tree-diagram">
+<pre>
+<span class="tree-node">ROOT</span>
+ │
+ ├── <span class="tree-node">Primitives</span> <span style="color:#888">(what each slider does)</span>
+ │    ├── Slider 47 → affects { <span class="tree-value">NoseWidth: +0.15</span> }
+ │    ├── Slider 52 → affects { <span class="tree-value">NoseWidth: +0.08, JawWidth: +0.02</span> }
+ │    └── <span style="color:#888">... 62 total morph sliders mapped</span>
+ │
+ ├── <span class="tree-node">Methods</span> <span style="color:#888">(combinations that achieve goals)</span>
+ │    ├── <span class="tree-leaf">"WideNose"</span>
+ │    │    ├── Basic: [47=0.8, 52=0.7] → <span class="tree-value">Success: 87%</span>
+ │    │    └── OnNarrowFace: [47=0.9, 52=0.8, 80=0.3] → <span class="tree-value">Success: 92%</span>
+ │    └── <span style="color:#888">... methods grow as patterns are discovered</span>
+ │
+ └── <span class="tree-node">Recipes</span> <span style="color:#888">(full face compositions)</span>
+      ├── <span class="tree-leaf">"lfw_person_001"</span> → Score: <span class="tree-value">0.823</span>
+      └── <span style="color:#888">... every matched face stored for future reference</span>
+</pre>
+            </div>
+        </div>
+    </section>
+
+    <section class="ui-preview">
+        <div class="container">
+            <h2 class="section-title">🖥️ User Interface</h2>
+            <div class="ui-mockup">
+                <div class="ui-titlebar">
+                    <div class="ui-dot red"></div>
+                    <div class="ui-dot yellow"></div>
+                    <div class="ui-dot green"></div>
+                    <span style="margin-left: 15px; color: #888;">FaceLearner v0.17.0</span>
+                </div>
+                <div class="ui-content">
+                    <div class="ui-face-preview">
+                        <div class="ui-face-icon">👤</div>
+                    </div>
+                    <div class="ui-panel">
+                        <div class="ui-log">
+[14:32:15] FaceLearner Ready
+[14:32:18] Face API: 62 morphs OK
+[14:32:19] Landmark detector OK
+[14:32:20] LFW: 13233 samples
+[14:32:20] Init complete! Press Learn
+[14:32:46] Target: lfw_Aaron_Eckhart
+                        </div>
+                        <div class="ui-buttons">
+                            <button class="ui-btn">Init</button>
+                            <button class="ui-btn">Learn</button>
+                            <button class="ui-btn secondary">Stop</button>
+                            <button class="ui-btn secondary">Generate</button>
+                            <button class="ui-btn secondary">Match</button>
+                            <button class="ui-btn secondary">Exit</button>
+                        </div>
+                        <div class="ui-input-row">
+                            <input type="text" class="ui-input" placeholder="Paste BodyProperties code here...">
+                            <button class="ui-btn">Preview</button>
+                            <button class="ui-btn secondary">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="code-section">
+        <div class="container">
+            <h2 class="section-title">📄 Output Format</h2>
+            <div class="code-block">
+<pre>
+<span class="comment">&lt;!-- FaceLearner Photo Matches --&gt;</span>
+
+<span class="comment">&lt;!-- ========== aragorn.jpg ========== --&gt;</span>
+
+<span class="comment">&lt;!-- #1 Score: 0.823 --&gt;</span>
+<span class="tag">&lt;BodyProperties</span> <span class="attr">version</span>=<span class="value">"4"</span> <span class="attr">age</span>=<span class="value">"35.0"</span> <span class="attr">weight</span>=<span class="value">"0.52"</span> <span class="attr">build</span>=<span class="value">"0.68"</span> 
+                <span class="attr">key</span>=<span class="value">"001CAC0840000014AFC3784..."</span> <span class="tag">/&gt;</span>
+
+<span class="comment">&lt;!-- #2 Score: 0.756 --&gt;</span>
+<span class="tag">&lt;BodyProperties</span> <span class="attr">version</span>=<span class="value">"4"</span> <span class="attr">age</span>=<span class="value">"34.2"</span> <span class="attr">weight</span>=<span class="value">"0.55"</span> <span class="attr">build</span>=<span class="value">"0.71"</span>
+                <span class="attr">key</span>=<span class="value">"001DAF0850000012BFC4892..."</span> <span class="tag">/&gt;</span>
+</pre>
+            </div>
+            
+            <h3 style="color: #e94560; margin: 40px 0 20px;">How to Use in Your Mod:</h3>
+            <div class="code-block">
+<pre>
+<span class="comment">&lt;!-- In your lords.xml or heroes.xml: --&gt;</span>
+
+<span class="tag">&lt;NPCCharacter</span> <span class="attr">id</span>=<span class="value">"lord_custom_1"</span> <span class="attr">name</span>=<span class="value">"Aragorn"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;face&gt;</span>
+    <span class="comment">&lt;!-- Just paste the BodyProperties line here! --&gt;</span>
+    <span class="tag">&lt;BodyProperties</span> <span class="attr">version</span>=<span class="value">"4"</span> <span class="attr">age</span>=<span class="value">"35.0"</span> <span class="attr">weight</span>=<span class="value">"0.52"</span> 
+                    <span class="attr">build</span>=<span class="value">"0.68"</span> <span class="attr">key</span>=<span class="value">"001CAC08..."</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;/face&gt;</span>
+<span class="tag">&lt;/NPCCharacter&gt;</span>
+</pre>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <h2 class="section-title">📊 Technical Specs</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">62</div>
+                    <div class="stat-label">Morph Sliders Controlled</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">68</div>
+                    <div class="stat-label">Facial Landmark Points</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">200K+</div>
+                    <div class="stat-label">Training Faces (CelebA)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">~0.5s</div>
+                    <div class="stat-label">Per Learning Iteration</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="requirements">
+        <div class="container">
+            <h2 class="section-title">📋 Requirements</h2>
+            <div class="req-grid">
+                <div class="req-card">
+                    <h4>🎮 Game Requirements</h4>
+                    <ul>
+                        <li>Mount & Blade II: Bannerlord</li>
+                        <li>Version 1.2.x or 1.3.x</li>
+                        <li>Bannerlord.Harmony mod</li>
+                    </ul>
+                </div>
+                <div class="req-card">
+                    <h4>💻 System Requirements</h4>
+                    <ul>
+                        <li>Windows 10/11 (64-bit)</li>
+                        <li>~500MB disk space (for datasets)</li>
+                        <li>Internet connection (first run only)</li>
+                    </ul>
+                </div>
+                <div class="req-card">
+                    <h4>📁 Training Data (Optional)</h4>
+                    <ul>
+                        <li>LFW Dataset (~173MB, 13K faces)</li>
+                        <li>CelebA Dataset (~1.4GB, 200K faces)</li>
+                        <li>Or use your own photo collection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">🚀 Quick Start</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Install</h4>
+                        <p>Extract FaceLearner to <code>Modules/FaceLearner/</code> in your Bannerlord folder. Enable in launcher.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Add Training Data</h4>
+                        <p>Download LFW or CelebA and extract to <code>Modules/FaceLearner/Data/datasets/</code></p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Init & Learn</h4>
+                        <p>Click <strong>Init</strong> then <strong>Learn</strong>. Let it run for best results.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Generate or Match</h4>
+                        <p>Use <strong>Generate</strong> for random characters or <strong>Match</strong> with your photos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p style="font-size: 1.2em; margin-bottom: 20px;">🧠 FaceLearner v0.17.0</p>
+            <p>Created for the Bannerlord modding community<br>Part of the <a href="#">LOTR: Age of Men</a> project</p>
+            <p style="margin-top: 20px; color: #444;">Uses dlib for facial landmark detection • MIT License</p>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BRUSH REFERENCE FOR THEME AUTHORS -->
+<!-- Documents key brushes that can be themed in Bannerlord -->
+
+<!--
+═══════════════════════════════════════════════════════════════════════════
+CHARACTER CREATION BRUSHES (Native/GUI/Brushes/CharacterCreation.xml)
+═══════════════════════════════════════════════════════════════════════════
+CharacterCreation.Culture.Button        - Culture selection button background
+CharacterCreation.Culture.Button.Frame  - Culture selection button border
+CharacterCreation.Culture.Banner        - Culture banner image
+Culture.Text                            - Culture name text
+Culture.Banner.Icon                     - Small culture flag icon
+Culture.Banner.Layer.1-4                - Culture banner layers
+
+Stage.Title.Text                        - Stage title text
+Stage.Description.Text                  - Stage description text
+Stage.Selection.Description.Text        - Selection description
+Stage.PositiveEffect.Text               - Positive effect (green text)
+Stage.NegativeEffect.Text               - Negative effect (red text)
+
+Generic.Button.Text                     - Generic button text
+Creation.ColorCard                      - Color picker card
+Creation.ColorCard.Selection            - Selected color indicator
+RandomButtonBrush                       - Random button
+
+Review.Title.Text                       - Review screen titles
+Review.Value.Text                       - Review screen values
+Review.NameInput.Text                   - Name input field
+
+═══════════════════════════════════════════════════════════════════════════
+POPUP/DIALOG BRUSHES (Native/GUI/Brushes/Popup.xml)
+═══════════════════════════════════════════════════════════════════════════
+Popup.Frame                             - Popup window frame
+Popup.Title.Text                        - Popup title text
+Popup.Description.Text                  - Popup description text
+Popup.Button.Text                       - Popup button text
+Popup.Done.Button                       - Done/confirm button
+Popup.Done.Button.NineGrid              - 9-slice done button
+Popup.Cancel.Button                     - Cancel button
+Popup.Cancel.Button.NineGrid            - 9-slice cancel button
+Popup.Tuple.Text                        - List item text
+
+═══════════════════════════════════════════════════════════════════════════
+STANDARD UI BRUSHES (Native/GUI/Brushes/Standard.xml)
+═══════════════════════════════════════════════════════════════════════════
+Standard.BackButton                     - Back navigation button
+Standard.PopupCloseButton               - Popup close button
+Standard.DropdownItem                   - Dropdown list item
+Standard.DropdownItem.Text              - Dropdown item text
+Standard.DialogCloseButtons.DoneButton  - Dialog done button
+Standard.DialogCloseButtons.CancelButton - Dialog cancel button
+Header.Tab.Left/Center/Right            - Tab buttons
+
+═══════════════════════════════════════════════════════════════════════════
+ESCAPE MENU BRUSHES (Native/GUI/Brushes/EscapeMenu.xml)
+═══════════════════════════════════════════════════════════════════════════
+EscapeMenu.Background                   - Escape menu panel background
+EscapeMenu.GameTip                      - Game tip box
+GameTip.Text                            - Game tip text
+GameTip.Title.Text                      - Game tip title
+
+═══════════════════════════════════════════════════════════════════════════
+FACEGEN BRUSHES (Native/GUI/Brushes/FaceGen.xml)
+═══════════════════════════════════════════════════════════════════════════
+FaceGenMaleButtonBrush                  - Male gender button
+FaceGenFemaleButtonBrush                - Female gender button
+FaceGenBodyButtonBrush                  - Body tab button
+FaceGenFaceButtonBrush                  - Face tab button
+FaceGenEyesButtonBrush                  - Eyes tab button
+FaceGenNoseButtonBrush                  - Nose tab button
+FaceGenMouthButtonBrush                 - Mouth tab button
+FaceGenHairButtonBrush                  - Hair tab button
+FaceGen.Card                            - Face property card
+FaceGen.Property.Text                   - Property label text
+FaceGen.Scrollbar.Handle                - Scrollbar handle
+FaceGen.VoiceSample.Button              - Voice sample button
+
+═══════════════════════════════════════════════════════════════════════════
+CONVERSATION BRUSHES (Native/GUI/Brushes/ConversationBrush.xml)
+═══════════════════════════════════════════════════════════════════════════
+ConversationItemBrush                   - Conversation option background
+ConversationItem.Text                   - Conversation option text
+ConversationTextContainer.Frame         - NPC dialogue container
+Conversation.HeaderText                 - NPC name header
+Conversation.PartySize.Text             - Party size text
+PersuasionPanel.Frame                   - Persuasion panel frame
+
+═══════════════════════════════════════════════════════════════════════════
+ENCYCLOPEDIA BRUSHES (SandBox/GUI/Brushes/Encyclopedia.xml)
+═══════════════════════════════════════════════════════════════════════════
+Encyclopedia.Frame                      - Encyclopedia window frame
+Encyclopedia.Canvas                     - Encyclopedia background canvas
+Encyclopedia.ListButton                 - List item button
+Encyclopedia.SubPage.Element            - Subpage element card
+
+═══════════════════════════════════════════════════════════════════════════
+CLAN BRUSHES (SandBox/GUI/Brushes/Clan.xml)
+═══════════════════════════════════════════════════════════════════════════
+Clan.Header                             - Clan screen header
+Clan.TornBanner                         - Clan banner display
+Clan.TopPanel.Left/Right                - Top panel decorations
+Flat.Banner.Small                       - Small flat banner
+
+═══════════════════════════════════════════════════════════════════════════
+NOTIFICATION BRUSHES
+═══════════════════════════════════════════════════════════════════════════
+GameNotification                        - Game notification background
+GameNotification.Text                   - Game notification text
+ChatLog.Text                            - Chat log text
+
+═══════════════════════════════════════════════════════════════════════════
+BRUSH STRUCTURE EXAMPLE
+═══════════════════════════════════════════════════════════════════════════
+<Brush Name="MyBrush.ThemeName" Font="Galahad" TextHorizontalAlignment="Center">
+  <Layers>
+    <BrushLayer Name="Default" Sprite="my_sprite" Color="#RRGGBBAA" />
+    <BrushLayer Name="Hovered" Sprite="my_sprite_hover" Color="#RRGGBBAA" />
+  </Layers>
+  <Styles>
+    <Style Name="Default" FontColor="#RRGGBBAA" FontSize="24">
+      <BrushLayer Name="Default" ColorFactor="1.0" AlphaFactor="1.0" />
+    </Style>
+    <Style Name="Hovered">
+      <BrushLayer Name="Default" ColorFactor="1.2" />
+    </Style>
+    <Style Name="Pressed">
+      <BrushLayer Name="Default" ColorFactor="0.8" />
+    </Style>
+    <Style Name="Selected">
+      <BrushLayer Name="Default" Color="#HIGHLIGHTCOLOR" />
+    </Style>
+    <Style Name="Disabled">
+      <BrushLayer Name="Default" AlphaFactor="0.5" />
+    </Style>
+  </Styles>
+</Brush>
+-->
+</Brushes>
