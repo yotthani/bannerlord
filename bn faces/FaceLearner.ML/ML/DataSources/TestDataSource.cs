@@ -28,10 +28,11 @@ namespace FaceLearner.ML.DataSources
             // Look for testing folder in multiple locations
             string[] possiblePaths = new[]
             {
-                Path.Combine(basePath, "Datasets", "testing"),
+                Path.Combine(basePath, "datasets", "testing"),   // Deployed: Data\datasets\testing
+                Path.Combine(basePath, "Datasets", "testing"),   // Alt casing
                 Path.Combine(basePath, "..", "Datasets", "testing"),
                 // Source code location (for development)
-                @"C:\Work\Sources\github\bn faces\FaceLearner.ML\Datasets\testing",
+                @"D:\Work\Sources\github\bannerlord\bn faces\FaceLearner.ML\Datasets\testing",
             };
 
             _dataDir = null;
@@ -72,9 +73,9 @@ namespace FaceLearner.ML.DataSources
         {
             if (!IsReady || _allImages.Count == 0) return null;
 
-            // Wrap around when we reach the end
+            // Stop at end — no duplicates during testing cycle
             if (_currentIndex >= _allImages.Count)
-                _currentIndex = 0;
+                return null;
 
             string file = _allImages[_currentIndex];
             _currentIndex++;

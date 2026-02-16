@@ -196,29 +196,75 @@ namespace FaceLearner.ML
                     hairColor = "other";
             }
             
-            // === v3.0.24: BEARD DETECTION ===
-            // Sample the lower-center face region (chin/jaw area) for hair-like pixels.
+            // === v3.0.40: BEARD DETECTION (improved) ===
+            // Sample the lower-center face region (chin/jaw area) for beard-like pixels.
             // A beard is a VERY strong male signal that other methods can't detect.
-            int beardTop = height * 55 / 100;
-            int beardBottom = height * 90 / 100;
-            int beardLeft = width * 20 / 100;
-            int beardRight = width * 80 / 100;
+            //
+            // v3.0.40 improvements:
+            // - Use dedicated IsBeardPixel() that's more forgiving than IsHairPixel()
+            //   (beards have different texture/color than head hair — often mixed with skin)
+            // - Two-region sampling: tight chin area + wider jaw area
+            // - Compare beard region darkness vs cheek region (beards are darker than surrounding skin)
+            // - Lower threshold from 0.25 to 0.15 (many beards are stubbly/short)
+
+            // Region 1: Tight chin/mustache area (most reliable for detecting any facial hair)
+            int chinTop = height * 60 / 100;
+            int chinBottom = height * 85 / 100;
+            int chinLeft = width * 25 / 100;
+            int chinRight = width * 75 / 100;
             int beardHairPixels = 0;
             int beardSampled = 0;
+            float beardDarkness = 0f;
 
-            for (int y = beardTop; y < beardBottom; y += 3)
+            for (int y = chinTop; y < chinBottom; y += 2)
             {
-                for (int x = beardLeft; x < beardRight; x += 3)
+                for (int x = chinLeft; x < chinRight; x += 2)
                 {
                     if (x >= width || y >= height) continue;
                     var pixel = bmp.GetPixel(x, y);
                     beardSampled++;
-                    if (IsHairPixel(pixel)) beardHairPixels++;
+                    if (IsBeardPixel(pixel))
+                    {
+                        beardHairPixels++;
+                    }
+                    // Track average darkness of beard region
+                    beardDarkness += (pixel.R + pixel.G + pixel.B) / (3f * 255f);
+                }
+            }
+
+            // Region 2: Sample cheek area for skin baseline comparison
+            int cheekSkinTop = height * 35 / 100;
+            int cheekSkinBottom = height * 50 / 100;
+            int cheekSkinLeft = width * 15 / 100;
+            int cheekSkinRight = width * 35 / 100;
+            float cheekBrightness = 0f;
+            int cheekSampled = 0;
+
+            for (int y = cheekSkinTop; y < cheekSkinBottom; y += 3)
+            {
+                for (int x = cheekSkinLeft; x < cheekSkinRight; x += 3)
+                {
+                    if (x >= width || y >= height) continue;
+                    var pixel = bmp.GetPixel(x, y);
+                    cheekBrightness += (pixel.R + pixel.G + pixel.B) / (3f * 255f);
+                    cheekSampled++;
                 }
             }
 
             float beardRatio = beardSampled > 0 ? (float)beardHairPixels / beardSampled : 0f;
-            bool likelyBeard = beardRatio > 0.25f;  // 25%+ of chin/jaw area is hair-like = beard
+            float avgBeardDark = beardSampled > 0 ? beardDarkness / beardSampled : 0.5f;
+            float avgCheekBright = cheekSampled > 0 ? cheekBrightness / cheekSampled : 0.5f;
+
+            // Chin area is significantly darker than cheeks = strong beard signal
+            float darknessDiff = avgCheekBright - avgBeardDark;
+            bool darkerChin = darknessDiff > 0.08f;  // Chin is 8%+ darker than cheeks
+
+            // v3.0.40: Beard detection with tightened IsBeardPixel():
+            // - beardRatio > 0.20 = solid beard signal (was 0.25, IsBeardPixel is now stricter)
+            // - OR beardRatio > 0.12 AND chin significantly darker than cheeks
+            bool likelyBeard = beardRatio > 0.20f || (beardRatio > 0.12f && darkerChin);
+
+            SubModule.Log($"  BeardDetect: ratio={beardRatio:F3} ({beardHairPixels}/{beardSampled}), chinDark={avgBeardDark:F3}, cheekBright={avgCheekBright:F3}, darkDiff={darknessDiff:F3}, darkerChin={darkerChin}, likely={likelyBeard}");
 
             // Score calculation
             float score = 0f;
@@ -267,31 +313,67 @@ namespace FaceLearner.ML
         private static bool IsHairPixel(Color pixel)
         {
             var hsv = RgbToHsv(pixel);
-            
+
             // Exclude very bright pixels (likely background/highlights)
             if (hsv.v > 0.95f) return false;
-            
+
             // Exclude skin tones (orangish, medium saturation)
             if (hsv.h > 10 && hsv.h < 40 && hsv.s > 0.2f && hsv.s < 0.6f && hsv.v > 0.4f && hsv.v < 0.85f)
                 return false;
-            
+
             // Hair is typically:
             // - Low saturation (black, brown, gray) OR
             // - Yellow-ish (blonde) OR
             // - Red-ish (red hair)
-            
+
             // Black/dark hair
             if (hsv.v < 0.35f && hsv.s < 0.5f) return true;
-            
+
             // Brown hair
             if (hsv.h > 15 && hsv.h < 45 && hsv.s > 0.2f && hsv.v > 0.15f && hsv.v < 0.55f) return true;
-            
+
             // Blonde hair
             if (hsv.h > 35 && hsv.h < 55 && hsv.s > 0.15f && hsv.v > 0.5f) return true;
-            
-            // Red hair  
+
+            // Red hair
             if (hsv.h < 25 && hsv.s > 0.4f && hsv.v > 0.3f && hsv.v < 0.7f) return true;
-            
+
+            return false;
+        }
+
+        /// <summary>
+        /// v3.0.40: Check if a pixel is likely beard/facial hair.
+        /// Must be more specific than IsHairPixel() to avoid false positives on:
+        /// - Dark skin (especially dark-skinned women)
+        /// - Shadows under chin/jaw
+        /// - Dark lipstick or natural lip color
+        /// - Clothing showing in chin area
+        ///
+        /// Strategy: Look for pixels that are darker than typical skin AND have
+        /// hair-like texture characteristics (low saturation, not skin-toned).
+        /// </summary>
+        private static bool IsBeardPixel(Color pixel)
+        {
+            var hsv = RgbToHsv(pixel);
+
+            // Exclude bright pixels (skin, background)
+            if (hsv.v > 0.75f) return false;
+
+            // Exclude very saturated colorful pixels (lips, clothing, makeup)
+            if (hsv.s > 0.55f) return false;
+
+            // Exclude typical skin tones — this is critical to avoid false positives!
+            // Skin is warm-toned (hue 10-40), medium saturation, medium-high brightness
+            if (hsv.h > 8 && hsv.h < 45 && hsv.s > 0.15f && hsv.s < 0.55f && hsv.v > 0.30f)
+                return false;
+
+            // What remains: dark, desaturated pixels that aren't skin = likely facial hair
+            // Very dark + low saturation = black/dark beard
+            if (hsv.v < 0.25f && hsv.s < 0.40f) return true;
+
+            // Dark with very low saturation = gray/dark stubble
+            if (hsv.v < 0.35f && hsv.s < 0.20f) return true;
+
             return false;
         }
         

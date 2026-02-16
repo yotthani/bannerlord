@@ -34,7 +34,6 @@
     <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
     <GameBinaries>$(GameFolder)\bin\Win64_Shipping_Client</GameBinaries>
     <NativeModuleBin>$(GameFolder)\Modules\Native\bin\Win64_Shipping_Client</NativeModuleBin>
-    <DlibNativePath>$(NuGetPackageRoot)dlibdotnet\19.21.0.20220724\runtimes\win-x64\native</DlibNativePath>
     <OnnxNativePath>$(NuGetPackageRoot)microsoft.ml.onnxruntime\1.16.3\runtimes\win-x64\native</OnnxNativePath>
   </PropertyGroup>
 
@@ -58,7 +57,6 @@
 
   <!-- ML NuGet Packages -->
   <ItemGroup>
-    <PackageReference Include="DlibDotNet" Version="19.21.0.20220724" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.16.3" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
@@ -80,7 +78,6 @@
     <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
     
     <!-- Copy managed DLLs -->
-    <Copy SourceFiles="$(TargetDir)DlibDotNet.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)DlibDotNet.dll')" />
     <Copy SourceFiles="$(TargetDir)ICSharpCode.SharpZipLib.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)ICSharpCode.SharpZipLib.dll')" />
     <Copy SourceFiles="$(TargetDir)System.Memory.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)System.Memory.dll')" />
     <Copy SourceFiles="$(TargetDir)System.Buffers.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)System.Buffers.dll')" />
@@ -91,10 +88,6 @@
     <Copy SourceFiles="$(TargetDir)Microsoft.ML.OnnxRuntime.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)Microsoft.ML.OnnxRuntime.dll')" />
     <Copy SourceFiles="$(OnnxNativePath)\onnxruntime.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(OnnxNativePath)\onnxruntime.dll')" />
     <Copy SourceFiles="$(OnnxNativePath)\onnxruntime_providers_shared.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(OnnxNativePath)\onnxruntime_providers_shared.dll')" />
-    
-    <!-- Native DLLs (Dlib) -->
-    <Copy SourceFiles="$(DlibNativePath)\DlibDotNetNative.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(DlibNativePath)\DlibDotNetNative.dll')" />
-    <Copy SourceFiles="$(DlibNativePath)\DlibDotNetNativeDnn.dll" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(DlibNativePath)\DlibDotNetNativeDnn.dll')" />
     
     <!-- Copy SubModule.xml -->
     <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFolder="$(ModuleFolder)" SkipUnchangedFiles="true" />
@@ -114,6 +107,14 @@
     <MakeDir Directories="$(ModuleFolder)\Data\datasets\celeba" />
     <MakeDir Directories="$(ModuleFolder)\Data\datasets\UTKFace" />
     <MakeDir Directories="$(ModuleFolder)\Data\datasets\lfw-deepfunneled" />
+    <MakeDir Directories="$(ModuleFolder)\Data\datasets\testing" />
+
+    <!-- Testing dataset -->
+    <ItemGroup>
+      <TestingFiles Include="$(ProjectDir)Datasets\testing\*.jpg" />
+      <TestingFiles Include="$(ProjectDir)Datasets\testing\*.png" />
+    </ItemGroup>
+    <Copy SourceFiles="@(TestingFiles)" DestinationFiles="@(TestingFiles->'$(ModuleFolder)\Data\datasets\testing\%(Filename)%(Extension)')" SkipUnchangedFiles="true" Condition="'@(TestingFiles)' != ''" />
     
     <!-- UTKFace dataset -->
     <ItemGroup>

@@ -75,19 +75,21 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
         // ═══════════════════════════════════════════════════════════════
         
         /// <summary>Phase 1.1: Face width morphs (affects overall face width)</summary>
-        public static readonly int[] FaceWidth = { 
+        /// v3.0.29: Removed morph 48 (jaw_line) — it belongs exclusively in Jaw group.
+        /// Having it here AND in Jaw caused double-optimization conflicts.
+        public static readonly int[] FaceWidth = {
             0,   // face_width (PRIMARY)
             1,   // face_depth (also affects apparent width)
             6,   // cheekbone_width
-            48,  // jaw_line
         };
-        
-        /// <summary>Phase 1.2: Face height/length morphs - EXPANDED</summary>
-        public static readonly int[] FaceHeight = { 
+
+        /// <summary>Phase 1.2: Face height/length morphs</summary>
+        /// v3.0.29: Removed morphs 50 (jaw_height) and 53 (chin_length) — they belong
+        /// exclusively in Jaw and Chin groups. Sharing morphs between Foundation and Structure
+        /// caused the optimizer to fight itself: Foundation locked morph 50 then Jaw couldn't adjust it.
+        public static readonly int[] FaceHeight = {
             2,   // center_height
             3,   // face_ratio (PRIMARY for height)
-            50,  // jaw_height (affects lower face height)
-            53,  // chin_length
             54,  // head_scaling (affects overall proportions!)
         };
         
@@ -100,8 +102,9 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
         };
         
         /// <summary>ALL FOUNDATION MORPHS - for global optimization</summary>
+        /// v3.0.29: Removed 48, 50, 53 — now exclusively in Structure groups
         public static readonly int[] AllFoundation = {
-            0, 1, 2, 3, 4, 6, 8, 13, 48, 50, 53, 54
+            0, 1, 2, 3, 4, 6, 8, 13, 54
         };
         
         // ═══════════════════════════════════════════════════════════════
@@ -123,8 +126,14 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
             50,  // jaw_height
         };
         
-        /// <summary>Phase 2.3: Chin morphs</summary>
-        public static readonly int[] Chin = { 
+        /// <summary>Phase 2.3: Chin morphs
+        /// v3.0.34: Added jaw_line (48) — engine needs jaw_line to make round chins.
+        /// Without it, CMA-ES can only adjust 51/52/53 during Chin phase, which can't
+        /// achieve round chins alone (engine couples chin roundness with jaw width).
+        /// jaw_line is now in BOTH Jaw and Chin groups so both phases can adjust it.
+        /// </summary>
+        public static readonly int[] Chin = {
+            48,  // jaw_line — needed for round chin shapes (shared with Jaw group)
             51,  // chin_forward
             52,  // chin_shape
             53,  // chin_length
@@ -334,7 +343,8 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                 case MainPhase.MajorFeatures:
                     return Nose.Concat(Eyes).Concat(Mouth).Distinct().ToArray();
                 case MainPhase.FineDetails:
-                    return Eyebrows.Concat(Ears).Concat(FineDetails).Distinct().ToArray();
+                    // v3.0.30: Only Eyebrows — Ears and FineDetails removed (consistently 0.55, wasting iterations)
+                    return Eyebrows.ToArray();
                 default:
                     return Array.Empty<int>();
             }
@@ -364,7 +374,8 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                 case MainPhase.MajorFeatures:
                     return new[] { SubPhase.Nose, SubPhase.Eyes, SubPhase.Mouth };
                 case MainPhase.FineDetails:
-                    return new[] { SubPhase.Eyebrows, SubPhase.Ears, SubPhase.FineDetails };
+                    // v3.0.30: Only Eyebrows — Ears/FineDetails SubPhases removed (wasting iterations)
+                    return new[] { SubPhase.Eyebrows };
                 default:
                     return Array.Empty<SubPhase>();
             }
@@ -405,7 +416,7 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
             return $"MorphGroups: Foundation({FaceWidth.Length + FaceHeight.Length + FaceShape.Length}) " +
                    $"Structure({Forehead.Length + Jaw.Length + Chin.Length + Cheeks.Length}) " +
                    $"Features({Nose.Length + Eyes.Length + Mouth.Length}) " +
-                   $"Details({Eyebrows.Length + Ears.Length + FineDetails.Length})";
+                   $"Details({Eyebrows.Length})";
         }
         
         // ═══════════════════════════════════════════════════════════════

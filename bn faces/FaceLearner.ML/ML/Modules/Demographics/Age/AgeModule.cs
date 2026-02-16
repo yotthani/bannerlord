@@ -72,7 +72,7 @@ namespace FaceLearner.ML.Modules.Demographics.Age
                 Source = "AgeModule.Landmarks"
             };
             
-            if (landmarks == null || landmarks.Length < 136)
+            if (landmarks == null || landmarks.Length < 936)
             {
                 result.EstimatedAge = 30;  // Default
                 result.Confidence = 0.1f;

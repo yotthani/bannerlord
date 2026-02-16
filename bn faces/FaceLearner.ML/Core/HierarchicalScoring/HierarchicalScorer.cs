@@ -18,12 +18,14 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
         private RaceModifier _activeRaceModifier;
         
         // Weights for each main phase
+        // v3.0.25: Rebalanced — identity features (eyes/nose/mouth) now 55% instead of 35%
+        // Foundation+Structure still gates via soft-gating, but direct weight reduced
         private static readonly Dictionary<MainPhase, float> MainPhaseWeights = new Dictionary<MainPhase, float>
         {
-            { MainPhase.Foundation, 0.35f },      // 35% - most important
-            { MainPhase.Structure, 0.30f },       // 30%
-            { MainPhase.MajorFeatures, 0.25f },   // 25%
-            { MainPhase.FineDetails, 0.10f }      // 10% - least important alone
+            { MainPhase.Foundation, 0.20f },      // 20% — generic proportions
+            { MainPhase.Structure, 0.25f },       // 25%
+            { MainPhase.MajorFeatures, 0.45f },   // 45% (was 40%) — eyes/nose/mouth = identity
+            { MainPhase.FineDetails, 0.10f }      // 10% (was 15%) — only Eyebrows now (Ears/FineDetails removed v3.0.30)
         };
         
         // Gate threshold - below this, higher levels are penalized
@@ -126,31 +128,45 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
             float[] targetFeatures = target.GetFeaturesForPhase(phase);
             float[] currentFeatures = current.GetFeaturesForPhase(phase);
             float[] expectedRanges = GetExpectedRanges(phase);
-            
+
             if (targetFeatures.Length == 0 || currentFeatures.Length == 0)
                 return 0.5f;  // Neutral score if no features
-            
+
+            // v3.0.31: Photo→Render bias correction for FaceWidth/FaceHeight.
+            // Photos have faces filling ~80-90% of bounding box; renders ~50-60%.
+            // This means photo landmarks are systematically wider/taller in normalized space.
+            // Observed offsets: FaceWidth ~+0.15, FaceHeight ~+0.15 in photos vs renders.
+            // Apply correction by subtracting bias from target (photo) values before comparison.
+            float[] biasCorrection = GetBiasCorrection(phase);
+
             float sumMatch = 0f;
             float minMatch = 1f;  // Track worst feature match
             int count = Math.Min(targetFeatures.Length, currentFeatures.Length);
-            
+
             for (int i = 0; i < count; i++)
             {
+                // Apply bias correction: photo values are systematically higher
+                float correctedTarget = targetFeatures[i];
+                if (biasCorrection != null && i < biasCorrection.Length)
+                    correctedTarget = Math.Max(0f, Math.Min(1f, targetFeatures[i] - biasCorrection[i]));
+
                 // NORMALIZED SCORING: Divide diff by expected range for that feature!
-                float diff = Math.Abs(targetFeatures[i] - currentFeatures[i]);
+                float diff = Math.Abs(correctedTarget - currentFeatures[i]);
                 float expectedRange = i < expectedRanges.Length ? expectedRanges[i] : 0.2f;
                 float normalizedDiff = diff / Math.Max(expectedRange, 0.01f);
                 
-                // v3.0.23: Tukey biweight (1-x²)² replaces exp(-x²*12) for better discrimination.
-                // Old exponential created a "mushy middle" where 25-50% errors all scored 0.3-0.7.
-                // Tukey: 0.96 at 10%, 0.82 at 25%, 0.39 at 50%, 0.10 at 75%, 0.0 at 100%.
+                // v3.0.26: Extended Tukey (1-x²)² with 1.5x range.
+                // v3.0.25 was too harsh: (1-x²)³ with cutoff at 1.0 → NormDiff>1.0 got Match=0.000
+                // and optimizer had NO gradient signal. Now: cutoff at 1.5, (1-x²)² for gentler curve.
+                // NormDiff=0.5→0.79, NormDiff=1.0→0.31, NormDiff=1.5→0.0
                 float match;
-                if (normalizedDiff >= 1.0f)
+                if (normalizedDiff >= 1.5f)
                     match = 0.0f;
                 else
                 {
-                    float t = 1.0f - normalizedDiff * normalizedDiff;
-                    match = t * t;
+                    float scaled = normalizedDiff / 1.5f;
+                    float t = 1.0f - scaled * scaled;
+                    match = t * t;  // (1-x²)²
                 }
                 sumMatch += match;
                 minMatch = Math.Min(minMatch, match);
@@ -158,10 +174,9 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
             
             float avgMatch = sumMatch / count;
             
-            // v3.0.20: KEEP STRICT 50/50 min-priority for SCORING
-            // This forces the optimizer to fix ALL bad features, not just boost one.
-            // The LEARNING system is where we're more flexible (feature-level learning).
-            return avgMatch * 0.5f + minMatch * 0.5f;
+            // v3.0.26: 50/50 avg/min — balanced. v3.0.25's 35/65 was too harsh,
+            // one bad feature crushed the entire SubPhase to near-zero.
+            return avgMatch * 0.50f + minMatch * 0.50f;
         }
         
         /// <summary>
@@ -170,64 +185,179 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
         /// </summary>
         private float[] GetExpectedRanges(SubPhase phase)
         {
+            // v3.0.26: Ranges widened back from v3.0.25's aggressive tightening.
+            // v3.0.25 ranges (0.10-0.14) caused most features to hit NormDiff>1.0 → Match=0.000
+            // leaving the optimizer with zero gradient signal.
+            // New: ranges accommodate real photo→render variation (0.08-0.15 typical diffs)
+            // while the extended Tukey (cutoff 1.5x) ensures gradients exist up to 1.5× range.
+            // NOTE: Feature formulas now use Offset+Scale (v3.0.26) so diffs should be smaller.
             switch (phase)
             {
                 case SubPhase.FaceWidth:
-                    return new[] { 0.25f };  // v3.0.23b: Relaxed from 0.15 — Dlib has landmark jitter
+                    // v3.0.35: Widened from 0.20 to 0.30. Without fixed bias correction,
+                    // photo→render FaceWidth diffs can be 0.00-0.20 depending on bounding box.
+                    // 0.30 range means NormDiff=0.20→0.67→Match=0.64. Still penalizes, but
+                    // doesn't destroy the score. NormDiff=0.10→0.33→Match=0.90 (good match).
+                    return new[] { 0.30f };
 
                 case SubPhase.FaceHeight:
-                    return new[] { 0.25f };  // v3.0.23b: Relaxed from 0.15
+                    // v3.0.35: Widened from 0.20 to 0.30. Same reasoning as FaceWidth.
+                    return new[] { 0.30f };
 
                 case SubPhase.FaceShape:
-                    // v3.0.23b: Contour profile — 7 values: FaceRatio + 6 contour widths.
-                    // Relaxed from 0.08 to 0.15 — landmarks have jitter and photo/render
-                    // lighting differences cause systematic contour shifts.
                     // FaceRatio, UpperJaw, Cheekbone, MidJaw, LowerJaw, NearChin, ChinArea
-                    return new[] { 0.20f, 0.15f, 0.15f, 0.15f, 0.18f, 0.20f, 0.25f };
+                    // v3.0.35: Cheekbone and MidJaw widened from 0.15 to 0.18. Man 1285416547 had
+                    // Cheekbone diff=0.11 (Match=0.58) and MidJaw diff=0.10 (Match=0.64) — these
+                    // contour values are relative but still affected by bbox crop differences.
+                    return new[] { 0.18f, 0.18f, 0.18f, 0.18f, 0.18f, 0.20f, 0.22f };
 
                 case SubPhase.Forehead:
-                    return new[] { 0.25f, 0.20f };  // Height, Width
+                    // v3.0.38: ForeheadWidth tightened from 0.25 to 0.18.
+                    // v3.0.36 widened to 0.25 because of bbox bias (Photo ~0.82 vs Render ~0.65).
+                    // Now we have bias correction (0.12) so corrected diff should be ~0.05.
+                    // With 0.18 range: diff=0.05→NormDiff=0.28→Match=0.93. Good.
+                    return new[] { 0.18f, 0.18f };  // Height, Width
 
                 case SubPhase.Jaw:
-                    // v3.0.23b: Moderate — jaw is important but Bannerlord morphs have limits
                     // Width, AngleL, AngleR, Taper, Curvature
-                    return new[] { 0.18f, 0.15f, 0.15f, 0.20f, 0.25f };
+                    return new[] { 0.15f, 0.18f, 0.18f, 0.18f, 0.20f };
 
                 case SubPhase.Chin:
-                    // v3.0.23b: Moderate — chin is key but landmark accuracy varies
                     // Width, Height, Pointedness, Drop
-                    return new[] { 0.18f, 0.15f, 0.25f, 0.20f };
+                    return new[] { 0.15f, 0.12f, 0.18f, 0.18f };
 
                 case SubPhase.Cheeks:
-                    return new[] { 0.18f, 0.15f };  // v3.0.24: Height range widened (new faceHeightRaw-based formula)
+                    // v3.0.35: CheekWidth widened from 0.12 to 0.18.
+                    // Man 1285416547 had Photo=0.89, Render=0.78, Diff=0.11 → Match=0.390 with 0.12 range.
+                    // CheekWidth is derived from Dist(JAW_R2,JAW_L2)/faceWidthRaw which varies with bbox.
+                    return new[] { 0.15f, 0.18f };  // Height, Width (was 0.12)
 
                 case SubPhase.Nose:
-                    // v3.0.24: Ranges adjusted for recalibrated multipliers (features now have real spread)
-                    return new[] { 0.22f, 0.20f, 0.20f, 0.18f, 0.22f };  // Width, Length, Bridge, Tip, NostrilFlare
+                    // v3.0.38: Tightened from v3.0.36 (0.25/0.30/0.30/0.18/0.25).
+                    // v3.0.36 ranges were too generous — NoseWidth diff=0.15 got Match=0.71,
+                    // NoseLength diff=0.09 got Match=0.92. Visually wrong noses scored 0.93+.
+                    // Typical photo→render diffs: 0.04-0.15. Ranges should make 0.10 diff ≈ 0.75 match.
+                    // With Tukey (1-x²)², range 0.18: diff=0.10→NormDiff=0.56→Match=0.74. Good.
+                    // Engine ceiling still exists (NoseLength can be 0.16+ off) but Tukey extends
+                    // to 1.5x range, so diff=0.27 still gets Match>0 gradient signal.
+                    // Width, Length, Bridge, Tip, NostrilFlare
+                    return new[] { 0.18f, 0.20f, 0.20f, 0.15f, 0.18f };
 
                 case SubPhase.Eyes:
-                    // v3.0.24: Ranges adjusted for recalibrated multipliers + new EyeAngle/VertPos formulas
-                    return new[] { 0.18f, 0.18f, 0.18f, 0.20f, 0.18f };  // Width, Height, Distance, Angle, VertPos
+                    // v3.0.38: EyeDistance has systematic bbox bias (Photo always higher).
+                    // Adding bias correction instead of wide range. Range tightened 0.25→0.20.
+                    // EyeHeight: 0.22→0.18. Monolid vs closed eye distinction now comes from
+                    // EyeOpenness (Width/Height aspect ratio).
+                    // Width, Height, Distance, Angle, VertPos, Openness
+                    return new[] { 0.18f, 0.18f, 0.20f, 0.18f, 0.15f, 0.20f };
 
                 case SubPhase.Mouth:
-                    // v3.0.24: Ranges adjusted for recalibrated multipliers + new VertPos formula
-                    return new[] { 0.22f, 0.20f, 0.20f, 0.20f, 0.18f };  // Width, Height, UpperLip, LowerLip, VertPos
+                    // v3.0.38: Tightened from v3.0.36.
+                    // MouthWidth: 0.25→0.20. Diff=0.19 (smiling Asian man) was getting Match=0.57.
+                    //   With 0.20: NormDiff=0.95→Match=0.36. Better penalty for wide mouth mismatch.
+                    // MouthHeight: 0.28→0.22. Smile cap (v3.0.37) should reduce photo values already.
+                    // LowerLip: 0.25→0.20. Engine lip range is limited but 0.25 was too generous.
+                    // Width, Height, UpperLip, LowerLip, VertPos
+                    return new[] { 0.20f, 0.22f, 0.18f, 0.20f, 0.15f };
 
                 case SubPhase.Eyebrows:
-                    // v3.0.24: Angle range widened for new brow slope formula
-                    return new[] { 0.18f, 0.20f, 0.18f, 0.22f };  // Height, Arch, Thickness, Angle
-                    
+                    // v3.0.36: BrowArch widened 0.18→0.22 (engine brow arch limited).
+                    // BrowAngle widened 0.20→0.25 (bbox + engine: Photo=0.73 vs Render=0.53).
+                    // Height, Arch, Thickness, Angle
+                    return new[] { 0.18f, 0.22f, 0.18f, 0.25f };
+
                 case SubPhase.Ears:
-                    return new[] { 0.20f };  // Placeholder
-                    
+                    return new[] { 0.20f };
+
                 case SubPhase.FineDetails:
-                    return new[] { 0.20f };  // Placeholder
-                    
+                    return new[] { 0.20f };
+
                 default:
-                    return new[] { 0.20f };  // Default
+                    return new[] { 0.20f };
             }
         }
-        
+
+        /// <summary>
+        /// v3.0.31: Photo→Render bias correction per sub-phase.
+        /// Photo landmarks are normalized to a tighter bounding box (face fills more of the frame)
+        /// while render landmarks have more empty space around the face.
+        /// This causes systematic differences in FaceWidth, FaceHeight, and some other features.
+        /// Returns null for phases with no bias, or float[] of per-feature correction values.
+        /// Correction is SUBTRACTED from photo (target) values before comparison.
+        /// </summary>
+        private float[] GetBiasCorrection(SubPhase phase)
+        {
+            switch (phase)
+            {
+                case SubPhase.FaceWidth:
+                    // v3.0.35: REMOVED fixed bias. The 0.18 bias helped faces where the photo
+                    // fills the bounding box tightly (FaceWidth ~0.58) but DESTROYED faces where
+                    // the photo has more background (FaceWidth ~0.41 already matching render).
+                    // Example: Man 1285416547 — Photo=0.41, Render=0.41, but after -0.18 bias
+                    // corrected to 0.23 → Match=0.397 → Foundation=0.48 → Score=0.30!
+                    // Instead: wider Range (0.30) absorbs the photo/render variance without
+                    // needing a fixed bias that's wrong for half the faces.
+                    return null;  // No bias — wider range handles photo/render variance
+
+                case SubPhase.FaceHeight:
+                    // v3.0.35: REMOVED fixed bias. Same reason as FaceWidth.
+                    return null;  // No bias — wider range handles photo/render variance
+
+                // FaceShape contours are RELATIVE (normalized by maxWidth) → much less bias
+
+                case SubPhase.Chin:
+                    // v3.0.40: ChinPointedness bias — Photo chinPointedness is systematically LOWER
+                    // than renders (engine can't make chins as round as real faces).
+                    // Observed: Photo ~0.07-0.18, Render ~0.23-0.27 for round chins.
+                    // v3.0.34: was -0.10, but that left 0.076→0.176 still too far from render ~0.24.
+                    // v3.0.40: increased to -0.15 so photo 0.076→0.226 (closer to render minimum).
+                    // Negative correction = photo value INCREASES (we subtract negative = add).
+                    return new[] { 0f, 0f, -0.15f, 0f };  // [Width, Height, Pointedness, Drop]
+
+                case SubPhase.Eyes:
+                    // v3.0.38: EyeDistance has systematic bbox bias.
+                    // Photo inner-corner-dist / faceWidth ratio is always higher than render:
+                    //   1285416547: Photo=0.77, Render=0.76 (small bias, tightly cropped)
+                    //   1332972396: Photo=0.97, Render=0.79 (Diff=0.18! wide crop)
+                    //   1383493764: Photo=0.93, Render=0.80 (Diff=0.13)
+                    // Photo crops often include more forehead→ wider faceWidth→ higher ratio.
+                    // Correction 0.10 = moderate offset (won't hurt tight crops too much).
+                    // [Width, Height, Distance, Angle, VertPos, Openness]
+                    return new[] { 0f, 0f, 0.10f, 0f, 0f, 0f };
+
+                case SubPhase.Forehead:
+                    // v3.0.38: ForeheadWidth has systematic bbox bias.
+                    // Photo temple-to-temple / faceWidth is always higher:
+                    //   1332972396: Photo=0.82, Render=0.65 (Diff=0.17!)
+                    //   1383493764: Photo=0.83, Render=0.66 (Diff=0.17!)
+                    //   1285416547: Photo=0.54, Render=0.60 (no bias — tight crop)
+                    // Correction 0.12 = moderate offset (tight crops will undershoot slightly).
+                    // [Height, Width]
+                    return new[] { 0f, 0.12f };
+
+                case SubPhase.Nose:
+                    // v3.0.40: NoseLength and NoseBridge have systematic photo→render bias.
+                    // Renders always produce HIGHER values than photos:
+                    //   NoseLength: Photo 0.34-0.44, Render 0.53-0.61 (avg diff ~+0.18)
+                    //   NoseBridge: Photo 0.11-0.15, Render 0.27-0.35 (avg diff ~+0.18)
+                    // This is because render nose landmarks have different geometry than real noses
+                    // (engine noses are proportionally longer/higher bridge than real faces).
+                    // Negative bias = photo value INCREASES to match render range.
+                    // [Width, Length, Bridge, Tip, NostrilFlare]
+                    return new[] { 0f, -0.18f, -0.18f, 0f, 0f };
+
+                case SubPhase.Eyebrows:
+                    // v3.0.34: BrowThick bias — Photo brow thickness is systematically HIGHER
+                    // than renders (engine brows are thinner).
+                    // Observed: Photo ~0.33-0.40, Render ~0.12-0.24. Offset ~0.12.
+                    // BrowHeight, BrowArch, BrowAngle: no clear systematic bias.
+                    return new[] { 0f, 0f, 0.12f, 0f };  // [Height, Arch, Thickness, Angle]
+
+                default:
+                    return null;  // No bias correction needed
+            }
+        }
+
         /// <summary>
         /// Get score for a specific sub-phase only (for focused optimization)
         /// </summary>
@@ -272,10 +402,8 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
             
             float avg = sum / count;
             
-            // v3.0.20: KEEP STRICT 50/50 for SCORING
-            // This forces optimizer to improve ALL sub-phases, not just one.
-            // Feature-level LEARNING handles partial successes separately.
-            return avg * 0.5f + min * 0.5f;
+            // v3.0.26: 50/50 avg/min — balanced. v3.0.25's 35/65 was too punishing.
+            return avg * 0.50f + min * 0.50f;
         }
         
         /// <summary>
@@ -289,8 +417,12 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
         /// </summary>
         private float CalculateTotalWithGating(HierarchicalScore scores)
         {
-            // Foundation gates Structure; Foundation+Structure gate MajorFeatures and FineDetails
-            float fGate = SoftGate(scores.FoundationScore, 0.35f, 0.65f);
+            // v3.0.35: Relaxed gating — floor 0.15 was too aggressive.
+            // Example: Man 1285416547 — Foundation=0.48 → fGate=0.31 → MajorFeatures=0.946*0.45*0.31=0.13!
+            // The MajorFeatures were EXCELLENT but got destroyed by a borderline Foundation score
+            // that was wrong due to FaceWidth bias overcorrection.
+            // New thresholds: lowered to 0.30/0.60, so Foundation=0.48 → fGate=0.55 (was 0.31).
+            float fGate = SoftGate(scores.FoundationScore, 0.30f, 0.60f);
             float sGate = SoftGate(scores.StructureScore, 0.30f, 0.60f);
 
             float total =
@@ -309,7 +441,8 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
         /// </summary>
         private float SoftGate(float score, float lowThreshold, float highThreshold)
         {
-            const float floor = 0.3f;
+            const float floor = 0.25f;  // v3.0.35: was 0.15. Too low caused cascade destruction when
+                                        // FaceWidth bias was wrong. 0.25 still penalizes but doesn't zero out.
             if (score >= highThreshold) return 1.0f;
             if (score <= lowThreshold) return floor;
             float t = (score - lowThreshold) / (highThreshold - lowThreshold);
@@ -387,7 +520,7 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                 { SubPhase.Chin, new[] { "ChinWidth", "ChinHeight", "ChinPointedness", "ChinDrop" } },
                 { SubPhase.Cheeks, new[] { "CheekHeight", "CheekWidth" } },
                 { SubPhase.Nose, new[] { "NoseWidth", "NoseLength", "NoseBridge", "NoseTip", "NostrilWidth" } },
-                { SubPhase.Eyes, new[] { "EyeWidth", "EyeHeight", "EyeDistance", "EyeAngle", "EyeVertPos" } },
+                { SubPhase.Eyes, new[] { "EyeWidth", "EyeHeight", "EyeDistance", "EyeAngle", "EyeVertPos", "EyeOpenness" } },
                 { SubPhase.Mouth, new[] { "MouthWidth", "MouthHeight", "UpperLip", "LowerLip", "MouthVertPos" } },
                 { SubPhase.Eyebrows, new[] { "BrowHeight", "BrowArch", "BrowThick", "BrowAngle" } },
             };
@@ -419,6 +552,7 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                     float[] targetFeatures = target.GetFeaturesForPhase(subPhase);
                     float[] currentFeatures = current.GetFeaturesForPhase(subPhase);
                     float[] expectedRanges = GetExpectedRanges(subPhase);
+                    float[] biasCorrection = GetBiasCorrection(subPhase);  // v3.0.34: Show corrected diffs in report
 
                     float subScore = hierarchicalScore.SubPhaseScores.ContainsKey(subPhase)
                         ? hierarchicalScore.SubPhaseScores[subPhase] : 0f;
@@ -433,29 +567,39 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                     for (int i = 0; i < count; i++)
                     {
                         string name = i < names.Length ? names[i] : $"Feature[{i}]";
-                        float diff = Math.Abs(targetFeatures[i] - currentFeatures[i]);
+                        // v3.0.34: Apply bias correction in report so diff/normDiff/match match actual scoring
+                        float correctedTarget = targetFeatures[i];
+                        if (biasCorrection != null && i < biasCorrection.Length)
+                            correctedTarget = Math.Max(0f, Math.Min(1f, targetFeatures[i] - biasCorrection[i]));
+                        float diff = Math.Abs(correctedTarget - currentFeatures[i]);
                         float range = i < expectedRanges.Length ? expectedRanges[i] : 0.2f;
                         float normDiff = diff / Math.Max(range, 0.01f);
 
+                        // v3.0.26: Extended Tukey (1-x²)² with 1.5x range (matches scoring)
                         float match;
-                        if (normDiff >= 1.0f)
+                        if (normDiff >= 1.5f)
                             match = 0.0f;
                         else
                         {
-                            float t = 1.0f - normDiff * normDiff;
+                            float scaled = normDiff / 1.5f;
+                            float t = 1.0f - scaled * scaled;
                             match = t * t;
                         }
 
                         // Flag features with poor match
                         string flag = match < 0.5f ? " ◄◄ BAD" : match < 0.75f ? " ◄" : "";
 
-                        sb.AppendLine($"  {name,-20} {targetFeatures[i],8:F4} {currentFeatures[i],8:F4} {diff,8:F4} {range,8:F3} {normDiff,8:F3} {match,8:F3}{flag}");
+                        // v3.0.34: Show corrected photo value when bias correction is applied
+                        string photoStr = (biasCorrection != null && i < biasCorrection.Length)
+                            ? $"{correctedTarget:F4}*"  // * = bias-corrected
+                            : $"{targetFeatures[i]:F4} ";
+                        sb.AppendLine($"  {name,-20} {photoStr,8} {currentFeatures[i],8:F4} {diff,8:F4} {range,8:F3} {normDiff,8:F3} {match,8:F3}{flag}");
                     }
                     sb.AppendLine();
                 }
             }
 
-            // Summary section: worst features
+            // Summary section: worst features (v3.0.34: with bias correction)
             sb.AppendLine("── WORST FEATURES (Match < 0.50) ──────────────────────────────────");
             foreach (var subPhase in Enum.GetValues(typeof(SubPhase)).Cast<SubPhase>())
             {
@@ -464,26 +608,58 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                 float[] targetFeatures = target.GetFeaturesForPhase(subPhase);
                 float[] currentFeatures = current.GetFeaturesForPhase(subPhase);
                 float[] expectedRanges = GetExpectedRanges(subPhase);
+                float[] worstBias = GetBiasCorrection(subPhase);  // v3.0.34
                 string[] names = featureNames[subPhase];
                 int count = Math.Min(targetFeatures.Length, currentFeatures.Length);
 
                 for (int i = 0; i < count; i++)
                 {
-                    float diff = Math.Abs(targetFeatures[i] - currentFeatures[i]);
-                    float range = i < expectedRanges.Length ? expectedRanges[i] : 0.2f;
+                    // v3.0.34: Apply bias correction to match actual scoring
+                    float corrTarget = targetFeatures[i];
+                    if (worstBias != null && i < worstBias.Length)
+                        corrTarget = Math.Max(0f, Math.Min(1f, targetFeatures[i] - worstBias[i]));
+                    float diff = Math.Abs(corrTarget - currentFeatures[i]);
+                    float range = i < expectedRanges.Length ? expectedRanges[i] : 0.15f;
                     float normDiff = diff / Math.Max(range, 0.01f);
 
+                    // v3.0.26: Must match CalculateSubPhaseScore — extended Tukey (1-x²)² with 1.5x range
                     float match;
-                    if (normDiff >= 1.0f) match = 0.0f;
-                    else { float t2 = 1.0f - normDiff * normDiff; match = t2 * t2; }
+                    if (normDiff >= 1.5f) match = 0.0f;
+                    else { float sc = normDiff / 1.5f; float t2 = 1.0f - sc * sc; match = t2 * t2; }
 
                     if (match < 0.50f)
                     {
                         string name = i < names.Length ? names[i] : $"Feature[{i}]";
-                        sb.AppendLine($"  {subPhase}/{name}: Photo={targetFeatures[i]:F4} Render={currentFeatures[i]:F4} Diff={diff:F4} NormDiff={normDiff:F3} Match={match:F3}");
+                        sb.AppendLine($"  {subPhase}/{name}: Photo={corrTarget:F4} Render={currentFeatures[i]:F4} Diff={diff:F4} NormDiff={normDiff:F3} Match={match:F3}");
                     }
                 }
             }
+
+            // v3.0.25: Saturation warnings — features where BOTH photo and render are near-extreme
+            sb.AppendLine("── SATURATION WARNINGS (Both Photo & Render > 0.90) ──────────────");
+            bool anySaturation = false;
+            foreach (var subPhase in Enum.GetValues(typeof(SubPhase)).Cast<SubPhase>())
+            {
+                if (!featureNames.ContainsKey(subPhase)) continue;
+                float[] targetFeatures = target.GetFeaturesForPhase(subPhase);
+                float[] currentFeatures = current.GetFeaturesForPhase(subPhase);
+                string[] names = featureNames[subPhase];
+                int count = Math.Min(targetFeatures.Length, currentFeatures.Length);
+                for (int i = 0; i < count; i++)
+                {
+                    bool bothHigh = targetFeatures[i] > 0.90f && currentFeatures[i] > 0.90f;
+                    bool bothLow = targetFeatures[i] < 0.10f && currentFeatures[i] < 0.10f;
+                    if (bothHigh || bothLow)
+                    {
+                        string name = i < names.Length ? names[i] : $"Feature[{i}]";
+                        string side = bothHigh ? "HIGH" : "LOW";
+                        sb.AppendLine($"  ⚠ {subPhase}/{name}: Photo={targetFeatures[i]:F4} Render={currentFeatures[i]:F4} [{side}] — no discriminative value");
+                        anySaturation = true;
+                    }
+                }
+            }
+            if (!anySaturation)
+                sb.AppendLine("  (none — all features have discriminative range)");
             sb.AppendLine();
 
             return sb.ToString();

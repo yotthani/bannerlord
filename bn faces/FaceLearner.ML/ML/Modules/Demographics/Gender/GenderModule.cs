@@ -72,11 +72,6 @@ namespace FaceLearner.ML.Modules.Demographics.Gender
     /// </summary>
     public class GenderModule
     {
-        // Calibrated thresholds for landmark-based detection
-        private const float JAW_WIDTH_MALE_THRESHOLD = 0.85f;
-        private const float BROW_PROMINENCE_MALE_THRESHOLD = 0.15f;
-        private const float CHIN_POINTEDNESS_FEMALE_THRESHOLD = 0.6f;
-        
         // Weight for combining signals
         private const float LANDMARK_WEIGHT = 0.3f;
         private const float MODEL_WEIGHT = 0.5f;
@@ -197,129 +192,21 @@ namespace FaceLearner.ML.Modules.Demographics.Gender
         }
         
         /// <summary>
-        /// Analyze landmarks for gender indicators
+        /// Analyze landmarks for gender indicators.
+        /// Requires MediaPipe 468-point landmarks (936 values).
         /// Returns 0=male, 1=female
         /// </summary>
         private float AnalyzeLandmarks(float[] landmarks, GenderBreakdown breakdown)
         {
-            if (landmarks == null || landmarks.Length < 136)
+            if (landmarks == null || landmarks.Length < 936)
             {
-                return 0.5f;  // Unknown
+                return 0.5f;  // Unknown — need MediaPipe 468 landmarks
             }
-            
-            // MediaPipe uses 468 landmarks × 2 coords = 936 values
-            // dlib uses 68 landmarks × 2 coords = 136 values
-            // We'll support both
-            
-            bool isMediaPipe = landmarks.Length >= 936;
-            
-            float score = 0.5f;  // Start neutral
-            int factors = 0;
-            
-            if (isMediaPipe)
-            {
-                // MediaPipe landmark analysis
-                score = AnalyzeMediaPipeLandmarks(landmarks, breakdown);
-            }
-            else
-            {
-                // dlib 68-point landmark analysis
-                score = AnalyzeDlibLandmarks(landmarks, breakdown);
-            }
-            
+
+            float score = AnalyzeMediaPipeLandmarks(landmarks, breakdown);
             return Math.Max(0f, Math.Min(1f, score));
         }
-        
-        /// <summary>
-        /// Analyze 68-point dlib landmarks
-        /// </summary>
-        private float AnalyzeDlibLandmarks(float[] landmarks, GenderBreakdown breakdown)
-        {
-            // Key indices for dlib 68 landmarks:
-            // 0-16: Jaw contour
-            // 17-21: Left eyebrow
-            // 22-26: Right eyebrow
-            // 27-35: Nose
-            // 36-41: Left eye
-            // 42-47: Right eye
-            // 48-67: Mouth
-            
-            float score = 0.5f;
-            int factors = 0;
-            
-            // Jaw width (points 0 and 16)
-            float jawWidth = Math.Abs(landmarks[16 * 2] - landmarks[0 * 2]);
-            float faceHeight = Math.Abs(landmarks[8 * 2 + 1] - landmarks[27 * 2 + 1]);
-            float jawRatio = jawWidth / Math.Max(0.01f, faceHeight);
-            
-            // Wide jaw = more male (typical male: 0.85+, female: 0.75-)
-            float jawScore = jawRatio > JAW_WIDTH_MALE_THRESHOLD ? 0.3f : 0.7f;
-            breakdown.JawWidthScore = jawRatio;
-            score += (jawScore - 0.5f) * 0.3f;
-            factors++;
-            
-            // Chin pointedness (point 8 relative to points 6,10)
-            float chinX = landmarks[8 * 2];
-            float chinY = landmarks[8 * 2 + 1];
-            float leftJaw = landmarks[6 * 2 + 1];
-            float rightJaw = landmarks[10 * 2 + 1];
-            float jawLineY = (leftJaw + rightJaw) / 2;
-            float chinExtension = chinY - jawLineY;
-            
-            // More pointed chin = more female
-            float chinPointScore = chinExtension > 0.05f ? 0.65f : 0.35f;
-            breakdown.ChinPointedness = chinExtension;
-            score += (chinPointScore - 0.5f) * 0.2f;
-            factors++;
-            
-            // Eye distance relative to face width
-            float leftEyeX = (landmarks[36 * 2] + landmarks[39 * 2]) / 2;
-            float rightEyeX = (landmarks[42 * 2] + landmarks[45 * 2]) / 2;
-            float eyeDistance = Math.Abs(rightEyeX - leftEyeX);
-            float eyeRatio = eyeDistance / Math.Max(0.01f, jawWidth);
-            
-            // Wider eye spacing relative to face = more female
-            float eyeScore = eyeRatio > 0.38f ? 0.6f : 0.4f;
-            breakdown.EyeDistance = eyeRatio;
-            score += (eyeScore - 0.5f) * 0.15f;
-            factors++;
-            
-            // Nose width (points 31-35)
-            float noseWidth = Math.Abs(landmarks[35 * 2] - landmarks[31 * 2]);
-            float noseRatio = noseWidth / Math.Max(0.01f, jawWidth);
-            
-            // Wider nose = more male
-            float noseScore = noseRatio > 0.25f ? 0.35f : 0.65f;
-            breakdown.NoseWidth = noseRatio;
-            score += (noseScore - 0.5f) * 0.15f;
-            factors++;
-            
-            // Lip fullness (mouth height)
-            float upperLipTop = landmarks[51 * 2 + 1];
-            float upperLipBot = landmarks[62 * 2 + 1];
-            float lowerLipTop = landmarks[66 * 2 + 1];
-            float lowerLipBot = landmarks[57 * 2 + 1];
-            float lipHeight = Math.Abs(lowerLipBot - upperLipTop);
-            float lipRatio = lipHeight / Math.Max(0.01f, faceHeight);
-            
-            // Fuller lips = more female
-            float lipScore = lipRatio > 0.12f ? 0.6f : 0.4f;
-            breakdown.LipFullness = lipRatio;
-            score += (lipScore - 0.5f) * 0.1f;
-            factors++;
-            
-            // Face aspect ratio
-            float faceAspect = faceHeight / Math.Max(0.01f, jawWidth);
-            breakdown.FaceAspectRatio = faceAspect;
-            
-            // Longer face = more male
-            float aspectScore = faceAspect > 1.3f ? 0.4f : 0.6f;
-            score += (aspectScore - 0.5f) * 0.1f;
-            factors++;
-            
-            return score;
-        }
-        
+
         /// <summary>
         /// Analyze MediaPipe 468 landmarks
         /// </summary>

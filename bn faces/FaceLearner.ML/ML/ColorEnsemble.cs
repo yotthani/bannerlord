@@ -234,14 +234,15 @@ namespace FaceLearner.ML
             // === RACE-BASED BOUNDS (for non-White, non-Latino-misclassified) ===
             if (RaceSkinRanges.TryGetValue(race, out var bounds) && raceConf >= 0.50f)
             {
-                // Clamp RGB value within race bounds, weighted by confidence
+                // Clamp RGB value within race bounds
                 float clampedValue = Math.Max(bounds.Min, Math.Min(bounds.Max, rgbDirect));
-                
-                // Blend between raw RGB and clamped value based on race confidence
-                // Higher confidence = more clamping to race bounds
-                result.Value = rgbDirect * (1f - raceConf) + clampedValue * raceConf;
+
+                // v3.0.30: Stronger race influence — race bounds are more reliable than single-image RGB.
+                // Blend: 70% race-clamped + 30% raw RGB (was 50/50 via raceConf).
+                float raceWeight = Math.Min(0.80f, 0.50f + raceConf * 0.30f);  // 0.50-0.80 based on conf
+                result.Value = rgbDirect * (1f - raceWeight) + clampedValue * raceWeight;
                 result.Confidence = 0.6f + raceConf * 0.3f;
-                result.Decision = $"{race} (conf={raceConf:F2}) → bounds [{bounds.Min:F2}-{bounds.Max:F2}], RGB={rgbDirect:F2}";
+                result.Decision = $"{race} (conf={raceConf:F2}) → bounds [{bounds.Min:F2}-{bounds.Max:F2}], RGB={rgbDirect:F2}, w={raceWeight:F2}";
                 SubModule.Log($"  SkinTone: {result.Decision} → {result.Value:F2}");
                 return Clamp(result);
             }
@@ -299,10 +300,11 @@ namespace FaceLearner.ML
                     // Sample skin area (cheeks)
                     var samples = new List<Color>();
                     
-                    if (landmarks != null && landmarks.Length >= 136)
+                    if (landmarks != null && landmarks.Length >= 936)
                     {
-                        // Sample from cheek landmarks (1-4 and 12-15 for dlib 68)
-                        int[] cheekIndices = { 1, 2, 3, 4, 12, 13, 14, 15 };
+                        // Sample from cheek landmarks using FaceMesh 468 indices
+                        // FM jaw: 93(R1), 132(R2), 58(R3), 172(R4), 288(L3), 361(L2), 323(L1), 397(L4)
+                        int[] cheekIndices = { 93, 132, 58, 172, 288, 361, 323, 397 };
                         foreach (int i in cheekIndices)
                         {
                             int x = (int)(landmarks[i * 2] * bitmap.Width);
@@ -376,52 +378,85 @@ namespace FaceLearner.ML
                     // Sample from multiple skin regions
                     int w = bitmap.Width;
                     int h = bitmap.Height;
-                    
-                    // Center regions (likely face)
-                    int[][] regions = {
-                        new[] { w/2, h/3 },      // Forehead
-                        new[] { w/3, h/2 },      // Left cheek
-                        new[] { 2*w/3, h/2 },    // Right cheek
-                        new[] { w/2, 2*h/3 },    // Lower face
-                    };
+
+                    // v3.0.29b: Use FaceMesh landmarks for accurate cheek sampling!
+                    // Previously: hardcoded w/3, h/2 etc. → missed actual face on off-center photos.
+                    // FaceMesh cheek landmarks: R2=132 (right cheekbone), L2=361 (left cheekbone),
+                    // Forehead=151, Lower face: average of chin area
+                    int[][] regions;
+                    if (landmarks != null && landmarks.Length >= 936)
+                    {
+                        regions = new int[][] {
+                            new[] { (int)(landmarks[151 * 2] * w), (int)(landmarks[151 * 2 + 1] * h) },  // Forehead (FM 151)
+                            new[] { (int)(landmarks[132 * 2] * w), (int)(landmarks[132 * 2 + 1] * h) },  // Right cheek (FM 132)
+                            new[] { (int)(landmarks[361 * 2] * w), (int)(landmarks[361 * 2 + 1] * h) },  // Left cheek (FM 361)
+                            new[] { (int)(landmarks[58 * 2] * w), (int)(landmarks[58 * 2 + 1] * h) },    // Right mid-jaw (FM 58)
+                            new[] { (int)(landmarks[288 * 2] * w), (int)(landmarks[288 * 2 + 1] * h) },  // Left mid-jaw (FM 288)
+                        };
+                    }
+                    else
+                    {
+                        // Fallback: approximate from image dimensions
+                        regions = new int[][] {
+                            new[] { w/2, h/3 },      // Forehead
+                            new[] { w/3, h/2 },      // Left cheek
+                            new[] { 2*w/3, h/2 },    // Right cheek
+                            new[] { w/2, 2*h/3 },    // Lower face
+                        };
+                    }
                     
                     // Calculate overall image brightness to detect dark images
                     float totalBrightness = 0f;
                     int sampleCount = 0;
                     
+                    // v3.0.30: Sample 5x5 patch around each landmark to reduce noise.
+                    // Single-pixel sampling was extremely noisy — one pixel on shadow/hair/lip
+                    // could throw the entire skin tone off.
+                    int patchRadius = Math.Max(2, Math.Min(5, w / 50));  // Scale with image size
+
                     foreach (var region in regions)
                     {
-                        int x = Math.Max(0, Math.Min(w-1, region[0]));
-                        int y = Math.Max(0, Math.Min(h-1, region[1]));
-                        
-                        var color = bitmap.GetPixel(x, y);
-                        float avgRGB = (color.R + color.G + color.B) / 3f;
+                        int cx = Math.Max(patchRadius, Math.Min(w - 1 - patchRadius, region[0]));
+                        int cy = Math.Max(patchRadius, Math.Min(h - 1 - patchRadius, region[1]));
+
+                        float patchR = 0, patchG = 0, patchB = 0;
+                        int patchCount = 0;
+                        for (int dy = -patchRadius; dy <= patchRadius; dy++)
+                        {
+                            for (int dx = -patchRadius; dx <= patchRadius; dx++)
+                            {
+                                var px = bitmap.GetPixel(cx + dx, cy + dy);
+                                patchR += px.R;
+                                patchG += px.G;
+                                patchB += px.B;
+                                patchCount++;
+                            }
+                        }
+                        float avgRGB = (patchR + patchG + patchB) / (3f * patchCount);
                         rawRGBs.Add(avgRGB);
                         totalBrightness += avgRGB;
                         sampleCount++;
                     }
                     
                     float avgBrightness = totalBrightness / sampleCount;
-                    
-                    // Detect dark/underexposed image
-                    // Normal face images have avgBrightness ~120-180
-                    // Dark images have avgBrightness < 100
-                    bool isDarkImage = avgBrightness < 100f;
-                    float brightnessCorrection = 1f;
-                    
+
+                    // v3.0.32: Dark image detection REMOVED.
+                    // The old code multiplied raw RGB by up to 2x when avgBrightness < 100.
+                    // This caused WRONG skin tones on faces with warm/dark lighting but light skin
+                    // (e.g. rawAvg=43 for a pale man in dark hoodie → corrected to 86 → skinTone=0.65).
+                    // The correction cannot distinguish "dark skin" from "dark lighting on light skin"
+                    // so it's better to just use the raw values. Very dark images will have low
+                    // confidence anyway from the race weighting system.
+                    bool isDarkImage = avgBrightness < 60f;  // Only flag extreme cases for logging
                     if (isDarkImage)
                     {
-                        // Image is underexposed - normalize brightness
-                        // Target brightness ~140 for normal exposure
-                        brightnessCorrection = 140f / Math.Max(avgBrightness, 30f);
-                        brightnessCorrection = Math.Min(brightnessCorrection, 2.0f); // Cap at 2x correction
-                        SubModule.Log($"  RGB: Dark image detected (avg={avgBrightness:F0}), correction={brightnessCorrection:F2}");
+                        SubModule.Log($"  RGB: Very dark image (avg={avgBrightness:F0}) — skin tone may be unreliable");
                     }
-                    
+
                     foreach (var rawRGB in rawRGBs)
                     {
-                        // Apply brightness correction for dark images
-                        float correctedRGB = Math.Min(255f, rawRGB * brightnessCorrection);
+                        // NO brightness correction — use raw values directly
+                        float correctedRGB = rawRGB;
                         
                         // v2.9.1 FIX: Better calibration for skin tones
                         // Bannerlord uses 0=LIGHT, 1=DARK
@@ -466,15 +501,8 @@ namespace FaceLearner.ML
                     
                     float result = (float)samples.Average();
                     
-                    // v2.8.18: More detailed logging
-                    if (isDarkImage)
-                    {
-                        SubModule.Log($"  RGB Direct: rawAvg={rawRGBs.Average():F0} (DARK) corrected→{samples.Average()*255/0.85:F0} → skinTone={result:F2}");
-                    }
-                    else
-                    {
-                        SubModule.Log($"  RGB Direct: rawAvg={rawRGBs.Average():F0} → skinTone={result:F2}");
-                    }
+                    // v3.0.32: Simplified logging (no more dark image correction)
+                    SubModule.Log($"  RGB Direct: rawAvg={rawRGBs.Average():F0}{(isDarkImage ? " (VERY DARK)" : "")} → skinTone={result:F2}");
                     
                     return (result, isDarkImage);
                 }
@@ -516,23 +544,38 @@ namespace FaceLearner.ML
         public EnsembleResult DetectEyeColor(string imagePath, float[] landmarks)
         {
             var result = new EnsembleResult { Signals = new List<Signal>() };
-            
+
             try
             {
                 using (var bitmap = new Bitmap(imagePath))
                 {
                     int w = bitmap.Width;
                     int h = bitmap.Height;
-                    
-                    // Approximate eye positions from image center
-                    // Eyes are typically at ~30% from top, 35% and 65% from sides
-                    int leftEyeX = (int)(w * 0.35f);
-                    int rightEyeX = (int)(w * 0.65f);
-                    int eyeY = (int)(h * 0.38f);
-                    
+
+                    // v3.0.29b: Use actual FaceMesh eye landmarks instead of guessing position!
+                    // Previously: hardcoded 35%/65% from image sides → wildly inaccurate on cropped photos.
+                    // FaceMesh eye center = average of inner+outer corner landmarks.
+                    // Right eye: inner=133, outer=33. Left eye: inner=263, outer=362.
+                    int leftEyeX, rightEyeX, leftEyeY, rightEyeY;
+                    if (landmarks != null && landmarks.Length >= 936)
+                    {
+                        // FaceMesh 468: coordinates at [index*2] = x, [index*2+1] = y (normalized 0-1)
+                        rightEyeX = (int)(((landmarks[33 * 2] + landmarks[133 * 2]) / 2f) * w);
+                        rightEyeY = (int)(((landmarks[33 * 2 + 1] + landmarks[133 * 2 + 1]) / 2f) * h);
+                        leftEyeX = (int)(((landmarks[362 * 2] + landmarks[263 * 2]) / 2f) * w);
+                        leftEyeY = (int)(((landmarks[362 * 2 + 1] + landmarks[263 * 2 + 1]) / 2f) * h);
+                    }
+                    else
+                    {
+                        // Fallback: approximate from image dimensions
+                        leftEyeX = (int)(w * 0.35f);
+                        rightEyeX = (int)(w * 0.65f);
+                        leftEyeY = rightEyeY = (int)(h * 0.38f);
+                    }
+
                     // Sample iris colors (looking for darkest pixels in eye region)
-                    float leftIris = SampleIrisRegion(bitmap, leftEyeX, eyeY, 4);
-                    float rightIris = SampleIrisRegion(bitmap, rightEyeX, eyeY, 4);
+                    float leftIris = SampleIrisRegion(bitmap, leftEyeX, leftEyeY, 4);
+                    float rightIris = SampleIrisRegion(bitmap, rightEyeX, rightEyeY, 4);
                     float avgIris = (leftIris + rightIris) / 2f;
                     
                     // Map luminance to eye color

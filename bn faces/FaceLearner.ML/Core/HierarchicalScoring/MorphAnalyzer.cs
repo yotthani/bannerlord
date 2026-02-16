@@ -19,7 +19,7 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
     /// </summary>
     public class MorphAnalyzer
     {
-        // Landmark groups (Dlib 68)
+        // Landmark groups (index-based, used for morph effect analysis)
         private static readonly Dictionary<string, int[]> LandmarkGroups = new Dictionary<string, int[]>
         {
             { "Jaw", Enumerable.Range(0, 17).ToArray() },           // 0-16

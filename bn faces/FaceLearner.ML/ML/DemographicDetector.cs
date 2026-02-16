@@ -185,21 +185,24 @@ namespace FaceLearner.ML
                         graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
                         graphics.DrawImage(bitmap, 0, 0, INPUT_SIZE, INPUT_SIZE);
                         
-                        // Convert to CHW format with 0-1 normalization
-                        // BGR order (InsightFace standard)
+                        // Convert to CHW format — RAW 0-255 float values, RGB order
+                        // InsightFace genderage.onnx has input_mean=0, input_std=1
+                        // meaning normalization is baked INTO the model graph.
+                        // cv2.dnn.blobFromImage with scale=1.0, mean=(0,0,0), swapRB=True
+                        // → raw RGB pixels as float32 in 0-255 range
                         float[] data = new float[3 * INPUT_SIZE * INPUT_SIZE];
-                        
+
                         for (int y = 0; y < INPUT_SIZE; y++)
                         {
                             for (int x = 0; x < INPUT_SIZE; x++)
                             {
                                 var pixel = resized.GetPixel(x, y);
                                 int idx = y * INPUT_SIZE + x;
-                                
-                                // BGR order, 0-1 normalization
-                                data[0 * INPUT_SIZE * INPUT_SIZE + idx] = pixel.B / 255f;
-                                data[1 * INPUT_SIZE * INPUT_SIZE + idx] = pixel.G / 255f;
-                                data[2 * INPUT_SIZE * INPUT_SIZE + idx] = pixel.R / 255f;
+
+                                // RGB order, RAW 0-255 (NOT normalized!)
+                                data[0 * INPUT_SIZE * INPUT_SIZE + idx] = pixel.R;
+                                data[1 * INPUT_SIZE * INPUT_SIZE + idx] = pixel.G;
+                                data[2 * INPUT_SIZE * INPUT_SIZE + idx] = pixel.B;
                             }
                         }
                         
@@ -245,11 +248,11 @@ namespace FaceLearner.ML
                     int srcIdx = (srcY * width + srcX) * 3;
                     int dstIdx = y * INPUT_SIZE + x;
                     
-                    // Try 0-1 normalization with BGR order (InsightFace standard)
-                    // Many InsightFace models use simple 0-255 or 0-1 range
-                    data[0 * INPUT_SIZE * INPUT_SIZE + dstIdx] = rgbPixels[srcIdx + 2] / 255f;  // B
-                    data[1 * INPUT_SIZE * INPUT_SIZE + dstIdx] = rgbPixels[srcIdx + 1] / 255f;  // G
-                    data[2 * INPUT_SIZE * INPUT_SIZE + dstIdx] = rgbPixels[srcIdx + 0] / 255f;  // R
+                    // RGB order, RAW 0-255 (NOT normalized!)
+                    // InsightFace genderage has input_mean=0, input_std=1 (normalization baked in)
+                    data[0 * INPUT_SIZE * INPUT_SIZE + dstIdx] = rgbPixels[srcIdx + 0];  // R
+                    data[1 * INPUT_SIZE * INPUT_SIZE + dstIdx] = rgbPixels[srcIdx + 1];  // G
+                    data[2 * INPUT_SIZE * INPUT_SIZE + dstIdx] = rgbPixels[srcIdx + 2];  // B
                 }
             }
             
@@ -259,75 +262,50 @@ namespace FaceLearner.ML
         private Demographics? ParseOutput(Tensor<float> output)
         {
             var values = output.ToArray();
-            
+
             // Log output shape and all values for debugging
             SubModule.Log($"  AI output: length={values.Length}, dims={string.Join("x", output.Dimensions.ToArray())}");
-            
+
             if (values.Length < 3)
             {
                 SubModule.Log($"DemographicDetector: Unexpected output length {values.Length}");
                 SubModule.Log($"  Values: [{string.Join(", ", values.Take(Math.Min(10, values.Length)).Select(v => v.ToString("F4")))}]");
                 return null;
             }
-            
+
             // Show first 10 values if more than 3
             if (values.Length > 3)
             {
                 SubModule.Log($"  First 10 values: [{string.Join(", ", values.Take(10).Select(v => v.ToString("F3")))}]");
             }
-            
-            // InsightFace genderage model output format:
-            // Interpretation 1: [male_logit, female_logit, age_normalized]
-            // Interpretation 2: [gender_score, -, age_normalized] where negative = female
-            
-            float val0 = values[0];
-            float val1 = values[1];
-            float val2 = values[2];
-            
-            // Check if val0 and val1 are opposites (suggests single gender score)
-            bool isSymmetric = Math.Abs(val0 + val1) < 0.01f;
-            
-            bool isFemale;
-            float confidence;
-            
-            if (isSymmetric)
-            {
-                // Model outputs single score: negative = female, positive = male
-                // Use val0 directly as gender indicator
-                isFemale = val0 < 0;
-                // Confidence based on magnitude (larger = more confident)
-                float magnitude = Math.Abs(val0);
-                confidence = Math.Min(1f, magnitude);  // Cap at 1.0
-                SubModule.Log($"  Gender interpretation: symmetric (val0={val0:F3} → {(isFemale ? "Female" : "Male")}, conf={confidence:F2})");
-            }
-            else
-            {
-                // Standard softmax interpretation
-                float expFemale = (float)Math.Exp(val1);
-                float expMale = (float)Math.Exp(val0);
-                float femaleProbability = expFemale / (expFemale + expMale);
-                isFemale = femaleProbability > 0.5f;
-                confidence = Math.Abs(femaleProbability - 0.5f) * 2f;
-                SubModule.Log($"  Gender interpretation: softmax (femaleProb={femaleProbability:F2}, conf={confidence:F2})");
-            }
-            
-            // Age: Multiply by 100 if small (normalized) or use directly
-            float age;
-            if (val2 < 1.5f)
-            {
-                // Normalized age (0-1 scale, multiply by 100)
-                age = val2 * 100f;
-            }
-            else
-            {
-                // Direct age output
-                age = val2;
-            }
+
+            // InsightFace genderage.onnx output: [class0_score, class1_score, age_normalized]
+            // From attribute.py:
+            //   gender = np.argmax(pred[:2])   → 0=Female, 1=Male
+            //   age = int(np.round(pred[2]*100))
+            float val0 = values[0];  // Female score
+            float val1 = values[1];  // Male score
+            float val2 = values[2];  // Age (normalized 0-1, multiply by 100)
+
+            // Gender: argmax of first two values
+            // Convention: index 0 = Female, index 1 = Male
+            bool isFemale = val0 > val1;
+
+            // Confidence: how far apart the two scores are (softmax-like)
+            float expF = (float)Math.Exp(val0);
+            float expM = (float)Math.Exp(val1);
+            float femaleProb = expF / (expF + expM);
+            float confidence = Math.Abs(femaleProb - 0.5f) * 2f;  // 0=uncertain, 1=certain
+
+            SubModule.Log($"  Gender: argmax({val0:F3},{val1:F3}) → {(isFemale ? "Female" : "Male")} (prob={femaleProb:F2}, conf={confidence:F2})");
+
+            // Age: pred[2] * 100
+            float age = val2 * 100f;
             age = Math.Max(1f, Math.Min(100f, age));
-            
+
             SubModule.Log($"  AI raw: [{val0:F4}, {val1:F4}, {val2:F4}]");
             SubModule.Log($"  AI result: {(isFemale ? "Female" : "Male")} conf={confidence:F2} age={age:F0} (raw={val2:F3})");
-            
+
             return new Demographics
             {
                 IsFemale = isFemale,

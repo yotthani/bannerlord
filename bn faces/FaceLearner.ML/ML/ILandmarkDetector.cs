@@ -1,7 +1,7 @@
 namespace FaceLearner.ML
 {
     /// <summary>
-    /// Interface for landmark detectors (68-point Dlib, 468-point FaceMesh, etc.)
+    /// Interface for landmark detectors (FaceMesh 468-point)
     /// </summary>
     public interface ILandmarkDetector
     {

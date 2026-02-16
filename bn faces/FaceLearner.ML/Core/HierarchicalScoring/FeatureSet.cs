@@ -87,6 +87,7 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
         public float EyeDistance { get; set; }
         public float EyeAngle { get; set; }
         public float EyeVerticalPos { get; set; }
+        public float EyeOpenness { get; set; }  // v3.0.38: Width/Height ratio — high=almond/monolid, low=round-open
         
         // Mouth
         public float MouthWidth { get; set; }
@@ -154,7 +155,7 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                     return new[] { NoseWidth, NoseLength, NoseBridge, NoseTip, NostrilWidth };
                     
                 case SubPhase.Eyes:
-                    return new[] { EyeWidth, EyeHeight, EyeDistance, EyeAngle, EyeVerticalPos };
+                    return new[] { EyeWidth, EyeHeight, EyeDistance, EyeAngle, EyeVerticalPos, EyeOpenness };
                     
                 case SubPhase.Mouth:
                     return new[] { MouthWidth, MouthHeight, UpperLipThickness, LowerLipThickness, MouthVerticalPos };
@@ -212,6 +213,7 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                 EyeDistance = this.EyeDistance,
                 EyeAngle = this.EyeAngle,
                 EyeVerticalPos = this.EyeVerticalPos,
+                EyeOpenness = this.EyeOpenness,
                 MouthWidth = this.MouthWidth,
                 MouthHeight = this.MouthHeight,
                 UpperLipThickness = this.UpperLipThickness,
@@ -245,19 +247,133 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
     /// </summary>
     public class FeatureExtractor
     {
+        // ═══════════════════════════════════════════════════════════════
+        // FaceMesh 468 landmark indices
+        // v3.0.27: FaceMesh 468 only — Dlib removed
+        // ═══════════════════════════════════════════════════════════════
+
+        // --- Jawline / Face Oval (36 points, vs Dlib's 17) ---
+        // Full face oval from MediaPipe: forehead→right→chin→left→forehead
+        // We use the jaw-relevant subset for contour measurements
+        private static readonly int FM_JAW_RIGHT = 234;       // Right ear/jaw start (≈Dlib 0)
+        private static readonly int FM_JAW_R1 = 93;            // (≈Dlib 1)
+        private static readonly int FM_JAW_R2 = 132;           // (≈Dlib 2) Cheekbone level
+        private static readonly int FM_JAW_R3 = 58;            // (≈Dlib 3) Mid jaw
+        private static readonly int FM_JAW_R4 = 172;           // (≈Dlib 4) Lower jaw
+        private static readonly int FM_JAW_R5 = 136;           // (≈Dlib 5)
+        private static readonly int FM_JAW_R6 = 150;           // (≈Dlib 6) Near chin right
+        private static readonly int FM_CHIN_R = 176;           // Right of chin
+        private static readonly int FM_CHIN = 152;             // Chin center bottom (≈Dlib 8)
+        private static readonly int FM_CHIN_L = 400;           // Left of chin
+        private static readonly int FM_JAW_L6 = 378;           // Near chin left (≈Dlib 10)
+        private static readonly int FM_JAW_L5 = 365;           // (≈Dlib 11)
+        private static readonly int FM_JAW_L4 = 397;           // (≈Dlib 12) Lower jaw
+        private static readonly int FM_JAW_L3 = 288;           // (≈Dlib 13) Mid jaw
+        private static readonly int FM_JAW_L2 = 361;           // (≈Dlib 14) Cheekbone level
+        private static readonly int FM_JAW_L1 = 323;           // (≈Dlib 15)
+        private static readonly int FM_JAW_LEFT = 454;         // Left ear/jaw end (≈Dlib 16)
+
+        // --- Forehead (FaceMesh EXCLUSIVE — Dlib has NONE!) ---
+        private static readonly int FM_FOREHEAD_TOP = 10;      // Top center (hairline)
+        private static readonly int FM_FOREHEAD_MID = 151;     // Mid forehead
+        private static readonly int FM_FOREHEAD_R = 67;        // Right forehead
+        private static readonly int FM_FOREHEAD_L = 297;       // Left forehead
+        private static readonly int FM_TEMPLE_R = 54;          // Right temple
+        private static readonly int FM_TEMPLE_L = 284;         // Left temple
+
+        // --- Eyebrows ---
+        // Right eyebrow (10 points vs Dlib's 5)
+        private static readonly int FM_RBROW_OUTER = 70;       // (≈Dlib 17)
+        private static readonly int FM_RBROW_MID2 = 63;        // (≈Dlib 18)
+        private static readonly int FM_RBROW_MID = 105;        // (≈Dlib 19) — brow peak
+        private static readonly int FM_RBROW_MID1 = 66;        // (≈Dlib 20)
+        private static readonly int FM_RBROW_INNER = 107;      // (≈Dlib 21)
+        // Left eyebrow
+        private static readonly int FM_LBROW_INNER = 336;      // (≈Dlib 22)
+        private static readonly int FM_LBROW_MID1 = 296;       // (≈Dlib 23)
+        private static readonly int FM_LBROW_MID = 334;        // (≈Dlib 24) — brow peak
+        private static readonly int FM_LBROW_MID2 = 293;       // (≈Dlib 25)
+        private static readonly int FM_LBROW_OUTER = 300;      // (≈Dlib 26)
+
+        // --- Nose ---
+        private static readonly int FM_NOSE_TOP = 168;         // Between brows / glabella (≈Dlib 27)
+        private static readonly int FM_NOSE_BRIDGE_UP = 6;     // Upper bridge (≈Dlib 28)
+        private static readonly int FM_NOSE_BRIDGE_MID = 197;  // Mid bridge (≈Dlib 29)
+        private static readonly int FM_NOSE_BRIDGE_LOW = 195;  // Lower bridge (≈Dlib 30)
+        private static readonly int FM_NOSE_TIP = 1;           // Actual nose tip (FaceMesh EXCLUSIVE!)
+        private static readonly int FM_NOSTRIL_R = 98;         // Right nostril (≈Dlib 31)
+        private static readonly int FM_NOSE_R = 97;            // Right nose bottom (≈Dlib 32)
+        private static readonly int FM_NOSE_BOTTOM = 2;        // Nose bottom center (≈Dlib 33)
+        private static readonly int FM_NOSE_L = 326;           // Left nose bottom (≈Dlib 34)
+        private static readonly int FM_NOSTRIL_L = 327;        // Left nostril (≈Dlib 35)
+
+        // --- Eyes ---
+        // Right eye (16 points vs Dlib's 6)
+        private static readonly int FM_REYE_OUTER = 33;        // (≈Dlib 36)
+        private static readonly int FM_REYE_UPPER_OUT = 160;   // (≈Dlib 37)
+        private static readonly int FM_REYE_UPPER_IN = 158;    // (≈Dlib 38)
+        private static readonly int FM_REYE_INNER = 133;       // (≈Dlib 39)
+        private static readonly int FM_REYE_LOWER_IN = 153;    // (≈Dlib 40)
+        private static readonly int FM_REYE_LOWER_OUT = 144;   // (≈Dlib 41)
+        private static readonly int FM_REYE_UPPER_MID = 159;   // Additional: upper eyelid center
+        private static readonly int FM_REYE_LOWER_MID = 145;   // Additional: lower eyelid center
+        // Left eye
+        private static readonly int FM_LEYE_OUTER = 362;       // (≈Dlib 42) — NOTE: this is actually outer corner
+        private static readonly int FM_LEYE_UPPER_OUT = 385;   // (≈Dlib 43)
+        private static readonly int FM_LEYE_UPPER_IN = 387;    // (≈Dlib 44)
+        private static readonly int FM_LEYE_INNER = 263;       // (≈Dlib 45)
+        private static readonly int FM_LEYE_LOWER_IN = 373;    // (≈Dlib 46)
+        private static readonly int FM_LEYE_LOWER_OUT = 380;   // (≈Dlib 47)
+        private static readonly int FM_LEYE_UPPER_MID = 386;   // Additional: upper eyelid center
+        private static readonly int FM_LEYE_LOWER_MID = 374;   // Additional: lower eyelid center
+
+        // --- Mouth / Lips ---
+        // Outer lips
+        private static readonly int FM_MOUTH_R = 61;           // Right corner (≈Dlib 48)
+        private static readonly int FM_ULIP_R = 40;            // Upper lip right (≈Dlib 49)
+        private static readonly int FM_ULIP_MR = 37;           // Upper lip mid-right (≈Dlib 50)
+        private static readonly int FM_ULIP_TOP = 0;           // Upper lip center top (≈Dlib 51)
+        private static readonly int FM_ULIP_ML = 267;          // Upper lip mid-left (≈Dlib 52)
+        private static readonly int FM_ULIP_L = 270;           // Upper lip left (≈Dlib 53)
+        private static readonly int FM_MOUTH_L = 291;          // Left corner (≈Dlib 54)
+        private static readonly int FM_LLIP_L = 321;           // Lower lip left (≈Dlib 55)
+        private static readonly int FM_LLIP_ML = 314;          // Lower lip mid-left (≈Dlib 56)
+        private static readonly int FM_LLIP_BOTTOM = 17;       // Lower lip center bottom (≈Dlib 57)
+        private static readonly int FM_LLIP_MR = 84;           // Lower lip mid-right (≈Dlib 58)
+        private static readonly int FM_LLIP_R = 181;           // Lower lip right (≈Dlib 59)
+        // Inner lips
+        private static readonly int FM_INNER_R = 78;           // (≈Dlib 60)
+        private static readonly int FM_INNER_UR = 82;          // (≈Dlib 61)
+        private static readonly int FM_INNER_TOP = 13;         // Inner upper center (≈Dlib 62)
+        private static readonly int FM_INNER_UL = 312;         // (≈Dlib 63)
+        private static readonly int FM_INNER_L = 308;          // (≈Dlib 64)
+        private static readonly int FM_INNER_LL = 317;         // (≈Dlib 65)
+        private static readonly int FM_INNER_BOTTOM = 14;      // Inner lower center (≈Dlib 66)
+        private static readonly int FM_INNER_LR = 87;          // (≈Dlib 67)
+
+        // --- Cheek surface landmarks ---
+        private static readonly int FM_CHEEK_R_UPPER = 50;     // Right upper cheek
+        private static readonly int FM_CHEEK_L_UPPER = 280;    // Left upper cheek
+        private static readonly int FM_CHEEK_R_MID = 116;      // Right mid cheek
+        private static readonly int FM_CHEEK_L_MID = 345;      // Left mid cheek
+
         /// <summary>
-        /// Extract features from Dlib 68 landmarks (136 floats)
+        /// Extract features from FaceMesh 468 landmarks (936 floats).
+        /// v3.0.27: FaceMesh 468 only — Dlib removed.
         /// </summary>
         public FeatureSet Extract(float[] landmarks)
         {
-            if (landmarks == null || landmarks.Length < 136)
+            if (landmarks == null || landmarks.Length < 936)
                 return new FeatureSet();
-            
+
+            // v3.0.27: FaceMesh 468 only — Dlib removed
+            float[] fm = landmarks;
+
             var features = new FeatureSet();
-            
-            // Helper functions
-            float X(int i) => landmarks[i * 2];
-            float Y(int i) => landmarks[i * 2 + 1];
+
+            // Helper functions — now index into FaceMesh 468 space
+            float X(int fmIdx) => fm[fmIdx * 2];
+            float Y(int fmIdx) => fm[fmIdx * 2 + 1];
             float Dist(int a, int b) => (float)Math.Sqrt(
                 Math.Pow(X(a) - X(b), 2) + Math.Pow(Y(a) - Y(b), 2));
             float Angle(int a, int center, int b)
@@ -270,166 +386,248 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                 float cross = ax * by - ay * bx;
                 return (float)Math.Atan2(cross, dot) * 180f / (float)Math.PI;
             }
-            
-            // DEBUG: Log landmark count to verify format
-            // FaceMesh=468*3=1404, Dlib68=68*2=136
-            bool isFaceMesh = landmarks.Length > 400;
-            
-            // === EBENE 1: GESICHTSFORM ===
-            
-            float faceWidthRaw = Dist(0, 16);      // Jaw endpoints
-            float faceHeightRaw = Dist(8, 27);     // Chin to nose bridge
-            float fullHeightRaw = Math.Abs(Y(8) - Y(19));  // Chin to brow
-            
-            // FaceWidth/FaceHeight: The * 2f normalization works because Dlib landmarks
-            // are already normalized to the detected face bounding box (0-1 range).
-            // The scale is consistent between photo and render as long as both use
-            // the same landmark detector. FaceRatio provides the scale-invariant shape info.
-            features.FaceWidth = Clamp(faceWidthRaw * 2f, 0f, 1f);
-            features.FaceHeight = Clamp(faceHeightRaw * 2f, 0f, 1f);
-            features.FaceRatio = faceWidthRaw / (fullHeightRaw + 0.001f);
 
-            // v3.0.23: Contour profile — measure face width at 6 different heights
-            // using landmark pairs along the jawline (0-16).
-            // Normalized to the widest point (Dist(0,16)) so the profile is scale-invariant.
-            // This captures the actual face outline shape instead of guessing from individual values.
-            float maxWidth = faceWidthRaw + 0.001f;  // Dist(0,16), avoid division by zero
-            features.ContourUpperJaw = Clamp(Dist(1, 15) / maxWidth, 0f, 1f);
-            features.ContourCheekbone = Clamp(Dist(2, 14) / maxWidth, 0f, 1f);
-            features.ContourMidJaw = Clamp(Dist(3, 13) / maxWidth, 0f, 1f);
-            features.ContourLowerJaw = Clamp(Dist(4, 12) / maxWidth, 0f, 1f);
-            features.ContourNearChin = Clamp(Dist(5, 11) / maxWidth, 0f, 1f);
-            features.ContourChinArea = Clamp(Dist(6, 10) / maxWidth, 0f, 1f);
+            // ═══════════════════════════════════════════════════════════════
+            // EBENE 1: GESICHTSFORM
+            // ═══════════════════════════════════════════════════════════════
 
-            // Classify face shape using 5 measurements for better discrimination
-            // (jawCurvature, chinPointedness, cheekWidth computed below but needed here;
-            //  compute preliminary values now, final features set in their own sections)
-            float prelimJawCurvature = Clamp(Math.Abs(Angle(4, 8, 12)) / 180f, 0f, 1f);
-            float prelimChinAngle = Math.Abs(Angle(6, 8, 10));
-            float prelimChinPointedness = Clamp((140f - prelimChinAngle) / 80f, 0f, 1f);
-            float prelimCheekWidth = Clamp(Dist(2, 14) / faceWidthRaw, 0f, 1f);
-            float prelimJawTaper = Dist(5, 11) / (Dist(1, 15) + 0.001f);
+            // v3.0.27: Use FaceMesh native indices for reference measurements
+            float faceWidthRaw = Dist(FM_JAW_RIGHT, FM_JAW_LEFT);    // Jaw endpoints (was Dlib 0,16)
+            float faceHeightRaw = Dist(FM_CHIN, FM_NOSE_TOP);        // Chin to nose bridge (was Dlib 8,27)
+            // v3.0.27: FaceMesh 468 only — Dlib removed. Use forehead landmark for stable fullHeight.
+            float fullHeightRaw = Math.Abs(Y(FM_CHIN) - Y(FM_FOREHEAD_MID));
+
+            // Face dimensions — normalize with Offset+Scale to spread variation
+            features.FaceWidth = Clamp((faceWidthRaw - 0.35f) / 0.30f, 0f, 1f);
+            features.FaceHeight = Clamp((faceHeightRaw - 0.20f) / 0.30f, 0f, 1f);
+            float rawRatio = faceWidthRaw / (fullHeightRaw + 0.001f);
+            features.FaceRatio = Clamp((rawRatio - 0.60f) / 0.50f, 0f, 1f);
+
+            // v3.0.27: Contour profile using FaceMesh native jaw landmarks
+            // These are direct measurements, no longer going through lossy Dlib conversion
+            float maxWidth = faceWidthRaw + 0.001f;
+            features.ContourUpperJaw = Clamp((Dist(FM_JAW_R1, FM_JAW_L1) / maxWidth - 0.90f) / 0.10f, 0f, 1f);
+            features.ContourCheekbone = Clamp((Dist(FM_JAW_R2, FM_JAW_L2) / maxWidth - 0.85f) / 0.12f, 0f, 1f);
+            features.ContourMidJaw = Clamp((Dist(FM_JAW_R3, FM_JAW_L3) / maxWidth - 0.75f) / 0.18f, 0f, 1f);
+            features.ContourLowerJaw = Clamp((Dist(FM_JAW_R4, FM_JAW_L4) / maxWidth - 0.60f) / 0.25f, 0f, 1f);
+            features.ContourNearChin = Clamp((Dist(FM_JAW_R5, FM_JAW_L5) / maxWidth - 0.45f) / 0.30f, 0f, 1f);
+            features.ContourChinArea = Clamp(Dist(FM_JAW_R6, FM_JAW_L6) / maxWidth, 0f, 1f);
+
+            // Face shape classification
+            float prelimJawCurvature = Clamp(Math.Abs(Angle(FM_JAW_R4, FM_CHIN, FM_JAW_L4)) / 180f, 0f, 1f);
+            // v3.0.27: ChinPointedness using FM_CHIN_R (176) and FM_CHIN_L (400) — these are
+            // DIFFERENT from Dlib's 6,10 which were mapped to 150,176 (too close together → 8-12° angles).
+            // FaceMesh chin area landmarks are wider spread → better angle discrimination.
+            float prelimChinAngle = Math.Abs(Angle(FM_CHIN_R, FM_CHIN, FM_CHIN_L));
+            // v3.0.28: Recalibrated — observed range ~100-160°
+            float prelimChinPointedness = Clamp((160f - prelimChinAngle) / 60f, 0f, 1f);
+            float prelimCheekWidth = Clamp(Dist(FM_JAW_R2, FM_JAW_L2) / faceWidthRaw, 0f, 1f);
+            float prelimJawTaper = Dist(FM_JAW_R5, FM_JAW_L5) / (Dist(FM_JAW_R1, FM_JAW_L1) + 0.001f);
             features.FaceShape = ClassifyFaceShape(features.FaceRatio, prelimJawTaper,
                 prelimJawCurvature, prelimChinPointedness, prelimCheekWidth);
-            
+
             features.Confidence[SubPhase.FaceWidth] = 0.9f;
             features.Confidence[SubPhase.FaceHeight] = 0.9f;
-            features.Confidence[SubPhase.FaceShape] = 0.8f;
-            
-            // === EBENE 2: STRUKTUR ===
-            
-            // Forehead (estimated from brow landmarks)
-            features.ForeheadHeight = Clamp(Math.Abs(Y(27) - Y(19)) / faceHeightRaw, 0f, 1f);
-            features.ForeheadWidth = Clamp(Dist(17, 26) / faceWidthRaw, 0f, 1f);
-            // ForeheadSlope: estimate from brow curvature instead of hardcoding
-            float browMidY = Y(19);
-            float browLeftY = Y(17);
-            float browRightY = Y(26);
-            features.ForeheadSlope = Clamp(0.5f + (browMidY - (browLeftY + browRightY) / 2f) * 5f, 0f, 1f);
-            features.Confidence[SubPhase.Forehead] = 0.7f;
-            
-            // Jaw
-            features.JawWidth = Clamp(Dist(3, 13) / faceWidthRaw, 0f, 1f);
-            features.JawAngleLeft = Clamp((Angle(1, 4, 8) + 180f) / 360f, 0f, 1f);
-            features.JawAngleRight = Clamp((Angle(15, 12, 8) + 180f) / 360f, 0f, 1f);
-            features.JawTaper = Clamp(Dist(5, 11) / (Dist(1, 15) + 0.001f), 0f, 1f);
-            
-            // NEW: JawCurvature - measures how curved/angular the jaw line is
-            // Points 4-8-12 form the lower jaw. Sharp angle = angular, gentle curve = round
-            float jawAngle = Math.Abs(Angle(4, 8, 12));
-            features.JawCurvature = Clamp(jawAngle / 180f, 0f, 1f);  // 0=sharp angle, 1=flat/round
+            features.Confidence[SubPhase.FaceShape] = 0.85f;  // Higher with FaceMesh's better contour
+
+            // ═══════════════════════════════════════════════════════════════
+            // EBENE 2: STRUKTUR
+            // ═══════════════════════════════════════════════════════════════
+
+            // Forehead — v3.0.27: FaceMesh 468 only — Dlib removed
+            // ACTUAL forehead measurements from FaceMesh forehead landmarks
+            float foreheadH = Math.Abs(Y(FM_FOREHEAD_MID) - Y(FM_NOSE_TOP));
+            features.ForeheadHeight = Clamp(foreheadH / (fullHeightRaw + 0.001f), 0f, 1f);
+            // Temple-to-temple width = actual forehead width
+            // v3.0.34: ForeheadWidth was near-saturated (~0.89-0.94 in all faces).
+            // Apply offset+scale to spread the actual variation range.
+            float foreheadW = Dist(FM_TEMPLE_R, FM_TEMPLE_L);
+            float foreheadWidthRatio = foreheadW / (faceWidthRaw + 0.001f);
+            features.ForeheadWidth = Clamp((foreheadWidthRatio - 0.75f) / 0.25f, 0f, 1f);
+            // ForeheadSlope: gradient from hairline to brow (using Y positions)
+            float hairlineY = Y(FM_FOREHEAD_TOP);
+            float browY = (Y(FM_RBROW_MID) + Y(FM_LBROW_MID)) / 2f;
+            float foreheadCenter = Y(FM_FOREHEAD_MID);
+            // Slope = how much forehead curves (flat = 0.5, receding = higher, bulging = lower)
+            float slopeBias = (foreheadCenter - (hairlineY + browY) / 2f) / (fullHeightRaw + 0.001f);
+            features.ForeheadSlope = Clamp(0.5f + slopeBias * 10f, 0f, 1f);
+            features.Confidence[SubPhase.Forehead] = 0.9f;
+
+            // Jaw — v3.0.29: DECOUPLED from chin landmarks!
+            // Previously JawAngle and JawCurvature used FM_CHIN (152) which gets moved by chin morphs
+            // (51,52,53). This caused the optimizer to reject correct jaw improvements because chin
+            // position changes made the jaw score look wrong. Now jaw features use only jaw-area
+            // landmarks (R3/R4/R5, L3/L4/L5) that aren't affected by chin morph changes.
+            features.JawWidth = Clamp(Dist(FM_JAW_R3, FM_JAW_L3) / faceWidthRaw, 0f, 1f);
+
+            // JawAngle: angle of jaw from upper to lower jaw points (NO chin involvement!)
+            // Uses the jaw curvature from ear→mid-jaw→lower-jaw, independent of chin position
+            // IMPORTANT: L and R use DIFFERENT offsets! The Angle() function uses atan2(cross,dot)
+            // which gives signed angles. Mirrored landmarks (R1/R3/R5 vs L1/L3/L5) produce
+            // fundamentally different raw values: L maps to ~0.80-0.99, R maps to ~0.05-0.40.
+            // v3.0.34: Widened L range (0.65-1.0 → 0-1, was 0.80-1.0) to prevent round-face saturation.
+            // R range widened proportionally (0.0-0.40 → 0-1, was 0.0-0.20).
+            float rawJawAngleL = (Angle(FM_JAW_R1, FM_JAW_R3, FM_JAW_R5) + 180f) / 360f;
+            features.JawAngleLeft = Clamp((rawJawAngleL - 0.65f) / 0.35f, 0f, 1f);
+            float rawJawAngleR = (Angle(FM_JAW_L1, FM_JAW_L3, FM_JAW_L5) + 180f) / 360f;
+            features.JawAngleRight = Clamp((rawJawAngleR - 0.0f) / 0.40f, 0f, 1f);
+
+            features.JawTaper = Clamp(Dist(FM_JAW_R5, FM_JAW_L5) / (Dist(FM_JAW_R1, FM_JAW_L1) + 0.001f), 0f, 1f);
+
+            // JawCurvature: angle at mid-jaw between upper and lower jaw points
+            // v3.0.29: Was Angle(FM_JAW_R4, FM_CHIN, FM_JAW_L4) — CHIN was the vertex!
+            // Now uses FM_JAW_R3 as vertex (mid-jaw), measuring jaw curvature without chin.
+            float jawAngle = Math.Abs(Angle(FM_JAW_R4, FM_JAW_R3, FM_JAW_L4));
+            features.JawCurvature = Clamp(jawAngle / 180f, 0f, 1f);
             features.Confidence[SubPhase.Jaw] = 0.85f;
-            
-            // Chin - IMPROVED: Use actual chin shape, not just width
-            features.ChinWidth = Clamp(Dist(7, 9) / faceWidthRaw, 0f, 1f);
-            features.ChinHeight = Clamp(Dist(8, 57) / faceHeightRaw, 0f, 1f);
-            
-            // ChinPointedness: Measure angle at chin point (landmarks 6, 8, 10)
-            // Sharp angle = pointed chin, wide angle = round chin
-            float chinAngle = Math.Abs(Angle(6, 8, 10));
-            // v3.0.24: Widened range from /80 to /120 to prevent saturation on pointed chins
-            // Sharp angle (~40°) = pointed (1.0), Wide angle (~160°) = round (0.0)
-            features.ChinPointedness = Clamp((160f - chinAngle) / 120f, 0f, 1f);
-            
-            // Also measure the "drop" - how far chin extends below jaw line
-            float jawLineY = (Y(4) + Y(12)) / 2f;
-            float chinDrop = (Y(8) - jawLineY) / faceHeightRaw;
-            features.ChinDrop = Clamp(chinDrop * 3f, 0f, 1f);  // How much chin extends down
-            features.Confidence[SubPhase.Chin] = 0.85f;
-            
-            // Cheeks (estimated) - use actual cheek bone distance
-            // v3.0.24: Use faceHeightRaw instead of fullHeightRaw (brow Y varies between photo/render)
-            float cheekCenterY = (Y(2) + Y(14)) / 2f;
-            features.CheekHeight = Clamp((Y(8) - cheekCenterY) / (faceHeightRaw * 1.3f), 0f, 1f);
-            features.CheekWidth = Clamp(Dist(2, 14) / faceWidthRaw, 0f, 1f);
-            // CheekProminence: estimate from relative position
-            float cheekOutward = (Dist(2, 30) + Dist(14, 30)) / 2f;  // Cheek to nose tip
-            features.CheekProminence = Clamp(cheekOutward / faceWidthRaw * 2f, 0f, 1f);
-            features.Confidence[SubPhase.Cheeks] = 0.7f;
-            
-            // === EBENE 3: GROSSE FEATURES ===
-            
-            // Nose — v3.0.24: Recalibrated multipliers so 5th-95th percentile maps to ~0.15-0.85
-            features.NoseWidth = Clamp(Dist(31, 35) / faceWidthRaw * 2.0f, 0f, 1f);
-            features.NoseLength = Clamp(Dist(27, 33) / faceHeightRaw * 2.0f, 0f, 1f);
-            features.NoseBridge = Clamp(Dist(27, 30) / faceHeightRaw * 3.0f, 0f, 1f);
-            features.NoseTip = Clamp(Dist(30, 33) / faceHeightRaw * 5.0f, 0f, 1f);
-            // v3.0.24: NostrilWidth was DUPLICATE of NoseWidth! New formula: nostril flare ratio
-            float nostrilSpan = Math.Abs(X(31) - X(35));  // Nostril-to-nostril horizontal
-            float bridgeTopSpan = Math.Abs(X(27) - X(30)) + 0.001f;  // Upper bridge width
+
+            // Chin — v3.0.27: Better chin landmarks from FaceMesh
+            // FM_CHIN_R (176) and FM_CHIN_L (400) are actual chin-area points, wider than Dlib 7/9
+            features.ChinWidth = Clamp(Dist(FM_CHIN_R, FM_CHIN_L) / faceWidthRaw, 0f, 1f);
+            features.ChinHeight = Clamp(Dist(FM_CHIN, FM_LLIP_BOTTOM) / faceHeightRaw, 0f, 1f);
+
+            // ChinPointedness: angle at chin center between chin-side landmarks
+            // v3.0.28: FM_CHIN_R (176) / FM_CHIN_L (400) are widely spread → obtuse angles
+            // Observed range: ~100-160°. Map: 100°→1.0 (pointed chin), 160°→0.0 (round chin)
+            float chinAngle = Math.Abs(Angle(FM_CHIN_R, FM_CHIN, FM_CHIN_L));
+            features.ChinPointedness = Clamp((160f - chinAngle) / 60f, 0f, 1f);
+
+            // ChinDrop: how far chin extends below jaw line
+            // v3.0.29: Use FM_CHIN_R/FM_CHIN_L as baseline instead of FM_JAW_R4/L4.
+            // Previously used jaw landmarks that get moved by jaw morphs, creating cross-contamination.
+            // Now uses chin-adjacent landmarks for a self-contained chin measurement.
+            float chinSideY = (Y(FM_CHIN_R) + Y(FM_CHIN_L)) / 2f;
+            float chinDrop = (Y(FM_CHIN) - chinSideY) / faceHeightRaw;
+            features.ChinDrop = Clamp((chinDrop + 0.05f) / 0.15f, 0f, 1f);
+            features.Confidence[SubPhase.Chin] = 0.9f;  // Better with FaceMesh chin landmarks
+
+            // Cheeks — v3.0.27: FaceMesh 468 only — Dlib removed
+            // Use actual cheek surface landmarks
+            float cheekCenterY = (Y(FM_CHEEK_R_MID) + Y(FM_CHEEK_L_MID)) / 2f;
+            features.CheekHeight = Clamp((Y(FM_CHIN) - cheekCenterY) / (faceHeightRaw * 1.3f), 0f, 1f);
+            features.CheekWidth = Clamp((Dist(FM_JAW_R2, FM_JAW_L2) / faceWidthRaw - 0.85f) / 0.12f, 0f, 1f);
+            // CheekProminence: distance from cheek surface to nose center line
+            float cheekToNoseR = Dist(FM_CHEEK_R_MID, FM_NOSE_BRIDGE_LOW);
+            float cheekToNoseL = Dist(FM_CHEEK_L_MID, FM_NOSE_BRIDGE_LOW);
+            features.CheekProminence = Clamp((cheekToNoseR + cheekToNoseL) / 2f / faceWidthRaw * 2f, 0f, 1f);
+            features.Confidence[SubPhase.Cheeks] = 0.85f;
+
+            // ═══════════════════════════════════════════════════════════════
+            // EBENE 3: GROSSE FEATURES
+            // ═══════════════════════════════════════════════════════════════
+
+            // Nose — v3.0.27: Using native FaceMesh nose landmarks
+            // NoseWidth: nostril-to-nostril distance
+            float noseWidthRatio = Dist(FM_NOSTRIL_R, FM_NOSTRIL_L) / faceWidthRaw;
+            features.NoseWidth = Clamp((noseWidthRatio - 0.15f) / 0.35f, 0f, 1f);
+            // NoseLength: bridge top to bottom center
+            float noseLenRatio = Dist(FM_NOSE_TOP, FM_NOSE_BOTTOM) / faceHeightRaw;
+            features.NoseLength = Clamp((noseLenRatio - 0.30f) / 0.30f, 0f, 1f);
+            // NoseBridge: top to lower bridge
+            float noseBridgeRatio = Dist(FM_NOSE_TOP, FM_NOSE_BRIDGE_LOW) / faceHeightRaw;
+            features.NoseBridge = Clamp((noseBridgeRatio - 0.15f) / 0.25f, 0f, 1f);
+            // NoseTip: ratio of tip protrusion to nose length
+            float noseTipRatio = Dist(FM_NOSE_BRIDGE_LOW, FM_NOSE_BOTTOM) / (Dist(FM_NOSE_TOP, FM_NOSE_BOTTOM) + 0.001f);
+            features.NoseTip = Clamp((noseTipRatio - 0.20f) / 0.50f, 0f, 1f);
+            // NostrilWidth: nostril flare ratio (horizontal nostril span vs bridge width)
+            float nostrilSpan = Math.Abs(X(FM_NOSTRIL_R) - X(FM_NOSTRIL_L));
+            float bridgeTopSpan = Math.Abs(X(FM_NOSE_TOP) - X(FM_NOSE_BRIDGE_LOW)) + 0.001f;
             features.NostrilWidth = Clamp(nostrilSpan / (bridgeTopSpan + faceWidthRaw) * 2.5f, 0f, 1f);
             features.Confidence[SubPhase.Nose] = 0.9f;
-            
-            // Eyes
-            float leftEyeW = Dist(36, 39);
-            float rightEyeW = Dist(42, 45);
-            float leftEyeH = Dist(37, 41);
-            float rightEyeH = Dist(43, 47);
-            
-            // v3.0.24: Recalibrated multipliers for real variation
-            features.EyeWidth = Clamp((leftEyeW + rightEyeW) / 2f / faceWidthRaw * 4.5f, 0f, 1f);
-            features.EyeHeight = Clamp((leftEyeH + rightEyeH) / 2f / faceHeightRaw * 10.0f, 0f, 1f);
-            features.EyeDistance = Clamp(Dist(39, 42) / faceWidthRaw * 3f, 0f, 1f);
-            // v3.0.24: EyeAngle was broken (Angle at point 39 always ~30° → saturated at 1.0)
-            // New: Canthal tilt = slope of the line from inner to outer eye corner
-            float leftTilt = (float)Math.Atan2(Y(36) - Y(39), X(39) - X(36));
-            float rightTilt = (float)Math.Atan2(Y(42) - Y(45), X(45) - X(42));
+
+            // Eyes — v3.0.27: FaceMesh has more eye landmarks for better measurements
+            // Use more points for eye width/height to get stable averages
+            float rEyeW = Dist(FM_REYE_OUTER, FM_REYE_INNER);
+            float lEyeW = Dist(FM_LEYE_OUTER, FM_LEYE_INNER);
+            // v3.0.27: FaceMesh 468 only — use mid-eyelid points for more accurate height
+            float rEyeH = Dist(FM_REYE_UPPER_MID, FM_REYE_LOWER_MID);
+            float lEyeH = Dist(FM_LEYE_UPPER_MID, FM_LEYE_LOWER_MID);
+
+            float eyeToFaceRatio = (rEyeW + lEyeW) / 2f / faceWidthRaw;
+            features.EyeWidth = Clamp((eyeToFaceRatio - 0.16f) / 0.20f, 0f, 1f);
+            float eyeHeightRatio = (rEyeH + lEyeH) / 2f / faceWidthRaw;
+            features.EyeHeight = Clamp((eyeHeightRatio - 0.01f) / 0.14f, 0f, 1f);
+            // EyeDistance: inner corner to inner corner, normalized to face width
+            // v3.0.34: Was ALWAYS saturated at 1.0/1.0 (both photo and render).
+            // Observed ratio range is actually 0.28-0.50+. Widen offset+scale significantly
+            // so we get meaningful variation instead of free points.
+            float eyeDistRatio = Dist(FM_REYE_INNER, FM_LEYE_INNER) / faceWidthRaw;
+            features.EyeDistance = Clamp((eyeDistRatio - 0.22f) / 0.35f, 0f, 1f);
+            // EyeAngle: Canthal tilt
+            float leftTilt = (float)Math.Atan2(Y(FM_REYE_OUTER) - Y(FM_REYE_INNER), X(FM_REYE_INNER) - X(FM_REYE_OUTER));
+            float rightTilt = (float)Math.Atan2(Y(FM_LEYE_OUTER) - Y(FM_LEYE_INNER), X(FM_LEYE_INNER) - X(FM_LEYE_OUTER));
             float avgTiltDeg = (leftTilt + rightTilt) / 2f * 180f / (float)Math.PI;
             features.EyeAngle = Clamp((avgTiltDeg + 15f) / 30f, 0f, 1f);
-            // v3.0.24: EyeVertPos was ALWAYS 1.0 for renders because fullHeightRaw differs
-            // between photo/render bounding boxes. Use faceHeightRaw (chin-to-nose-bridge) instead.
-            float eyeCenterY = (Y(36) + Y(45)) / 2f;
-            features.EyeVerticalPos = Clamp((Y(8) - eyeCenterY) / (faceHeightRaw * 1.5f), 0f, 1f);
+            // EyeVerticalPos: relative to face height
+            float eyeCenterY = (Y(FM_REYE_OUTER) + Y(FM_LEYE_INNER)) / 2f;
+            features.EyeVerticalPos = Clamp((Y(FM_CHIN) - eyeCenterY) / (faceHeightRaw * 1.5f), 0f, 1f);
+            // v3.0.38: EyeOpenness — aspect ratio Width/Height.
+            // Almond/monolid eyes: wide but not tall → high ratio (3-6)
+            // Round/open eyes: wide and tall → low ratio (2-3)
+            // This distinguishes monolid (eye_mono_lid morph) from closed (eye_closure morph).
+            // Without this, the optimizer sees "low EyeHeight" and cranks up eye_closure
+            // instead of using eye_mono_lid for Asian-style eyes.
+            float avgEyeW = (rEyeW + lEyeW) / 2f;
+            float avgEyeH = (rEyeH + lEyeH) / 2f;
+            float eyeAspect = avgEyeW / (avgEyeH + 0.001f);
+            features.EyeOpenness = Clamp((eyeAspect - 2.0f) / 4.0f, 0f, 1f);  // 2.0=round(0.0), 6.0=narrow(1.0)
             features.Confidence[SubPhase.Eyes] = 0.9f;
-            
-            // Mouth
-            // v3.0.24: Recalibrated multipliers for real variation
-            features.MouthWidth = Clamp(Dist(48, 54) / faceWidthRaw * 1.8f, 0f, 1f);
-            features.MouthHeight = Clamp(Dist(51, 57) / faceHeightRaw * 5.0f, 0f, 1f);
-            features.UpperLipThickness = Clamp(Dist(51, 62) / faceHeightRaw * 10.0f, 0f, 1f);
-            features.LowerLipThickness = Clamp(Dist(57, 66) / faceHeightRaw * 10.0f, 0f, 1f);
-            // v3.0.24: Use faceHeightRaw instead of fullHeightRaw (brow Y varies between photo/render)
-            features.MouthVerticalPos = Clamp((Y(8) - Y(51)) / faceHeightRaw, 0f, 1f);
+
+            // Mouth — v3.0.27: Using native FaceMesh lip landmarks
+            float mouthWidthRatio = Dist(FM_MOUTH_R, FM_MOUTH_L) / faceWidthRaw;
+            features.MouthWidth = Clamp((mouthWidthRatio - 0.25f) / 0.30f, 0f, 1f);
+            float mouthHeightRatio = Dist(FM_ULIP_TOP, FM_LLIP_BOTTOM) / faceWidthRaw;
+            // v3.0.36: Cap MouthHeight when mouth is open (smiling/laughing).
+            // Open mouth inflates MouthHeight to 1.0 (ratio>0.21), but Bannerlord renders
+            // always have closed mouth → MouthHeight=0.65-0.70 max → Match=0.20 ◄◄ BAD.
+            // Detect open mouth: if gap between inner lip top and bottom > 30% of outer lip height,
+            // cap the ratio to closed-mouth maximum (~0.15).
+            float innerGap = Dist(FM_INNER_TOP, FM_INNER_BOTTOM);
+            float outerGap = Dist(FM_ULIP_TOP, FM_LLIP_BOTTOM) + 0.001f;
+            float openRatio = innerGap / outerGap;
+            if (openRatio > 0.30f)  // Mouth is open (smiling, laughing, talking)
+            {
+                // Cap to closed-mouth equivalent — use lip thickness only, not gap
+                mouthHeightRatio = Math.Min(mouthHeightRatio, 0.15f);
+            }
+            features.MouthHeight = Clamp((mouthHeightRatio - 0.03f) / 0.18f, 0f, 1f);
+            // Lip thickness: ratio of upper/lower lip to total mouth height (self-referencing)
+            float mouthH = Dist(FM_ULIP_TOP, FM_LLIP_BOTTOM) + 0.001f;
+            float upperLipRatio = Dist(FM_ULIP_TOP, FM_INNER_TOP) / mouthH;
+            features.UpperLipThickness = Clamp((upperLipRatio - 0.15f) / 0.60f, 0f, 1f);
+            float lowerLipRatio = Dist(FM_LLIP_BOTTOM, FM_INNER_BOTTOM) / mouthH;
+            features.LowerLipThickness = Clamp((lowerLipRatio - 0.15f) / 0.60f, 0f, 1f);
+            // MouthVerticalPos relative to face
+            features.MouthVerticalPos = Clamp((Y(FM_CHIN) - Y(FM_ULIP_TOP)) / faceHeightRaw, 0f, 1f);
             features.Confidence[SubPhase.Mouth] = 0.85f;
-            
-            // === EBENE 4: FEINE DETAILS ===
-            
+
+            // ═══════════════════════════════════════════════════════════════
+            // EBENE 4: FEINE DETAILS
+            // ═══════════════════════════════════════════════════════════════
+
             // Eyebrows
-            features.EyebrowHeight = Clamp(Math.Abs(Y(19) - Y(36)) / faceHeightRaw * 5f, 0f, 1f);
-            features.EyebrowArch = Clamp(Math.Abs(Y(19) - (Y(17) + Y(21)) / 2f) / faceHeightRaw * 20f, 0f, 1f);
-            // EyebrowThickness: estimate from brow landmark spread
-            float browSpreadL = Math.Abs(Y(17) - Y(20));
-            float browSpreadR = Math.Abs(Y(22) - Y(25));
-            // v3.0.23: Normalize by faceHeightRaw to make scale-invariant (was absolute pixel distance)
+            // v3.0.34: BrowHeight was ALWAYS saturated at 1.0 in photos because
+            // fullHeightRaw (chin-to-brow) is small, making browEyeGap/fullHeightRaw too large.
+            // Fix: use faceHeightRaw (chin-to-nose-bridge, same fix as EyeVertPos v3.0.24)
+            // and widen the offset+scale range.
+            float browEyeGap = Math.Abs(Y(FM_RBROW_MID) - Y(FM_REYE_OUTER));
+            // v3.0.36: Still saturating at 1.0 for some faces (1473033823: BrowHeight=1.0→0.78).
+            // Widened scale from 0.20 to 0.30 — high brows (ratio 0.34) now map to 1.0 instead of 0.24.
+            features.EyebrowHeight = Clamp((browEyeGap / faceHeightRaw - 0.04f) / 0.30f, 0f, 1f);
+            // EyebrowArch: peak of brow vs ends
+            float rBrowPeakDrop = Math.Abs(Y(FM_RBROW_MID) - (Y(FM_RBROW_OUTER) + Y(FM_RBROW_INNER)) / 2f);
+            features.EyebrowArch = Clamp(rBrowPeakDrop / faceHeightRaw * 20f, 0f, 1f);
+            // EyebrowThickness: brow landmark vertical spread
+            float browSpreadL = Math.Abs(Y(FM_RBROW_OUTER) - Y(FM_RBROW_MID1));
+            float browSpreadR = Math.Abs(Y(FM_LBROW_OUTER) - Y(FM_LBROW_MID1));
             features.EyebrowThickness = Clamp((browSpreadL + browSpreadR) / 2f / faceHeightRaw * 5f, 0f, 1f);
-            // v3.0.24: BrowAngle was broken (Angle at point 19 always near-collinear → always 0.0)
-            // New: Brow slope from inner to outer corner. Positive = arched up, negative = sloping down
-            float leftBrowSlope = (Y(17) - Y(21)) / (X(21) - X(17) + 0.001f);
-            float rightBrowSlope = (Y(26) - Y(22)) / (X(22) - X(26) + 0.001f);
+            // EyebrowAngle: slope from inner to outer
+            float leftBrowSlope = (Y(FM_RBROW_OUTER) - Y(FM_RBROW_INNER)) / (X(FM_RBROW_INNER) - X(FM_RBROW_OUTER) + 0.001f);
+            float rightBrowSlope = (Y(FM_LBROW_OUTER) - Y(FM_LBROW_INNER)) / (X(FM_LBROW_OUTER) - X(FM_LBROW_INNER) + 0.001f);
             float avgBrowSlope = (leftBrowSlope + rightBrowSlope) / 2f;
             features.EyebrowAngle = Clamp(avgBrowSlope * 1.5f + 0.5f, 0f, 1f);
             features.Confidence[SubPhase.Eyebrows] = 0.7f;
-            
+
             return features;
         }
         

@@ -247,7 +247,7 @@ namespace FaceLearner.ML.Core
         
         /// <summary>
         /// Called when a screenshot is captured. Extracts landmarks for current phase.
-        /// Uses full 468 FaceMesh landmarks - NO conversion to Dlib 68!
+        /// Uses full 468 FaceMesh landmarks (936 floats).
         /// </summary>
         public void OnScreenshotCaptured(string imagePath)
         {
@@ -257,7 +257,7 @@ namespace FaceLearner.ML.Core
             {
                 var landmarks = _landmarkDetector.DetectLandmarks(imagePath);
                 
-                // DO NOT convert to Dlib 68 - use full 468 FaceMesh landmarks!
+                // Full 468 FaceMesh landmarks used directly
                 // landmarks should be 936 floats (468 landmarks * 2 coords)
                 
                 switch (_currentPhase)

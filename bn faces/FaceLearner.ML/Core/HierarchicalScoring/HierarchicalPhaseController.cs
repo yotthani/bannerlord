@@ -41,38 +41,53 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
         public MorphLockManager LockManager { get; set; }
         
         // Score thresholds
-        public float LockInThreshold { get; set; } = 0.80f;      // Score needed for lock-in
+        // v3.0.36: Raised LockIn from 0.80 to 0.90. With wider expected ranges (v3.0.36),
+        // SubPhase scores inflate — features that used to score 0.75 now score 0.90+.
+        // The old 0.80 threshold caused premature lock-in after just 47 iterations instead of 150+.
+        // 0.90 ensures the optimizer keeps refining even when ranges are forgiving.
+        public float LockInThreshold { get; set; } = 0.90f;
         public float MinAcceptableScore { get; set; } = 0.50f;   // Minimum before moving on
         public float PlateauThreshold { get; set; } = 0.01f;     // Score change considered "no improvement"
         
         public HierarchicalPhaseController()
         {
-            // Sigma values are now PERCENTAGES of the morph's natural range!
-            // e.g., Sigma=0.5 means variation of ±50% of the morph's range
+            // v3.0.29: Iteration budgets raised for CMA-ES population-based optimization.
+            // CMA-ES evaluates a population of 6-10 candidates per generation, so each
+            // "generation" needs 6-10 iterations. Old budgets (15/30) gave only 2-5 generations
+            // which isn't enough for the covariance matrix to learn meaningful correlations.
+            // New budgets give 4-8 generations per phase, enough for CMA-ES to converge.
+            //
+            // Sigma values are initial step sizes (fraction of morph range).
+            // CMA-ES adapts sigma automatically, so these are just starting points.
             _optSettings = new Dictionary<OptPhase, OptPhaseSettings>
             {
                 { OptPhase.Exploration, new OptPhaseSettings {
-                    Sigma = 0.50f,  // ±50% of range - broad search
-                    MaxIterations = 15,
-                    TargetScore = 0.50f,
+                    Sigma = 0.40f,  // ±40% of range - broad search
+                    MaxIterations = 40,   // ~5-6 CMA-ES generations
+                    // v3.0.36: Raised from 0.50 to 0.65. With wider ranges, 0.50 is trivial.
+                    TargetScore = 0.65f,
                     Description = "Broad search, find direction"
                 }},
                 { OptPhase.Refinement, new OptPhaseSettings {
-                    Sigma = 0.20f,  // ±20% of range - fine-tune
-                    MaxIterations = 30,
-                    TargetScore = 0.75f,
+                    Sigma = 0.15f,  // ±15% of range - fine-tune
+                    MaxIterations = 50,   // ~6-8 CMA-ES generations
+                    // v3.0.36: Raised from 0.75 to 0.85. With wider ranges, 0.75 is reached
+                    // almost immediately → premature lock → only 47 iterations total.
+                    // 0.85 forces the optimizer to keep refining fine details.
+                    TargetScore = 0.85f,
                     Description = "Fine-tune found direction"
                 }},
                 { OptPhase.PlateauEscape, new OptPhaseSettings {
-                    Sigma = 0.80f,  // ±80% of range - aggressive jumps!
-                    MaxIterations = 10,
+                    Sigma = 0.70f,  // ±70% of range - aggressive jumps!
+                    MaxIterations = 24,   // ~3-4 CMA-ES generations
                     TargetScore = 0.60f,
                     Description = "Large jumps to escape local minimum"
                 }},
                 { OptPhase.LockIn, new OptPhaseSettings {
-                    Sigma = 0.08f,  // ±8% of range - final polish
-                    MaxIterations = 5,
-                    TargetScore = 0.85f,
+                    Sigma = 0.06f,  // ±6% of range - final polish
+                    MaxIterations = 12,   // ~2 CMA-ES generations
+                    // v3.0.36: Raised from 0.85 to 0.93 to match inflated scores from wider ranges.
+                    TargetScore = 0.93f,
                     Description = "Final polish before locking"
                 }}
             };
@@ -169,7 +184,10 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
             }
             
             // === CHECK FOR PLATEAU ===
-            int plateauThreshold = CurrentOptPhase == OptPhase.Exploration ? 8 : 15;
+            // v3.0.29: Raised plateau thresholds for CMA-ES. Within a CMA-ES generation,
+            // individual candidates may score worse than the best, which shouldn't count as "no improvement".
+            // We need at least 2 full generations without improvement before declaring plateau.
+            int plateauThreshold = CurrentOptPhase == OptPhase.Exploration ? 18 : 25;
             if (_iterationsWithoutImprovement >= plateauThreshold)
             {
                 if (CurrentOptPhase == OptPhase.PlateauEscape)

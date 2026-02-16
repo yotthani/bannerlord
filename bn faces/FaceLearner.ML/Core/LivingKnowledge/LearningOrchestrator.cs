@@ -237,9 +237,14 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 }
             }
             
+            // v3.0.33: ViT age-gender as primary gender model
+            var vitDetector = new ViTGenderDetector();
+            string vitPath = _basePath + "Models/vit_age_gender.onnx";
+            vitDetector.Initialize(vitPath);
+
             _genderEnsemble = new GenderEnsemble();
-            _genderEnsemble.Initialize(fairFacePath);
-            
+            _genderEnsemble.Initialize(fairFacePath, _demographicDetector, vitDetector);
+
             _colorEnsemble = new ColorEnsemble();
             _colorEnsemble.Initialize(_fairFaceDetector);
             SubModule.Log("ColorEnsemble ready");

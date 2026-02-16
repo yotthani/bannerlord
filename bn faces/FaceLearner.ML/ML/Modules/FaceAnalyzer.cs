@@ -22,7 +22,7 @@ namespace FaceLearner.ML.Modules
         /// <summary>Face bounding box in original image</summary>
         public Rectangle FaceRect { get; set; }
         
-        /// <summary>468-point MediaPipe landmarks (or 68-point dlib)</summary>
+        /// <summary>468-point FaceMesh landmarks (936 floats)</summary>
         public float[] Landmarks { get; set; }
         
         /// <summary>Semantic face parsing result</summary>
@@ -102,7 +102,7 @@ namespace FaceLearner.ML.Modules
         {
             try
             {
-                // Initialize landmark detector (uses MediaPipe or dlib)
+                // Initialize landmark detector (uses FaceMesh 468)
                 _landmarkDetector = new LandmarkDetector();
                 if (!_landmarkDetector.Initialize(basePath))
                 {
@@ -244,7 +244,7 @@ namespace FaceLearner.ML.Modules
         {
             var result = new FaceAnalysisResult();
             
-            if (landmarks == null || landmarks.Length < 136)
+            if (landmarks == null || landmarks.Length < 936)
             {
                 return result;
             }

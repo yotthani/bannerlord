@@ -628,7 +628,7 @@ namespace FaceLearner.ML
             // This is harder to detect reliably without a trained model
             // For now, return no signal - can be enhanced later
             
-            if (landmarks == null || landmarks.Length < 136)
+            if (landmarks == null || landmarks.Length < 936)
                 return (false, 0f, 0f, "No landmarks");
             
             // Could analyze:

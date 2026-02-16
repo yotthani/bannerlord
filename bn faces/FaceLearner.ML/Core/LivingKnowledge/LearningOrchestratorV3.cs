@@ -54,7 +54,10 @@ namespace FaceLearner.ML.Core.LivingKnowledge
         private OrchestratorMemory _orchestratorMemory;       // Learns which strategies work best
         
         private readonly Random _random = new Random();
-        
+
+        // v3.0.29: CMA-ES optimizer (replaces Gaussian perturbation)
+        private CmaEsOptimizer _cmaEs;
+
         #endregion
         
         #region Demographics & Race
@@ -128,7 +131,11 @@ namespace FaceLearner.ML.Core.LivingKnowledge
         #region Constants
         
         private const int NUM_MORPHS = 62;
-        private const int MAX_ITERATIONS_PER_TARGET = 250;
+        // v3.0.29: Raised from 250 to 600. With CMA-ES population-based optimization,
+        // each generation needs PopulationSize evaluations. 13 SubPhases × ~40 iterations each = 520.
+        // 250 was too low — Foundation/Structure consumed all iterations and MajorFeatures never ran.
+        // The PhaseController already handles premature exit via phase transitions; this is just a safety net.
+        private const int MAX_ITERATIONS_PER_TARGET = 600;
         
         #endregion
         
@@ -179,9 +186,14 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 _fairFaceDetector.Load(fairFacePath);
             }
             
+            // v3.0.33: ViT age-gender as primary (most accurate) gender model
+            var vitDetector = new ViTGenderDetector();
+            string vitPath = _basePath + "Models/vit_age_gender.onnx";
+            vitDetector.Initialize(vitPath);
+
             _genderEnsemble = new GenderEnsemble();
-            _genderEnsemble.Initialize(fairFacePath);
-            
+            _genderEnsemble.Initialize(fairFacePath, _demographicDetector, vitDetector);
+
             _colorEnsemble = new ColorEnsemble();
             _colorEnsemble.Initialize(_fairFaceDetector);
             
@@ -243,7 +255,12 @@ namespace FaceLearner.ML.Core.LivingKnowledge
             _peakCount = 0;
             
             SubModule.Log("=== LEARNING V3 STARTED (Hierarchical) ===");
-            NextTarget();
+            if (!NextTarget())
+            {
+                SubModule.Log("=== NO TARGETS AVAILABLE — cannot start ===");
+                IsLearning = false;
+                return;
+            }
         }
         
         public void Stop()
@@ -320,11 +337,22 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 _targetFeatures,
                 currentFeatures);
             
-            // CRITICAL FIX: Track best morphs for THIS SubPhase based on TOTAL score, not SubPhase score!
-            // This prevents accepting changes that improve one feature but hurt others.
-            if (score.Total > _bestScoreForSubPhase)
+            // v3.0.29: Report fitness to CMA-ES optimizer
+            // CMA-ES uses the combined metric (SubPhase-focused) as fitness
+            float combinedScore = subPhaseScore * 0.70f + score.Total * 0.30f;
+            if (_cmaEs != null)
             {
-                _bestScoreForSubPhase = score.Total;  // Changed from subPhaseScore!
+                bool newGeneration = _cmaEs.ReportFitness(combinedScore, _currentMorphs);
+                if (newGeneration && IterationsOnTarget % 25 == 0)
+                {
+                    SubModule.Log($"  [CMA-ES] Gen {_cmaEs.Generation} complete, σ={_cmaEs.Sigma:F4}, best={_cmaEs.BestFitness:F3}");
+                }
+            }
+
+            // Track best morphs for SubPhase
+            if (combinedScore > _bestScoreForSubPhase && score.Total >= _bestTotalScore * 0.95f)
+            {
+                _bestScoreForSubPhase = combinedScore;
                 _bestMorphsForSubPhase = (float[])_currentMorphs.Clone();
             }
             
@@ -339,13 +367,16 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 // DEBUG: Log raw feature values to check if they're changing
                 if (IterationsOnTarget == 25 || IterationsOnTarget == 100)
                 {
+                    SubModule.Log($"    [DEBUG] Target Nose: W={_targetFeatures.NoseWidth:F3} L={_targetFeatures.NoseLength:F3} B={_targetFeatures.NoseBridge:F3} T={_targetFeatures.NoseTip:F3} N={_targetFeatures.NostrilWidth:F3}");
+                    SubModule.Log($"    [DEBUG] Current Nose: W={currentFeatures.NoseWidth:F3} L={currentFeatures.NoseLength:F3} B={currentFeatures.NoseBridge:F3} T={currentFeatures.NoseTip:F3} N={currentFeatures.NostrilWidth:F3}");
                     SubModule.Log($"    [DEBUG] Target Eyes: W={_targetFeatures.EyeWidth:F3} H={_targetFeatures.EyeHeight:F3} D={_targetFeatures.EyeDistance:F3}");
                     SubModule.Log($"    [DEBUG] Current Eyes: W={currentFeatures.EyeWidth:F3} H={currentFeatures.EyeHeight:F3} D={currentFeatures.EyeDistance:F3}");
                     SubModule.Log($"    [DEBUG] Target Mouth: W={_targetFeatures.MouthWidth:F3} H={_targetFeatures.MouthHeight:F3}");
                     SubModule.Log($"    [DEBUG] Current Mouth: W={currentFeatures.MouthWidth:F3} H={currentFeatures.MouthHeight:F3}");
                     SubModule.Log($"    [DEBUG] Target Brows: H={_targetFeatures.EyebrowHeight:F3} A={_targetFeatures.EyebrowArch:F3}");
                     SubModule.Log($"    [DEBUG] Current Brows: H={currentFeatures.EyebrowHeight:F3} A={currentFeatures.EyebrowArch:F3}");
-                    // NEW: Jaw/Chin features (critical for round vs pointed!)
+                    SubModule.Log($"    [DEBUG] Target Forehead: H={_targetFeatures.ForeheadHeight:F3} W={_targetFeatures.ForeheadWidth:F3}");
+                    SubModule.Log($"    [DEBUG] Current Forehead: H={currentFeatures.ForeheadHeight:F3} W={currentFeatures.ForeheadWidth:F3}");
                     SubModule.Log($"    [DEBUG] Target Jaw: Curve={_targetFeatures.JawCurvature:F3} Taper={_targetFeatures.JawTaper:F3}");
                     SubModule.Log($"    [DEBUG] Current Jaw: Curve={currentFeatures.JawCurvature:F3} Taper={currentFeatures.JawTaper:F3}");
                     SubModule.Log($"    [DEBUG] Target Chin: Point={_targetFeatures.ChinPointedness:F3} Drop={_targetFeatures.ChinDrop:F3}");
@@ -364,9 +395,11 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 SubModule.Log($"  ★ Peak: {score.Total:F3}");
             }
             
-            // CRITICAL FIX: Report TOTAL score to PhaseController, not SubPhase score!
-            // This ensures we only accept changes that improve the OVERALL face.
-            var action = _phaseController.ReportScore(score.Total, _currentMorphs);
+            // v3.0.28: Report combined score to PhaseController — 70% subphase focus, 30% total guard.
+            // Old approach (total-only) made the phase controller think nothing improved during
+            // individual feature optimization, causing premature phase transitions.
+            float phaseReportScore = subPhaseScore * 0.70f + score.Total * 0.30f;
+            var action = _phaseController.ReportScore(phaseReportScore, _currentMorphs);
             
             switch (action)
             {
@@ -376,18 +409,33 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 case PhaseAction.Complete:
                     SaveToKnowledgeTree();  // LEARNING: Save to knowledge tree!
                     SaveComparisonImage();
-                    NextTarget();
+                    if (!NextTarget())
+                    {
+                        SubModule.Log("=== ALL TARGETS COMPLETE ===");
+                        Stop();
+                        return;
+                    }
                     break;
                 case PhaseAction.Abort:
-                    NextTarget();
+                    if (!NextTarget())
+                    {
+                        SubModule.Log("=== ALL TARGETS COMPLETE (after abort) ===");
+                        Stop();
+                        return;
+                    }
                     break;
             }
-            
+
             if (IterationsOnTarget >= MAX_ITERATIONS_PER_TARGET)
             {
                 SaveToKnowledgeTree();  // LEARNING: Save even on timeout
                 SaveComparisonImage();
-                NextTarget();
+                if (!NextTarget())
+                {
+                    SubModule.Log("=== ALL TARGETS COMPLETE (timeout) ===");
+                    Stop();
+                    return;
+                }
             }
         }
         
@@ -481,87 +529,54 @@ namespace FaceLearner.ML.Core.LivingKnowledge
             }
         }
         
+        /// <summary>
+        /// v3.0.29: Initialize CMA-ES for the current SubPhase.
+        /// Called when SubPhase changes or at the start of a new target.
+        /// </summary>
+        private void InitializeCmaEs()
+        {
+            var activeMorphs = _phaseController.GetActiveMorphs();
+            var settings = _phaseController.GetCurrentSettings();
+
+            // Build per-morph min/max arrays from lock manager
+            float[] morphMin = new float[NUM_MORPHS];
+            float[] morphMax = new float[NUM_MORPHS];
+            for (int i = 0; i < NUM_MORPHS; i++)
+            {
+                var (lo, hi) = _lockManager.GetAllowedRange(i);
+                morphMin[i] = lo;
+                morphMax[i] = hi;
+            }
+
+            _cmaEs = new CmaEsOptimizer();
+            _cmaEs.Initialize(activeMorphs, _currentMorphs, settings.Sigma, morphMin, morphMax);
+
+            SubModule.Log($"  [CMA-ES] Init for {_phaseController.CurrentSubPhase}: " +
+                         $"dim={activeMorphs.Length}, pop={_cmaEs.PopulationSize}, σ={settings.Sigma:F2}");
+        }
+
+        /// <summary>
+        /// v3.0.29: Get next candidate from CMA-ES population.
+        /// Replaces the old Gaussian perturbation approach.
+        /// </summary>
         private void GenerateNextMorphs()
         {
-            var settings = _phaseController.GetCurrentSettings();
-            var activeMorphs = _phaseController.GetActiveMorphs();
-            
+            if (_cmaEs == null)
+            {
+                InitializeCmaEs();
+            }
+
+            // Get next candidate from CMA-ES
+            var candidate = _cmaEs.GetNextCandidate();
+            Array.Copy(candidate, _currentMorphs, NUM_MORPHS);
+
             // DEBUG: Log which morphs we're modifying
             if (IterationsOnTarget == 1 || IterationsOnTarget % 50 == 0)
             {
-                SubModule.Log($"  [DEBUG] Phase: {_phaseController.CurrentSubPhase}, ActiveMorphs: [{string.Join(",", activeMorphs)}]");
-            }
-            
-            if (_bestMorphsForSubPhase != null)
-                Array.Copy(_bestMorphsForSubPhase, _currentMorphs, NUM_MORPHS);
-            
-            // Get learned step size from OrchestratorMemory
-            float sigma = settings.Sigma;
-            if (_orchestratorMemory != null)
-            {
-                var learningPhase = MapToLearningPhase(_phaseController.CurrentOptPhase);
-                float recommendedStep = _orchestratorMemory.GetRecommendedStepSize(learningPhase, _currentScore);
-                if (recommendedStep > 0)
-                {
-                    sigma = recommendedStep;  // Use learned step size!
-                }
-            }
-            
-            // Get learned morph correlations for current feature
-            Dictionary<int, float> learnedMorphWeights = null;
-            if (_featureMorphLearning != null && !_featureMorphLearning.IsEmpty)
-            {
-                string featureName = _phaseController.CurrentSubPhase.ToString().ToLower();
-                learnedMorphWeights = _featureMorphLearning.GetBestMorphsForFeature(featureName, _currentScore);
-            }
-            
-            foreach (int idx in activeMorphs)
-            {
-                if (idx >= NUM_MORPHS) continue;
-                
-                var (minVal, maxVal) = _lockManager.GetAllowedRange(idx);
-                
-                // Get the official morph range for proportional variation
-                var (morphMin, morphMax, morphRange) = MorphGroups.GetMorphRange(idx);
-                float rangeScale = morphRange / 1.5f;  // Normalize to average range
-                
-                // Apply learned morph weight if available
-                float morphWeight = 1.0f;
-                if (learnedMorphWeights != null && learnedMorphWeights.TryGetValue(idx, out float weight))
-                {
-                    morphWeight = 0.5f + weight;  // Boost morphs that are known to help
-                }
-                
-                float u1 = (float)_random.NextDouble();
-                float u2 = (float)_random.NextDouble();
-                float gaussian = (float)(Math.Sqrt(-2.0 * Math.Log(u1 + 0.0001)) * Math.Cos(2.0 * Math.PI * u2));
-                
-                float oldValue = _currentMorphs[idx];
-                // Variation = gaussian * sigma * rangeScale * morphWeight
-                // rangeScale makes variations proportional to the morph's natural range
-                float variation = gaussian * sigma * rangeScale * morphWeight;
-                float newValue = Math.Max(minVal, Math.Min(maxVal, _currentMorphs[idx] + variation));
-                _currentMorphs[idx] = newValue;
-                
-                // DEBUG: Log first few morph changes
-                if (IterationsOnTarget == 1 && idx == activeMorphs[0])
-                {
-                    SubModule.Log($"  [DEBUG] Morph[{idx}]: {oldValue:F3} -> {newValue:F3} (σ={sigma:F3}, var={variation:F3})");
-                }
-            }
-            
-            // Record this mutation for learning
-            if (_orchestratorMemory != null)
-            {
-                var learningPhase = MapToLearningPhase(_phaseController.CurrentOptPhase);
-                bool usedTree = learnedMorphWeights != null && learnedMorphWeights.Count > 0;
-                _orchestratorMemory.RecordMutation(
-                    learningPhase,
-                    sigma,
-                    activeMorphs.Length,
-                    _previousScore,
-                    _currentScore,
-                    usedTree);
+                var activeMorphs = _phaseController.GetActiveMorphs();
+                SubModule.Log($"  [CMA-ES] Phase: {_phaseController.CurrentSubPhase}, " +
+                             $"Gen={_cmaEs.Generation}, Candidate={_cmaEs.CurrentCandidateIndex}/{_cmaEs.PopulationSize}, " +
+                             $"σ={_cmaEs.Sigma:F4}, ActiveMorphs: [{string.Join(",", activeMorphs)}]");
             }
         }
         
@@ -601,19 +616,12 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                         using (var bitmap = new Bitmap(ms))
                         {
                             var fullLandmarks = _detector.DetectLandmarks(bitmap);
-                            
-                            // CRITICAL: Convert FaceMesh 468 to Dlib 68 format for FeatureExtractor!
-                            // FaceMesh returns 468*2=936 or 468*3=1404 floats
-                            // FeatureExtractor expects Dlib 68*2=136 floats
-                            if (fullLandmarks != null && fullLandmarks.Length > 200)
-                            {
-                                _currentTarget.Landmarks = LandmarkDetector.ConvertFaceMeshTo68(fullLandmarks);
-                                SubModule.Log($"  Converted {fullLandmarks.Length} landmarks to Dlib 68 format");
-                            }
-                            else
-                            {
-                                _currentTarget.Landmarks = fullLandmarks;
-                            }
+
+                            // v3.0.27: Pass FULL FaceMesh 468 landmarks directly to FeatureExtractor
+                            _currentTarget.Landmarks = fullLandmarks;
+                            if (fullLandmarks != null)
+                                SubModule.Log($"  Landmarks: {fullLandmarks.Length} floats (FaceMesh 468)");
+
                         }
                     }
                     catch (Exception ex)
@@ -852,9 +860,16 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 var startingMorphs = _hierarchicalKnowledge.GetStartingMorphs(_targetLandmarks, metadata, NUM_MORPHS);
                 if (startingMorphs != null && startingMorphs.Length > 0)
                 {
-                    // Use morphs from knowledge tree!
-                    Array.Copy(startingMorphs, _currentMorphs, Math.Min(startingMorphs.Length, _currentMorphs.Length));
-                    SubModule.Log($"  [Init] Starting morphs from knowledge tree (not empty)");
+                    // v3.0.29: Knowledge tree as HINT, not gospel.
+                    // Blend 50% neutral + 50% tree suggestion. This prevents the tree from
+                    // converging all faces to a mean face while still giving CMA-ES a better
+                    // starting direction than pure neutral.
+                    const float treeInfluence = 0.50f;
+                    for (int i = 0; i < Math.Min(startingMorphs.Length, _currentMorphs.Length); i++)
+                    {
+                        _currentMorphs[i] = _currentMorphs[i] * (1f - treeInfluence) + startingMorphs[i] * treeInfluence;
+                    }
+                    SubModule.Log($"  [Init] Knowledge tree hint (blend={treeInfluence:F0}%, not full override)");
                 }
                 else
                 {
@@ -876,9 +891,18 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 SubModule.Log($"  [Init] Tree empty, using demographic fallback");
             }
             
+            // v3.0.34: Feature-based morph initialization.
+            // After demographic fallback (or tree hint), adjust morphs based on actual target features.
+            // This gives CMA-ES a much better starting point, especially for round faces where
+            // the default neutral (0.50) chin morphs produce too-pointed chins.
+            if (_targetFeatures != null)
+            {
+                ApplyFeatureBasedInit(_currentMorphs, _targetFeatures);
+            }
+
             // Apply to character
             _faceController.SetAllMorphs(_currentMorphs);
-            
+
             _startingMorphs = (float[])_currentMorphs.Clone();  // Save for learning comparison
             _bestMorphs = (float[])_currentMorphs.Clone();
             _startingScore = 0;  // Will be set after first evaluation
@@ -933,6 +957,116 @@ namespace FaceLearner.ML.Core.LivingKnowledge
             }
             
             SubModule.Log($"    Demographic fallback: {(isFemale ? "Female" : "Male")}, Age={age:F0}");
+        }
+
+        /// <summary>
+        /// v3.0.34: Feature-based morph initialization.
+        /// Adjusts morphs based on actual target photo features (chin roundness, jaw width,
+        /// nose width, eye size, etc.) to give CMA-ES a better starting point.
+        /// Called AFTER demographic fallback, so it refines rather than replaces.
+        /// </summary>
+        private void ApplyFeatureBasedInit(float[] morphs, FeatureSet target)
+        {
+            // === CHIN ROUNDNESS ===
+            // ChinPointedness: 0=round, 1=pointed. Engine default (0.50 morphs) produces ~0.23.
+            // For round chins (< 0.20), push morphs toward rounder settings.
+            if (target.ChinPointedness < 0.20f)
+            {
+                // v3.0.40: Very round chin — push chin morphs more aggressively.
+                // Previous init was too mild: chin_shape max 0.75, jaw_line min 0.30.
+                // Engine needs more extreme values to produce round chins.
+                // Also add chin_forward (51) — forward chin appears rounder.
+                float roundness = 1f - target.ChinPointedness / 0.20f;  // 1.0 = maximally round, 0.0 = borderline
+                morphs[52] = Math.Min(0.85f, morphs[52] + roundness * 0.30f);  // chin_shape toward round (was +0.20, max 0.75)
+                morphs[48] = Math.Max(0.15f, morphs[48] - roundness * 0.25f);  // jaw_line: stronger pull (was -0.15, min 0.30)
+                morphs[53] = Math.Max(0.25f, morphs[53] - roundness * 0.15f);  // chin_length shorter (was -0.10, min 0.30)
+                morphs[51] = Math.Min(0.65f, morphs[51] + roundness * 0.10f);  // chin_forward more prominent
+                SubModule.Log($"    [FeatureInit] Round chin (pointedness={target.ChinPointedness:F2}): m52={morphs[52]:F2} m48={morphs[48]:F2} m53={morphs[53]:F2} m51={morphs[51]:F2}");
+            }
+            else if (target.ChinPointedness > 0.60f)
+            {
+                // Pointed chin — push chin_shape lower
+                float pointedness = (target.ChinPointedness - 0.60f) / 0.40f;  // 0-1 scale
+                morphs[52] = Math.Max(0.25f, morphs[52] - pointedness * 0.20f);  // chin_shape toward pointed
+                morphs[51] = Math.Min(0.65f, morphs[51] + pointedness * 0.10f);  // chin_forward more
+                SubModule.Log($"    [FeatureInit] Pointed chin (pointedness={target.ChinPointedness:F2}): m52={morphs[52]:F2} m51={morphs[51]:F2}");
+            }
+
+            // === JAW WIDTH ===
+            // JawWidth: 0=narrow, 1=wide. Affects morph 48 (jaw_line).
+            if (target.JawWidth > 0.85f)
+            {
+                morphs[48] = Math.Min(0.70f, morphs[48] + 0.10f);  // wider jaw
+                SubModule.Log($"    [FeatureInit] Wide jaw ({target.JawWidth:F2}): m48={morphs[48]:F2}");
+            }
+            else if (target.JawWidth < 0.70f)
+            {
+                morphs[48] = Math.Max(0.30f, morphs[48] - 0.10f);  // narrower jaw
+            }
+
+            // === NOSE WIDTH ===
+            // NoseWidth: 0=narrow, 1=wide. Affects morph 30 (nose_size) and 31 (nose_width).
+            if (target.NoseWidth > 0.50f)
+            {
+                float noseWide = (target.NoseWidth - 0.50f) / 0.50f;
+                morphs[30] = Math.Min(0.70f, morphs[30] + noseWide * 0.15f);  // nose_size
+                morphs[31] = Math.Min(0.70f, morphs[31] + noseWide * 0.15f);  // nose_width
+            }
+            else if (target.NoseWidth < 0.30f)
+            {
+                float noseNarrow = (0.30f - target.NoseWidth) / 0.30f;
+                morphs[30] = Math.Max(0.30f, morphs[30] - noseNarrow * 0.15f);
+                morphs[31] = Math.Max(0.30f, morphs[31] - noseNarrow * 0.15f);
+            }
+
+            // === EYE SIZE ===
+            // EyeHeight: 0=small, 1=large. Affects morph 19 (eye_size).
+            if (target.EyeHeight > 0.50f)
+            {
+                float eyeBig = (target.EyeHeight - 0.50f) / 0.50f;
+                morphs[19] = Math.Min(0.70f, morphs[19] + eyeBig * 0.15f);  // eye_size
+            }
+            else if (target.EyeHeight < 0.25f)
+            {
+                float eyeSmall = (0.25f - target.EyeHeight) / 0.25f;
+                morphs[19] = Math.Max(0.30f, morphs[19] - eyeSmall * 0.15f);
+            }
+
+            // === MOUTH WIDTH ===
+            // MouthWidth: 0=narrow, 1=wide. Affects morph 40 (mouth_width).
+            if (target.MouthWidth > 0.55f)
+            {
+                float mouthWide = (target.MouthWidth - 0.55f) / 0.45f;
+                morphs[40] = Math.Min(0.70f, morphs[40] + mouthWide * 0.15f);
+            }
+            else if (target.MouthWidth < 0.30f)
+            {
+                float mouthNarrow = (0.30f - target.MouthWidth) / 0.30f;
+                morphs[40] = Math.Max(0.30f, morphs[40] - mouthNarrow * 0.15f);
+            }
+
+            // === LIP THICKNESS ===
+            // UpperLipThickness + LowerLipThickness: affects morph 43 (lip_thickness).
+            float avgLip = (target.UpperLipThickness + target.LowerLipThickness) / 2f;
+            if (avgLip > 0.40f)
+            {
+                morphs[43] = Math.Min(0.75f, morphs[43] + (avgLip - 0.40f) * 0.30f);
+            }
+            else if (avgLip < 0.20f)
+            {
+                morphs[43] = Math.Max(0.30f, morphs[43] - (0.20f - avgLip) * 0.30f);
+            }
+
+            // === FACE WIDTH ===
+            // FaceWidth (bias-corrected ~0.40-0.50): affects morph 0 (face_width).
+            if (target.FaceWidth > 0.60f)
+            {
+                morphs[0] = Math.Min(0.70f, morphs[0] + 0.10f);  // wider face
+            }
+            else if (target.FaceWidth < 0.45f)
+            {
+                morphs[0] = Math.Max(0.30f, morphs[0] - 0.10f);  // narrower face
+            }
         }
         
         #endregion
@@ -1264,10 +1398,10 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 _phaseStartScore = _currentScore;
                 _phaseStartIteration = IterationsOnTarget;
                 _lastSubPhase = sub;
-                
+
                 _bestScoreForSubPhase = 0f;
                 _bestMorphsForSubPhase = null;
-                
+
                 // Restore global best morphs at the START of each new SubPhase
                 if (_bestMorphs != null)
                 {
@@ -1275,8 +1409,28 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                     _faceController.SetAllMorphs(_currentMorphs);
                     SubModule.Log($"  [RESET] Restored global best for: {sub}");
                 }
+
+                // v3.0.29: Initialize new CMA-ES for this SubPhase
+                InitializeCmaEs();
             }
-            
+            else if (_cmaEs != null && opt == OptPhase.PlateauEscape)
+            {
+                // v3.0.29: On PlateauEscape, reinitialize CMA-ES with larger sigma
+                // This gives the optimizer a fresh start with broader search
+                var activeMorphs = _phaseController.GetActiveMorphs();
+                float[] morphMin = new float[NUM_MORPHS];
+                float[] morphMax = new float[NUM_MORPHS];
+                for (int i = 0; i < NUM_MORPHS; i++)
+                {
+                    var (lo, hi) = _lockManager.GetAllowedRange(i);
+                    morphMin[i] = lo;
+                    morphMax[i] = hi;
+                }
+                _cmaEs = new CmaEsOptimizer();
+                _cmaEs.Initialize(activeMorphs, _currentMorphs, 0.80f, morphMin, morphMax);
+                SubModule.Log($"  [CMA-ES] PlateauEscape: reinit with σ=0.80");
+            }
+
             SubModule.Log($"  [PHASE] {main}/{sub}/{opt}");
         }
         

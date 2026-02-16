@@ -231,19 +231,17 @@ namespace FaceLearner.ML
                         return (new float[62], 0f);
                     }
                     
-                    // Convert FaceMesh 468 to Dlib 68 format
-                    var landmarks = fullLandmarks.Length > 200 
-                        ? LandmarkDetector.ConvertFaceMeshTo68(fullLandmarks) 
-                        : fullLandmarks;
-                    
-                    if (landmarks == null || landmarks.Length < 136)
+                    // v3.0.27: Pass full FaceMesh 468 landmarks directly
+                    var landmarks = fullLandmarks;
+
+                    if (landmarks == null || landmarks.Length < 936)
                     {
-                        SubModule.Log("Landmark conversion failed");
+                        SubModule.Log("Landmark detection failed (need FaceMesh 468)");
                         return (new float[62], 0f);
                     }
-                    
+
                     progress?.Invoke(0.3f);
-                    
+
                     // Detect gender and age from the image
                     float detectedAge = 30f;
                     bool detectedFemale = isFemale;  // Use passed value as fallback
@@ -329,14 +327,12 @@ namespace FaceLearner.ML
                         return result;
                     }
                     
-                    // Convert FaceMesh 468 to Dlib 68 format
-                    var landmarks = fullLandmarks.Length > 200 
-                        ? LandmarkDetector.ConvertFaceMeshTo68(fullLandmarks) 
-                        : fullLandmarks;
-                    
-                    if (landmarks == null || landmarks.Length < 136)
+                    // v3.0.27: Pass full FaceMesh 468 landmarks directly
+                    var landmarks = fullLandmarks;
+
+                    if (landmarks == null || landmarks.Length < 936)
                     {
-                        result.ErrorMessage = "Landmark conversion failed";
+                        result.ErrorMessage = "Landmark detection failed (need FaceMesh 468)";
                         return result;
                     }
                     progress?.Invoke(0.15f);
@@ -733,16 +729,8 @@ namespace FaceLearner.ML
                     return false;
                 }
                 
-                // CRITICAL: Convert FaceMesh 468 to Dlib 68 format for FeatureExtractor!
-                float[] renderedLandmarks;
-                if (fullLandmarks.Length > 200)
-                {
-                    renderedLandmarks = LandmarkDetector.ConvertFaceMeshTo68(fullLandmarks);
-                }
-                else
-                {
-                    renderedLandmarks = fullLandmarks;
-                }
+                // v3.0.27: Pass FULL FaceMesh 468 landmarks directly — no more lossy 68 conversion!
+                float[] renderedLandmarks = fullLandmarks;
                 
                 // Feed to orchestrator - this does scoring, learning, mutation
                 _orchestrator.OnRenderCaptured(renderedLandmarks);
@@ -1113,16 +1101,11 @@ namespace FaceLearner.ML
             
             // Fallback to landmark-based gender estimation
             var fullLandmarks = _landmarkDetector?.DetectLandmarks(imagePath);
-            if (fullLandmarks != null && fullLandmarks.Length >= 136)
+            if (fullLandmarks != null && fullLandmarks.Length >= 936)
             {
-                // Convert FaceMesh 468 to Dlib 68 format
-                var landmarks = fullLandmarks.Length > 200 
-                    ? LandmarkDetector.ConvertFaceMeshTo68(fullLandmarks) 
-                    : fullLandmarks;
-                
-                if (landmarks != null && landmarks.Length >= 136)
+                // v3.0.27: Pass full FaceMesh 468 landmarks directly
                 {
-                    var result = LandmarkGenderEstimator.EstimateGender(landmarks);
+                    var result = LandmarkGenderEstimator.EstimateGender(fullLandmarks);
                     isFemale = result.isFemale;
                     SubModule.Log($"  Landmarks: {(isFemale ? "F" : "M")}({result.confidence:F2})");
                 }

@@ -102,7 +102,7 @@ namespace FaceLearner.Core.LivingKnowledge
         /// </summary>
         public void SetTargetLandmarks(float[] landmarks)
         {
-            if (!_isReady || landmarks == null || landmarks.Length < 136)
+            if (!_isReady || landmarks == null || landmarks.Length < 936)
             {
                 _targetLandmarks = null;
                 _targetProportions = null;

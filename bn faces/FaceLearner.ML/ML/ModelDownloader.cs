@@ -11,11 +11,7 @@ namespace FaceLearner.ML
     /// </summary>
     public static class ModelDownloader
     {
-        // Dlib 68-point model - use https
-        private const string DLIB_MODEL_URL = "https://github.com/davisking/dlib-models/raw/master/shape_predictor_68_face_landmarks.dat.bz2";
-        private const string DLIB_MODEL_FILENAME = "shape_predictor_68_face_landmarks.dat";
-        
-        // MediaPipe FaceMesh 468-point model (ONNX) 
+        // MediaPipe FaceMesh 468-point model (ONNX)
         // From PINTO Model Zoo: 032_FaceMesh/01_float32/face_landmark.onnx
         // Place in: FaceLearner/Models/face_landmark.onnx
         private const string FACEMESH_MODEL_FILENAME = "face_landmark.onnx";
@@ -50,27 +46,11 @@ namespace FaceLearner.ML
         }
         
         /// <summary>
-        /// Check if Dlib model exists
-        /// </summary>
-        public static bool ModelExists(string modelsDir)
-        {
-            return File.Exists(Path.Combine(modelsDir, DLIB_MODEL_FILENAME));
-        }
-        
-        /// <summary>
         /// Check if FaceMesh model exists
         /// </summary>
         public static bool FaceMeshModelExists(string modelsDir)
         {
             return File.Exists(Path.Combine(modelsDir, FACEMESH_MODEL_FILENAME));
-        }
-        
-        /// <summary>
-        /// Get full path to Dlib model file
-        /// </summary>
-        public static string GetModelPath(string modelsDir)
-        {
-            return Path.Combine(modelsDir, DLIB_MODEL_FILENAME);
         }
         
         /// <summary>
@@ -162,73 +142,6 @@ namespace FaceLearner.ML
         }
         
         /// <summary>
-        /// Download and extract Dlib model (synchronous)
-        /// </summary>
-        public static bool DownloadModel(string modelsDir)
-        {
-            try
-            {
-                if (!Directory.Exists(modelsDir))
-                    Directory.CreateDirectory(modelsDir);
-                
-                string bz2Path = Path.Combine(modelsDir, DLIB_MODEL_FILENAME + ".bz2");
-                string datPath = Path.Combine(modelsDir, DLIB_MODEL_FILENAME);
-                
-                if (File.Exists(datPath))
-                {
-                    OnProgress?.Invoke("Dlib model already exists");
-                    return true;
-                }
-                
-                // Try multiple URLs
-                string[] urls = {
-                    DLIB_MODEL_URL,
-                    "http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2",
-                    "https://huggingface.co/spaces/asdasdasdasd/Face68Landmarks/resolve/main/shape_predictor_68_face_landmarks.dat.bz2"
-                };
-                
-                bool downloaded = false;
-                foreach (var url in urls)
-                {
-                    try
-                    {
-                        OnProgress?.Invoke($"Downloading Dlib model from: {url}");
-                        if (DownloadFile(url, bz2Path))
-                        {
-                            downloaded = true;
-                            break;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        OnProgress?.Invoke($"URL failed: {ex.Message}");
-                    }
-                }
-                
-                if (!downloaded)
-                {
-                    OnProgress?.Invoke("All download URLs failed");
-                    return false;
-                }
-                
-                // Extract BZ2
-                OnProgress?.Invoke("Extracting model...");
-                ExtractBz2(bz2Path, datPath);
-                
-                // Cleanup
-                try { File.Delete(bz2Path); } catch { }
-                
-                OnProgress?.Invoke("Dlib model ready!");
-                return File.Exists(datPath);
-            }
-            catch (Exception ex)
-            {
-                OnProgress?.Invoke($"Download failed: {ex.Message}");
-                return false;
-            }
-        }
-        
-        /// <summary>
         /// Check for FaceMesh ONNX model - no auto-download, must be in project
         /// </summary>
         public static bool DownloadFaceMeshModel(string modelsDir)
@@ -253,14 +166,6 @@ namespace FaceLearner.ML
         {
             // DownloadFaceMeshModel now handles both landmark and detection models
             return DownloadFaceMeshModel(modelsDir);
-        }
-        
-        /// <summary>
-        /// Download model async
-        /// </summary>
-        public static async Task<bool> DownloadModelAsync(string modelsDir)
-        {
-            return await Task.Run(() => DownloadModel(modelsDir));
         }
         
         /// <summary>
