@@ -24,7 +24,7 @@ namespace FaceLearner.ML
     public class SubModule : MBSubModuleBase
     {
         // ML Addon has its own version (independent of Core)
-        public const string VERSION = "3.0.40";
+        public const string VERSION = "3.0.41";
         public const string MOD_NAME = "FaceLearner.ML";
         
         public static string ModulePath { get; private set; }

@@ -81,6 +81,8 @@ namespace FaceLearner.ML.Core.LivingKnowledge
         private FeatureSet _targetFeatures;
         private string _currentTargetImagePath;
         private DemographicDetector.Demographics? _cachedDemographics;
+        private string _cachedRace;       // v3.0.41: FairFace race string (e.g. "East Asian", "Black")
+        private float _cachedRaceConf;    // v3.0.41: Race confidence
         private int _lastSourceIndex = -1;
         
         #endregion
@@ -692,6 +694,8 @@ namespace FaceLearner.ML.Core.LivingKnowledge
             _bestHierarchicalScore = null;  // v3.0.24
             _bestRenderFeatures = null;  // v3.0.24
             _cachedDemographics = null;
+            _cachedRace = null;
+            _cachedRaceConf = 0f;
             _scoreHistory.Clear();
             _phaseController.Reset();
         }
@@ -727,6 +731,8 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                     }
                     if (!string.IsNullOrEmpty(genderResult.Race))
                     {
+                        _cachedRace = genderResult.Race;
+                        _cachedRaceConf = genderResult.RaceConfidence;
                         SubModule.Log($"    Race: {genderResult.Race} (conf={genderResult.RaceConfidence:F2})");
                     }
                     
@@ -900,6 +906,14 @@ namespace FaceLearner.ML.Core.LivingKnowledge
                 ApplyFeatureBasedInit(_currentMorphs, _targetFeatures);
             }
 
+            // v3.0.41: Ethnicity-aware morph initialization.
+            // FairFace detects race — use it to bias key morphs for better starting point.
+            // This runs AFTER feature-based init so it refines, not replaces.
+            if (!string.IsNullOrEmpty(_cachedRace) && _cachedRaceConf > 0.40f)
+            {
+                ApplyEthnicityInit(_currentMorphs, _cachedRace, _cachedRaceConf);
+            }
+
             // Apply to character
             _faceController.SetAllMorphs(_currentMorphs);
 
@@ -1005,18 +1019,25 @@ namespace FaceLearner.ML.Core.LivingKnowledge
             }
 
             // === NOSE WIDTH ===
-            // NoseWidth: 0=narrow, 1=wide. Affects morph 30 (nose_size) and 31 (nose_width).
+            // v3.0.40: FIXED morph indices! Previous code used 30/31 (nose_bridge/nose_tip_height).
+            // Correct indices from MorphGroups.cs: 32=nose_size, 33=nose_width, 35=nostril_scale.
             if (target.NoseWidth > 0.50f)
             {
                 float noseWide = (target.NoseWidth - 0.50f) / 0.50f;
-                morphs[30] = Math.Min(0.70f, morphs[30] + noseWide * 0.15f);  // nose_size
-                morphs[31] = Math.Min(0.70f, morphs[31] + noseWide * 0.15f);  // nose_width
+                morphs[32] = Math.Min(0.70f, morphs[32] + noseWide * 0.20f);  // nose_size (was morph 30!)
+                morphs[33] = Math.Min(0.70f, morphs[33] + noseWide * 0.20f);  // nose_width (was morph 31!)
+                morphs[35] = Math.Min(0.65f, morphs[35] + noseWide * 0.10f);  // nostril_scale wider
+                SubModule.Log($"    [FeatureInit] Wide nose (width={target.NoseWidth:F2}): m32={morphs[32]:F2} m33={morphs[33]:F2} m35={morphs[35]:F2}");
             }
-            else if (target.NoseWidth < 0.30f)
+            else if (target.NoseWidth < 0.40f)
             {
-                float noseNarrow = (0.30f - target.NoseWidth) / 0.30f;
-                morphs[30] = Math.Max(0.30f, morphs[30] - noseNarrow * 0.15f);
-                morphs[31] = Math.Max(0.30f, morphs[31] - noseNarrow * 0.15f);
+                // v3.0.40: Expanded from <0.30 to <0.40 and made more aggressive.
+                // Many faces have NoseWidth 0.30-0.40 that still look narrow.
+                float noseNarrow = (0.40f - target.NoseWidth) / 0.40f;  // 0-1 scale
+                morphs[32] = Math.Max(0.20f, morphs[32] - noseNarrow * 0.25f);  // nose_size smaller
+                morphs[33] = Math.Max(0.20f, morphs[33] - noseNarrow * 0.25f);  // nose_width narrower
+                morphs[35] = Math.Max(0.30f, morphs[35] - noseNarrow * 0.15f);  // nostril_scale smaller
+                SubModule.Log($"    [FeatureInit] Narrow nose (width={target.NoseWidth:F2}): m32={morphs[32]:F2} m33={morphs[33]:F2} m35={morphs[35]:F2}");
             }
 
             // === EYE SIZE ===
@@ -1069,10 +1090,82 @@ namespace FaceLearner.ML.Core.LivingKnowledge
             }
         }
         
+        /// <summary>
+        /// v3.0.41: Ethnicity-aware morph initialization.
+        /// Uses FairFace race detection to bias key morphs for ethnic features.
+        /// Called AFTER ApplyFeatureBasedInit so it refines rather than replaces.
+        /// The strength scales with race confidence (0.40-1.0).
+        /// </summary>
+        private void ApplyEthnicityInit(float[] morphs, string race, float confidence)
+        {
+            // Scale adjustments by confidence (40% conf = half strength, 100% conf = full strength)
+            float strength = Math.Min(1f, (confidence - 0.40f) / 0.60f);  // 0-1 scale
+
+            switch (race)
+            {
+                case "East Asian":
+                case "Southeast Asian":
+                    // Monolid eyes (morph 20): THE key morph for Asian eyes
+                    // Engine range: -0.50 to 0.90. Neutral = 0.50. Push toward 0.65-0.75 for monolid.
+                    morphs[20] = Math.Min(0.80f, morphs[20] + strength * 0.25f);  // monolid_eyes
+                    // Flatter nose bridge (morph 30): Asian faces typically have lower bridges
+                    morphs[30] = Math.Max(0.30f, morphs[30] - strength * 0.15f);  // nose_bridge lower
+                    // Slightly wider face (morph 0): East Asian faces tend to be wider
+                    morphs[0] = Math.Min(0.70f, morphs[0] + strength * 0.10f);    // face_width
+                    // Fuller cheeks (morph 4)
+                    morphs[4] = Math.Min(0.65f, morphs[4] + strength * 0.08f);    // cheeks fuller
+                    // Wider cheekbones (morph 6)
+                    morphs[6] = Math.Min(0.65f, morphs[6] + strength * 0.08f);    // cheekbone_width
+                    // Eye shape adjustments
+                    morphs[24] = Math.Max(0.35f, morphs[24] - strength * 0.08f);  // eye_outer_corner: slight downturn
+                    SubModule.Log($"    [EthnicInit] {race} (conf={confidence:F2}, str={strength:F2}): monolid={morphs[20]:F2} bridge={morphs[30]:F2} faceW={morphs[0]:F2}");
+                    break;
+
+                case "Black":
+                    // Wider nose (morphs 32, 33): African faces typically have wider noses
+                    morphs[32] = Math.Min(0.70f, morphs[32] + strength * 0.15f);  // nose_size
+                    morphs[33] = Math.Min(0.75f, morphs[33] + strength * 0.18f);  // nose_width
+                    morphs[35] = Math.Min(0.70f, morphs[35] + strength * 0.10f);  // nostril_scale
+                    // Flatter nose bridge
+                    morphs[30] = Math.Max(0.25f, morphs[30] - strength * 0.18f);  // nose_bridge lower
+                    // Fuller lips (morph 43)
+                    morphs[43] = Math.Min(0.75f, morphs[43] + strength * 0.15f);  // lip_thickness
+                    // Wider face
+                    morphs[0] = Math.Min(0.70f, morphs[0] + strength * 0.08f);    // face_width
+                    // Wider mouth
+                    morphs[40] = Math.Min(0.68f, morphs[40] + strength * 0.10f);  // mouth_width
+                    SubModule.Log($"    [EthnicInit] {race} (conf={confidence:F2}, str={strength:F2}): noseW={morphs[33]:F2} bridge={morphs[30]:F2} lips={morphs[43]:F2}");
+                    break;
+
+                case "Indian":
+                    // Moderate nose width
+                    morphs[33] = Math.Min(0.65f, morphs[33] + strength * 0.08f);  // nose_width slightly wider
+                    // Slightly deeper eyes (morph 22)
+                    morphs[22] = Math.Min(0.65f, morphs[22] + strength * 0.08f);  // eye_depth
+                    // Fuller lips
+                    morphs[43] = Math.Min(0.65f, morphs[43] + strength * 0.08f);  // lip_thickness
+                    SubModule.Log($"    [EthnicInit] {race} (conf={confidence:F2}, str={strength:F2}): noseW={morphs[33]:F2} lips={morphs[43]:F2}");
+                    break;
+
+                case "Middle Eastern":
+                    // More prominent nose (morph 30, 28)
+                    morphs[30] = Math.Min(0.65f, morphs[30] + strength * 0.08f);  // nose_bridge higher
+                    morphs[28] = Math.Min(0.65f, morphs[28] + strength * 0.08f);  // nose_angle
+                    // Stronger brow ridge (morph 14)
+                    morphs[14] = Math.Min(0.65f, morphs[14] + strength * 0.08f);  // eyebrow_depth
+                    SubModule.Log($"    [EthnicInit] {race} (conf={confidence:F2}, str={strength:F2}): bridge={morphs[30]:F2} browDepth={morphs[14]:F2}");
+                    break;
+
+                // "White", "Latino": no specific morph adjustments needed (engine default mesh is already European)
+                default:
+                    break;
+            }
+        }
+
         #endregion
-        
+
         #region Feature Classification Logging
-        
+
         private void LogFeatureClassification(Dictionary<string, float> metadata)
         {
             if (_hierarchicalKnowledge == null || _targetLandmarks == null)

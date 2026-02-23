@@ -301,32 +301,42 @@ namespace FaceLearner.ML
             bool unanimousFemale = femaleVotes == nnCount && nnCount >= 2;
             bool majorityFemaleVote = femaleVotes > maleVotes;
 
+            // v3.0.40: Beard override with ViT guard.
+            // IsBeardPixel() has high false positive rate on shadows, dark skin, makeup, etc.
+            // Example: 1473033823 (Asian woman with shadow) → beardRatio=0.57, beardConf=0.95!
+            // KEY RULE: ViT is the most reliable model (94.3% accuracy).
+            // If ViT says Female, beard pixel detection CANNOT override it.
+            // Beard can only override when ViT says Male (or is unavailable).
+            bool vitSaysFemale = hasViT && vitFemale && vitConf > 0.50f;
+
             if (beardDetected && beardConfidence > 0.60f)
             {
                 if (unanimousFemale)
                 {
-                    // ALL NNs say Female — beard detection is almost certainly a false positive
-                    // (dark skin, shadow, lips, etc.) Trust the NNs here.
-                    SubModule.Log($"  Gender: BEARD BLOCKED — all {nnCount} NNs say Female, beard is likely false positive (conf={beardConfidence:F2})");
+                    // ALL NNs say Female — beard is certainly a false positive
+                    SubModule.Log($"  Gender: BEARD BLOCKED — all {nnCount} NNs say Female, beard is false positive (conf={beardConfidence:F2})");
+                }
+                else if (vitSaysFemale)
+                {
+                    // ViT says Female — trust it over pixel-based beard detection.
+                    // ViT (94.3%) is more reliable than IsBeardPixel() which false-fires on
+                    // shadows, dark skin, makeup, and hair near chin.
+                    SubModule.Log($"  Gender: BEARD BLOCKED — ViT says Female (conf={vitConf:F2}), beard detection unreliable (conf={beardConfidence:F2})");
                 }
                 else if (majorityFemaleVote && beardConfidence < 0.85f)
                 {
-                    // Majority Female (2-1) — only override with very strong beard signal
+                    // Majority Female (2-1, ViT not Female) — only override with very strong beard
                     SubModule.Log($"  Gender: BEARD BLOCKED — majority Female ({femaleVotes}/{nnCount}), beard conf {beardConfidence:F2} < 0.85 threshold");
                 }
                 else
                 {
-                    // NNs support Male (majority or split) OR very strong beard with weak majority Female
+                    // ViT says Male (or unavailable) + beard detected → override fires
                     float overrideConf = Math.Min(0.92f, 0.50f + beardConfidence);
                     SubModule.Log($"  Gender: BEARD OVERRIDE → Male (beard={beardConfidence:F2}, femaleNNs={femaleVotes}/{nnCount})");
                     return new EnsembleResult
                     {
-                        IsFemale = false,
-                        Confidence = overrideConf,
-                        Age = age,
-                        Race = race,
-                        RaceConfidence = raceConf,
-                        Votes = votes,
+                        IsFemale = false, Confidence = overrideConf, Age = age,
+                        Race = race, RaceConfidence = raceConf, Votes = votes,
                         Decision = $"BeardOverride({beardConfidence:F2})→M"
                     };
                 }
@@ -410,7 +420,6 @@ namespace FaceLearner.ML
                 else
                 {
                     // 2-1 majority
-                    // Check which NNs are in the majority
                     string majorityNNs = "";
                     string dissenterNN = "";
                     float dissenterConf = 0f;
@@ -419,10 +428,35 @@ namespace FaceLearner.ML
                     if (hasInsightFace && (ifFemale == majorityFemale)) majorityNNs += "IF,"; else { dissenterNN = "IF"; dissenterConf = ifConf; }
                     majorityNNs = majorityNNs.TrimEnd(',');
 
-                    // Penalty from dissenter confidence
-                    float penalty = dissenterConf * 0.3f;
-                    majorityConf = Math.Max(0.35f, 0.70f - penalty);
-                    SubModule.Log($"  Gender: TRIPLE-NN MAJORITY ({majorityNNs}) → {(majorityFemale ? "Female" : "Male")} vs {dissenterNN} (conf={majorityConf:F2})");
+                    // v3.0.40: ViT override — if ViT dissents with high confidence AND
+                    // the other two NNs have weak combined confidence, trust ViT.
+                    // ViT (94.3%) is more reliable than FF or IF individually.
+                    // But if both FF and IF are confident, their combined signal is strong.
+                    // Example: 1473033823 — ViT F(0.89) vs FF M(0.61)+IF M(0.96)
+                    //   FF is weak (0.61), IF is strong (0.96). Average = 0.785.
+                    //   ViT 0.89 > avg 0.785 → ViT wins.
+                    float otherAvgConf = 0f;
+                    int otherCount = 0;
+                    if (hasFairFace && ffFemale != vitFemale) { otherAvgConf += ffConf; otherCount++; }
+                    if (hasInsightFace && ifFemale != vitFemale) { otherAvgConf += ifConf; otherCount++; }
+                    if (otherCount > 0) otherAvgConf /= otherCount;
+
+                    if (dissenterNN == "ViT" && vitConf > 0.80f && vitConf > otherAvgConf)
+                    {
+                        // ViT is more confident than the average of the opposing NNs → trust ViT
+                        bool vitResult = vitFemale;
+                        float vitOverrideConf = Math.Min(0.80f, vitConf * 0.7f);
+                        SubModule.Log($"  Gender: VIT OVERRIDE — ViT {(vitResult ? "F" : "M")}({vitConf:F2}) > avg opposition ({otherAvgConf:F2}) → trusting ViT");
+                        majorityFemale = vitResult;
+                        majorityConf = vitOverrideConf;
+                    }
+                    else
+                    {
+                        // Normal majority vote with penalty from dissenter
+                        float penalty = dissenterConf * 0.3f;
+                        majorityConf = Math.Max(0.35f, 0.70f - penalty);
+                        SubModule.Log($"  Gender: TRIPLE-NN MAJORITY ({majorityNNs}) → {(majorityFemale ? "Female" : "Male")} vs {dissenterNN} (conf={majorityConf:F2})");
+                    }
                 }
 
                 return new EnsembleResult

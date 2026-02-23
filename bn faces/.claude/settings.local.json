@@ -52,7 +52,9 @@
       "Bash(\"C:\\\\Program Files\\\\AILocal\\\\python\\\\3.10\\\\python.exe\":*)",
       "Bash(\"C:\\\\Program Files\\\\AILocal\\\\python\\\\3.10\\\\python.exe\" -c:*)",
       "Bash(del /Q \"D:\\\\Steam\\\\steamapps\\\\common\\\\Mount & Blade II Bannerlord\\\\Modules\\\\FaceLearner.ML\\\\Data\\\\Comparisons\\\\*.png\")",
-      "Bash(del /Q \"D:\\\\Steam\\\\steamapps\\\\common\\\\Mount & Blade II Bannerlord\\\\Modules\\\\FaceLearner.ML\\\\Data\\\\Comparisons\\\\*.txt\")"
+      "Bash(del /Q \"D:\\\\Steam\\\\steamapps\\\\common\\\\Mount & Blade II Bannerlord\\\\Modules\\\\FaceLearner.ML\\\\Data\\\\Comparisons\\\\*.txt\")",
+      "Bash(del \"D:\\\\Steam\\\\steamapps\\\\common\\\\Mount & Blade II Bannerlord\\\\Modules\\\\FaceLearner\\\\Data\\\\hierarchical_knowledge.dat\" \"D:\\\\Steam\\\\steamapps\\\\common\\\\Mount & Blade II Bannerlord\\\\Modules\\\\FaceLearner\\\\Data\\\\feature_morph_learning.dat\" \"D:\\\\Steam\\\\steamapps\\\\common\\\\Mount & Blade II Bannerlord\\\\Modules\\\\FaceLearner\\\\Data\\\\feature_intelligence.dat\" \"D:\\\\Steam\\\\steamapps\\\\common\\\\Mount & Blade II Bannerlord\\\\Modules\\\\FaceLearner\\\\Data\\\\phase_manager.dat\" \"D:\\\\Steam\\\\steamapps\\\\common\\\\Mount & Blade II Bannerlord\\\\Modules\\\\FaceLearner\\\\Data\\\\orchestrator_memory.dat\")",
+      "Bash(Select-String -Pattern \"error|Fehler|succeeded|erfolgreich\")"
     ]
   }
 }

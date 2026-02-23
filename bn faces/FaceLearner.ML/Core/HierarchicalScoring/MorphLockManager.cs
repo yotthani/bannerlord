@@ -38,14 +38,19 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
             if (allowedVariation < 0)
                 allowedVariation = DefaultAllowedVariation;
             
+            // v3.0.40: Use extended engine morph ranges for lock bounds
+            var (engineMin, engineMax, range) = MorphGroups.GetMorphRange(morphIndex);
+            float extension = range * 0.50f;
+            float extMin = engineMin - extension;
+            float extMax = engineMax + extension;
             _locks[morphIndex] = new MorphLock
             {
                 MorphIndex = morphIndex,
                 LockedValue = currentValue,
                 AllowedVariation = allowedVariation,
                 LockedAt = DateTime.Now,
-                MinValue = Math.Max(0f, currentValue - allowedVariation),
-                MaxValue = Math.Min(1f, currentValue + allowedVariation)
+                MinValue = Math.Max(extMin, currentValue - allowedVariation),
+                MaxValue = Math.Min(extMax, currentValue + allowedVariation)
             };
         }
         
@@ -100,7 +105,7 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
         
         /// <summary>
         /// Get the allowed range for a morph.
-        /// Returns (0, 1) if not locked, or the locked range.
+        /// Returns engine-extended range if not locked, or the locked range.
         /// </summary>
         public (float min, float max) GetAllowedRange(int morphIndex)
         {
@@ -108,7 +113,14 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
             {
                 return (morph.MinValue, morph.MaxValue);
             }
-            return (0f, 1f);
+            // v3.0.40: Use EXTENDED engine morph ranges — go BEYOND DeformKeyData limits!
+            // The engine does NOT clamp KeyWeights. DeformKeyData min/max are just UI guidelines.
+            // Real testing shows morphs work from -3 to +5 and beyond.
+            // We extend the official range by 50% on each side for maximum face variety.
+            // This is what makes us BETTER than the in-game editor (which limits to ~0.2-1.0).
+            var (engineMin, engineMax, range) = MorphGroups.GetMorphRange(morphIndex);
+            float extension = range * 0.50f;  // 50% extension on each side
+            return (engineMin - extension, engineMax + extension);
         }
         
         /// <summary>

@@ -300,8 +300,12 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                     return null;  // No bias — wider range handles photo/render variance
 
                 case SubPhase.FaceHeight:
-                    // v3.0.35: REMOVED fixed bias. Same reason as FaceWidth.
-                    return null;  // No bias — wider range handles photo/render variance
+                    // v3.0.41: Re-added moderate bias. v3.0.35 removed it but 20-face test shows
+                    // consistent Photo 0.76-0.89, Render 0.63-0.65 (avg diff ~0.18).
+                    // The 0.30 range absorbs some but NormDiff=0.60→Match=0.64 is harsh.
+                    // Moderate -0.12 bias: Photo 0.83-0.12=0.71 vs Render 0.64 → diff=0.07 → Match=0.95.
+                    // For tight crops (Photo 0.76): 0.76-0.12=0.64 vs Render 0.65 → diff=0.01 → Match=1.0.
+                    return new[] { -0.12f };
 
                 // FaceShape contours are RELATIVE (normalized by maxWidth) → much less bias
 
@@ -315,43 +319,49 @@ namespace FaceLearner.ML.Core.HierarchicalScoring
                     return new[] { 0f, 0f, -0.15f, 0f };  // [Width, Height, Pointedness, Drop]
 
                 case SubPhase.Eyes:
-                    // v3.0.38: EyeDistance has systematic bbox bias.
-                    // Photo inner-corner-dist / faceWidth ratio is always higher than render:
-                    //   1285416547: Photo=0.77, Render=0.76 (small bias, tightly cropped)
-                    //   1332972396: Photo=0.97, Render=0.79 (Diff=0.18! wide crop)
-                    //   1383493764: Photo=0.93, Render=0.80 (Diff=0.13)
-                    // Photo crops often include more forehead→ wider faceWidth→ higher ratio.
-                    // Correction 0.10 = moderate offset (won't hurt tight crops too much).
+                    // v3.0.41: Added EyeOpenness bias. Engine renders consistently show lower
+                    // EyeOpenness than photos (Photo 0.45-0.66, Render 0.28-0.41, avg diff ~0.20).
+                    // Engine eye meshes have narrower openings than real eyes.
+                    // EyeDistance bbox bias: Photo ~0.97, Render ~0.80 (Photo crop includes more forehead).
                     // [Width, Height, Distance, Angle, VertPos, Openness]
-                    return new[] { 0f, 0f, 0.10f, 0f, 0f, 0f };
+                    return new[] { 0f, 0f, 0.10f, 0f, 0f, -0.18f };
 
                 case SubPhase.Forehead:
-                    // v3.0.38: ForeheadWidth has systematic bbox bias.
-                    // Photo temple-to-temple / faceWidth is always higher:
-                    //   1332972396: Photo=0.82, Render=0.65 (Diff=0.17!)
-                    //   1383493764: Photo=0.83, Render=0.66 (Diff=0.17!)
-                    //   1285416547: Photo=0.54, Render=0.60 (no bias — tight crop)
-                    // Correction 0.12 = moderate offset (tight crops will undershoot slightly).
+                    // v3.0.41: ForeheadWidth bias increased from 0.03 to 0.08.
+                    // v3.0.40 data (20 faces): Photo 0.52-0.82, Render 0.58-0.67 (avg diff ~0.08).
+                    // 0.03 was too low — still leaving ForeheadWidth Match at 0.60-0.70.
+                    // 0.08 = moderate correction. Photo 0.73-0.08=0.65 vs Render 0.65 → Match=1.0.
+                    // Wide crops (0.82) will have corrected 0.74 vs 0.65 → diff=0.09 → Match=0.88.
                     // [Height, Width]
-                    return new[] { 0f, 0.12f };
+                    return new[] { 0f, 0.08f };
 
                 case SubPhase.Nose:
-                    // v3.0.40: NoseLength and NoseBridge have systematic photo→render bias.
-                    // Renders always produce HIGHER values than photos:
-                    //   NoseLength: Photo 0.34-0.44, Render 0.53-0.61 (avg diff ~+0.18)
-                    //   NoseBridge: Photo 0.11-0.15, Render 0.27-0.35 (avg diff ~+0.18)
-                    // This is because render nose landmarks have different geometry than real noses
-                    // (engine noses are proportionally longer/higher bridge than real faces).
-                    // Negative bias = photo value INCREASES to match render range.
+                    // v3.0.41: Added NoseWidth bias. All nose features systematically differ:
+                    //   NoseWidth:  Photo 0.44-0.56, Render 0.38-0.42 (avg diff ~0.10)
+                    //   NoseLength: Photo 0.34-0.86, Render 0.51-0.54 (avg diff ~0.17)
+                    //   NoseBridge: Photo 0.11-0.62, Render 0.27-0.34 (avg diff ~0.17)
+                    // Engine noses are proportionally longer/higher bridge than real faces,
+                    // and narrower overall. Negative bias = photo value INCREASES.
                     // [Width, Length, Bridge, Tip, NostrilFlare]
-                    return new[] { 0f, -0.18f, -0.18f, 0f, 0f };
+                    return new[] { -0.08f, -0.18f, -0.18f, 0f, 0f };
 
                 case SubPhase.Eyebrows:
-                    // v3.0.34: BrowThick bias — Photo brow thickness is systematically HIGHER
-                    // than renders (engine brows are thinner).
-                    // Observed: Photo ~0.33-0.40, Render ~0.12-0.24. Offset ~0.12.
-                    // BrowHeight, BrowArch, BrowAngle: no clear systematic bias.
-                    return new[] { 0f, 0f, 0.12f, 0f };  // [Height, Arch, Thickness, Angle]
+                    // v3.0.41: Added BrowHeight bias. Engine brow landmarks are systematically lower:
+                    //   BrowHeight: Photo 0.59-0.75, Render 0.50-0.54 (avg diff ~0.16)
+                    //   BrowThick:  Photo 0.21-0.25, Render 0.12-0.20 (avg diff ~0.08) — keep 0.12 from v3.0.34
+                    // BrowAngle also shows bias: Photo 0.51-0.70, Render 0.48-0.56 (avg diff ~0.10)
+                    // [Height, Arch, Thickness, Angle]
+                    return new[] { -0.14f, 0f, 0.12f, -0.10f };
+
+                case SubPhase.Mouth:
+                    // v3.0.41: Mouth features have systematic photo→render bias.
+                    // Engine mouths are proportionally narrower/shorter than real faces:
+                    //   MouthWidth:  Photo 0.59-0.78, Render 0.53-0.57 (avg diff ~0.14)
+                    //   MouthHeight: Photo 0.49-0.81, Render 0.54-0.65 (avg diff ~0.12)
+                    //   UpperLip:    Photo 0.27-0.38, Render 0.16-0.25 (avg diff ~0.10)
+                    //   LowerLip:    varies (sometimes Photo < Render), no clear bias
+                    // [Width, Height, UpperLip, LowerLip, VertPos]
+                    return new[] { -0.12f, -0.10f, -0.08f, 0f, 0f };
 
                 default:
                     return null;  // No bias correction needed
