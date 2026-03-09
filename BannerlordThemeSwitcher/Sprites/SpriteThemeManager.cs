@@ -84,6 +84,10 @@ namespace BannerlordThemeSwitcher.Sprites
             }
 
             // Cache miss — load fresh from disk
+            Debug.Print($"[ThemeSwitcher] SpriteThemeManager: Cache miss, loading from disk...");
+            Debug.Print($"[ThemeSwitcher] SpriteThemeManager: ThemePath={theme.ThemePath}");
+            Debug.Print($"[ThemeSwitcher] SpriteThemeManager: HasSpriteOverrides={theme.HasSpriteOverrides}");
+
             LoadResult loadResult = LoadFromDisk(theme);
 
             if (loadResult == null || !loadResult.Success)
@@ -92,6 +96,8 @@ namespace BannerlordThemeSwitcher.Sprites
                     $"{loadResult?.Error ?? "no sprite directory found"}");
                 return;
             }
+
+            Debug.Print($"[ThemeSwitcher] SpriteThemeManager: Loaded {loadResult.Parts.Count} parts, {loadResult.Textures.Count} textures");
 
             // Apply optional SpriteConfig.xml overrides (nine-slice borders, aliases)
             var configPath = Path.Combine(theme.ThemePath, "SpriteConfig.xml");
