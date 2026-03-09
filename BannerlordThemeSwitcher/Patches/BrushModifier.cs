@@ -312,16 +312,15 @@ namespace BannerlordThemeSwitcher.Patches
                 }
                 
                 var themeBrushes = _themeBrushData.TryGetValue(themeId, out var data) ? data : null;
-                var renderColors = new Dictionary<string, Color>();
                 int xmlModified = 0;
                 int autoModified = 0;
-                
+
                 foreach (var kvp in brushes.ToList())
                 {
                     var brushName = kvp.Key;
                     var brush = kvp.Value;
                     ThemeBrushData brushData = null;
-                    
+
                     // Check for XML-defined brush
                     if (themeBrushes != null && themeBrushes.TryGetValue(brushName, out brushData))
                     {
@@ -333,10 +332,6 @@ namespace BannerlordThemeSwitcher.Patches
                         {
                             brushes[brushName] = themed;
                             xmlModified++;
-                            // Only track render colors for brushes where layer colors
-                            // were actually applied (flat/fill layers without sprites)
-                            if (brushData._anyLayerColorApplied && brushData.HasLayerColor)
-                                renderColors[brushName] = brushData.LayerColor;
                         }
                     }
                     // AutoTheme mode - apply pattern-based theming
@@ -353,8 +348,6 @@ namespace BannerlordThemeSwitcher.Patches
                             {
                                 brushes[brushName] = themed;
                                 autoModified++;
-                                if (brushData._anyLayerColorApplied && brushData.HasLayerColor)
-                                    renderColors[brushName] = brushData.LayerColor;
                             }
                         }
                     }
@@ -380,10 +373,14 @@ namespace BannerlordThemeSwitcher.Patches
                 }
 
                 _currentThemeId = themeId;
-                BrushRendererPatch.SetThemeColors(renderColors);
+
+                // Disable render-time color overrides — cloned brushes handle all theming.
+                // The render patch was harmful: it overrode all layer colors with a single
+                // flat color (losing per-layer distinctions) and set FontColor to the layer
+                // color (wrong for text). Clones set correct per-layer and per-style colors.
+                BrushRendererPatch.SetThemeColors(null);
 
                 Debug.Print($"[ThemeSwitcher] Modified: {xmlModified} from XML, {autoModified} from AutoTheme");
-                Debug.Print($"[ThemeSwitcher] RenderColors: {renderColors.Count} brushes with flat-layer overrides");
                 Debug.Print($"[ThemeSwitcher] Total game brushes: {brushes.Count}");
                 Debug.Print($"[ThemeSwitcher] ═══════════════════════════════════════════════════════");
             }
@@ -449,19 +446,20 @@ namespace BannerlordThemeSwitcher.Patches
         /// <summary>
         /// Apply brush data to create a themed brush.
         ///
-        /// IMPORTANT: Layer colors are only applied to layers WITHOUT sprites.
-        /// In Bannerlord, layer.Color acts as a multiply-tint on sprite textures.
-        /// Setting a dark color on a sprite layer makes it invisible (dark × texture = near-black).
-        /// Sprite-based layers should be themed via the SpriteThemeManager instead.
+        /// Layer colors act as multiply-tints on sprite textures — this is the PRIMARY
+        /// mechanism for UI theming in Bannerlord. Sprites are neutral/white shapes that
+        /// get their visual color from layer.Color. We apply all explicitly-specified
+        /// colors from ThemedBrushes.xml but do NOT fallback-color unspecified layers.
+        ///
+        /// The cloned brush handles all theming persistently — no render-time patch needed.
         /// </summary>
         private static Brush ApplyBrushData(Brush original, ThemeBrushData data)
         {
             try
             {
                 var themed = original.Clone();
-                bool anyLayerColorApplied = false;
 
-                // Apply default style colors (font/text — always safe)
+                // Apply default style colors (font/text)
                 if (themed.DefaultStyle != null)
                 {
                     if (data.HasFontColor)
@@ -472,23 +470,18 @@ namespace BannerlordThemeSwitcher.Patches
                         themed.DefaultStyle.TextOutlineColor = data.TextOutlineColor;
                 }
 
-                // Apply layer colors — ONLY to explicitly named layers WITHOUT sprites
-                // Skip: (1) layers with sprite textures (tinting breaks them)
-                //        (2) layers not explicitly named in the theme data (no more fallback)
+                // Apply layer colors to explicitly named layers (including sprite-textured ones).
+                // In Bannerlord, layer.Color is a multiply-tint — this IS how you theme sprites.
+                // Only layers explicitly named in ThemedBrushes.xml get colors; unspecified layers
+                // keep their vanilla colors (no aggressive fallback).
                 if (data.LayerColors.Count > 0)
                 {
                     foreach (var layer in themed.Layers)
                     {
                         if (data.LayerColors.TryGetValue(layer.Name, out var color))
                         {
-                            // Only apply color to flat/fill layers (no sprite texture)
-                            if (layer.Sprite == null)
-                            {
-                                layer.Color = color;
-                                anyLayerColorApplied = true;
-                            }
+                            layer.Color = color;
                         }
-                        // Removed: fallback that colored ALL unspecified layers
                     }
                 }
 
@@ -504,7 +497,7 @@ namespace BannerlordThemeSwitcher.Patches
                         StyleColorData styleData = null;
                         if (data.StyleColors.TryGetValue(styleName, out styleData))
                         {
-                            // Font/text colors — always safe to apply
+                            // Font/text colors
                             if (styleData.HasFontColor)
                                 style.FontColor = styleData.FontColor;
                             if (styleData.HasGlowColor)
@@ -512,36 +505,26 @@ namespace BannerlordThemeSwitcher.Patches
                             if (styleData.HasOutlineColor)
                                 style.TextOutlineColor = styleData.TextOutlineColor;
 
-                            // Style layer colors — only on flat layers (no sprites)
+                            // Style layer colors — apply to explicitly named layers
                             var styleLayers = _layersField?.GetValue(style) as Dictionary<string, StyleLayer>;
                             if (styleLayers != null && (styleData.HasLayerColor || styleData.LayerColors.Count > 0))
                             {
                                 foreach (var layerKvp in styleLayers)
                                 {
-                                    // Skip sprite-based layers
-                                    if (layerKvp.Value.SourceLayer?.Sprite != null)
-                                        continue;
-
                                     if (styleData.LayerColors.TryGetValue(layerKvp.Key, out var layerColor))
                                     {
                                         layerKvp.Value.Color = layerColor;
-                                        anyLayerColorApplied = true;
                                     }
-                                    // Removed: fallback to default style layer color
                                 }
                             }
                         }
                         else if (data.HasFontColor)
                         {
-                            // Apply default font color to unspecified styles (safe)
+                            // Apply default font color to unspecified styles
                             style.FontColor = data.FontColor;
-                            // Removed: aggressive layer color override on unspecified styles
                         }
                     }
                 }
-
-                // Track whether any layer colors were actually applied
-                data._anyLayerColorApplied = anyLayerColorApplied;
 
                 return themed;
             }
@@ -869,10 +852,6 @@ namespace BannerlordThemeSwitcher.Patches
             public bool HasLayerColor;
             public Dictionary<string, Color> LayerColors = new Dictionary<string, Color>();
             public Dictionary<string, StyleColorData> StyleColors = new Dictionary<string, StyleColorData>();
-
-            // Set by ApplyBrushData: true if any layer colors were actually applied
-            // (false when all layers had sprites and were skipped)
-            internal bool _anyLayerColorApplied;
         }
         
         private class StyleColorData
