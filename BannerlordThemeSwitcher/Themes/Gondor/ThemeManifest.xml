@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Kingdom of Gondor</Name>
+  <Description>The White City — Tower of Guard. Silver and blue.</Description>
+  <Author>BannerlordThemeSwitcher (LOTR Test)</Author>
+  <Version>1.0.0</Version>
+  <BaseCulture>empire</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>empire</Kingdom>
+  </BoundKingdoms>
+  <Components Brushes="true" Sprites="true" />
+  <ColorScheme>
+    <Primary>#DCDCEB</Primary>
+    <Secondary>#4664A0</Secondary>
+    <Tertiary>#B4B4C8</Tertiary>
+    <Text>#E6F0FFEE</Text>
+    <TextMuted>#A0B0C8</TextMuted>
+    <TextHighlight>#E6F0FF</TextHighlight>
+    <TextTitle>#DCDCEB</TextTitle>
+    <TextOnPrimary>#1E2332</TextOnPrimary>
+    <TextDisabled>#607080</TextDisabled>
+    <Background>#1E233299</Background>
+    <BackgroundDark>#141822BB</BackgroundDark>
+    <BackgroundLight>#2A3040AA</BackgroundLight>
+    <BackgroundAccent>#4664A020</BackgroundAccent>
+    <BackgroundHover>#4664A040</BackgroundHover>
+    <BackgroundSelected>#4664A060</BackgroundSelected>
+    <Border>#8CA0C8AA</Border>
+    <BorderMuted>#8CA0C855</BorderMuted>
+    <BorderHighlight>#DCDCEBFF</BorderHighlight>
+    <BorderSecondary>#4664A0AA</BorderSecondary>
+    <ButtonBackground>#4664A025</ButtonBackground>
+    <ButtonHover>#4664A050</ButtonHover>
+    <ButtonPressed>#4664A080</ButtonPressed>
+    <ButtonDisabled>#40506044</ButtonDisabled>
+    <ButtonBorder>#8CA0C8CC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#FFA500</Warning>
+    <Error>#DC143C</Error>
+    <Info>#4169E1</Info>
+    <Gold>#C0C0C0</Gold>
+    <Experience>#6A8CCE</Experience>
+    <Health>#DC143C</Health>
+    <Morale>#32CD32</Morale>
+    <Shadow>#14182288</Shadow>
+    <Glow>#4664A066</Glow>
+  </ColorScheme>
+</Theme>

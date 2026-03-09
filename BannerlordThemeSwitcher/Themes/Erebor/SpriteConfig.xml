@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteConfig>
+  <!-- Nine-slice border definitions for Kingdom Under the Mountain -->
+  <NineRegion sprite="button_canvas_9" left="12" right="12" top="12" bottom="12" />
+  <NineRegion sprite="button_frame_9" left="12" right="12" top="12" bottom="12" />
+  <NineRegion sprite="frame_9" left="16" right="16" top="16" bottom="16" />
+  <NineRegion sprite="rounded_frame_9" left="12" right="12" top="12" bottom="12" />
+  <NineRegion sprite="rounded_canvas_9" left="12" right="12" top="12" bottom="12" />
+  <NineRegion sprite="BlankWhiteSquare_9" left="4" right="4" top="4" bottom="4" />
+  <NineRegion sprite="dialog_option_canvas_9" left="8" right="8" top="8" bottom="8" />
+  <NineRegion sprite="scroll_button_9" left="6" right="6" top="6" bottom="6" />
+</SpriteConfig>

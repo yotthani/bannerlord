@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Corsairs of Umbar</Name>
+  <Description>Black sails and sea-steel. Raiders of the southern coast.</Description>
+  <Author>BannerlordThemeSwitcher (LOTR Test)</Author>
+  <Version>1.0.0</Version>
+  <BaseCulture>khuzait</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms />
+  <Components Brushes="true" Sprites="true" />
+  <ColorScheme>
+    <Primary>#1E3250</Primary>
+    <Secondary>#A02828</Secondary>
+    <Tertiary>#324664</Tertiary>
+    <Text>#D0E0F0EE</Text>
+    <TextMuted>#8090A8</TextMuted>
+    <TextHighlight>#B43C3C</TextHighlight>
+    <TextTitle>#6E7E96</TextTitle>
+    <TextOnPrimary>#0A0F19</TextOnPrimary>
+    <TextDisabled>#506070</TextDisabled>
+    <Background>#0A0F1999</Background>
+    <BackgroundDark>#060A12BB</BackgroundDark>
+    <BackgroundLight>#1E2838AA</BackgroundLight>
+    <BackgroundAccent>#1E325020</BackgroundAccent>
+    <BackgroundHover>#1E325040</BackgroundHover>
+    <BackgroundSelected>#A0282840</BackgroundSelected>
+    <Border>#6E7E82AA</Border>
+    <BorderMuted>#6E7E8255</BorderMuted>
+    <BorderHighlight>#B43C3CFF</BorderHighlight>
+    <BorderSecondary>#1E3250AA</BorderSecondary>
+    <ButtonBackground>#1E325025</ButtonBackground>
+    <ButtonHover>#A0282840</ButtonHover>
+    <ButtonPressed>#A0282870</ButtonPressed>
+    <ButtonDisabled>#30405044</ButtonDisabled>
+    <ButtonBorder>#6E7E82CC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#FFA500</Warning>
+    <Error>#A02828</Error>
+    <Info>#4169E1</Info>
+    <Gold>#C0A040</Gold>
+    <Experience>#6080B0</Experience>
+    <Health>#A02828</Health>
+    <Morale>#32CD32</Morale>
+    <Shadow>#060A1288</Shadow>
+    <Glow>#A0282866</Glow>
+  </ColorScheme>
+</Theme>

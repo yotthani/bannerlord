@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Dominion of Harad</Name>
+  <Description>South-kingdom of crimson and gold. Desert sun and oliphaunts.</Description>
+  <Author>BannerlordThemeSwitcher (LOTR Test)</Author>
+  <Version>1.0.0</Version>
+  <BaseCulture>aserai</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>aserai</Kingdom>
+  </BoundKingdoms>
+  <Components Brushes="true" Sprites="true" />
+  <ColorScheme>
+    <Primary>#B4281E</Primary>
+    <Secondary>#C8A032</Secondary>
+    <Tertiary>#DC5032</Tertiary>
+    <Text>#FFF0E0EE</Text>
+    <TextMuted>#C8A080</TextMuted>
+    <TextHighlight>#F0C850</TextHighlight>
+    <TextTitle>#C8A032</TextTitle>
+    <TextOnPrimary>#280F0A</TextOnPrimary>
+    <TextDisabled>#705040</TextDisabled>
+    <Background>#280F0A99</Background>
+    <BackgroundDark>#1E0A06BB</BackgroundDark>
+    <BackgroundLight>#3C1A10AA</BackgroundLight>
+    <BackgroundAccent>#B4281E20</BackgroundAccent>
+    <BackgroundHover>#B4281E40</BackgroundHover>
+    <BackgroundSelected>#B4281E60</BackgroundSelected>
+    <Border>#C8A032AA</Border>
+    <BorderMuted>#C8A03255</BorderMuted>
+    <BorderHighlight>#F0C850FF</BorderHighlight>
+    <BorderSecondary>#B4281EAA</BorderSecondary>
+    <ButtonBackground>#B4281E25</ButtonBackground>
+    <ButtonHover>#B4281E50</ButtonHover>
+    <ButtonPressed>#B4281E80</ButtonPressed>
+    <ButtonDisabled>#50302044</ButtonDisabled>
+    <ButtonBorder>#C8A032CC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#FFA500</Warning>
+    <Error>#B4281E</Error>
+    <Info>#4169E1</Info>
+    <Gold>#F0C850</Gold>
+    <Experience>#DC5032</Experience>
+    <Health>#B4281E</Health>
+    <Morale>#32CD32</Morale>
+    <Shadow>#1E0A0688</Shadow>
+    <Glow>#B4281E66</Glow>
+  </ColorScheme>
+</Theme>

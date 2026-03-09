@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Kingdom Under the Mountain</Name>
+  <Description>Dwarven halls of stone and gold. Forged in fire.</Description>
+  <Author>BannerlordThemeSwitcher (LOTR Test)</Author>
+  <Version>1.0.0</Version>
+  <BaseCulture>sturgia</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>sturgia</Kingdom>
+  </BoundKingdoms>
+  <Components Brushes="true" Sprites="true" />
+  <ColorScheme>
+    <Primary>#8C6432</Primary>
+    <Secondary>#B4321E</Secondary>
+    <Tertiary>#645A50</Tertiary>
+    <Text>#FFF0DCEE</Text>
+    <TextMuted>#C8B090</TextMuted>
+    <TextHighlight>#DCB450</TextHighlight>
+    <TextTitle>#C8A03C</TextTitle>
+    <TextOnPrimary>#231A14</TextOnPrimary>
+    <TextDisabled>#706050</TextDisabled>
+    <Background>#231A1499</Background>
+    <BackgroundDark>#160F0ABB</BackgroundDark>
+    <BackgroundLight>#3A2A1EAA</BackgroundLight>
+    <BackgroundAccent>#8C643220</BackgroundAccent>
+    <BackgroundHover>#8C643240</BackgroundHover>
+    <BackgroundSelected>#8C643260</BackgroundSelected>
+    <Border>#C8A03CAA</Border>
+    <BorderMuted>#C8A03C55</BorderMuted>
+    <BorderHighlight>#DCBA50FF</BorderHighlight>
+    <BorderSecondary>#B4321EAA</BorderSecondary>
+    <ButtonBackground>#8C643225</ButtonBackground>
+    <ButtonHover>#8C643250</ButtonHover>
+    <ButtonPressed>#8C643280</ButtonPressed>
+    <ButtonDisabled>#50403044</ButtonDisabled>
+    <ButtonBorder>#C8A03CCC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#FFA500</Warning>
+    <Error>#B4321E</Error>
+    <Info>#4169E1</Info>
+    <Gold>#DCBA50</Gold>
+    <Experience>#C87832</Experience>
+    <Health>#B4321E</Health>
+    <Morale>#32CD32</Morale>
+    <Shadow>#160F0A88</Shadow>
+    <Glow>#B4321E66</Glow>
+  </ColorScheme>
+</Theme>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteConfig>
+  <!-- Custom nine-slice borders (different from default 16px) -->
+  <NineRegion sprite="custom_border_9" left="8" right="8" top="8" bottom="8" />
+
+  <!-- Alias: use my_custom_button.png as replacement for vanilla button_canvas_9 -->
+  <Alias file="my_custom_button.png" replaces="button_canvas_9" />
+</SpriteConfig>

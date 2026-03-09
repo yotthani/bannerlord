@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Kingdom of Rohan</Name>
+  <Description>Riders of the Mark — Green and gold, wind and horse.</Description>
+  <Author>BannerlordThemeSwitcher (LOTR Test)</Author>
+  <Version>1.0.0</Version>
+  <BaseCulture>vlandia</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>vlandia</Kingdom>
+  </BoundKingdoms>
+  <Components Brushes="true" Sprites="true" />
+  <ColorScheme>
+    <Primary>#3C7832</Primary>
+    <Secondary>#C8AA32</Secondary>
+    <Tertiary>#5A9646</Tertiary>
+    <Text>#F0FFE8EE</Text>
+    <TextMuted>#A0C890</TextMuted>
+    <TextHighlight>#F0DC50</TextHighlight>
+    <TextTitle>#C8AA32</TextTitle>
+    <TextOnPrimary>#1A2314</TextOnPrimary>
+    <TextDisabled>#607050</TextDisabled>
+    <Background>#1A231499</Background>
+    <BackgroundDark>#0F160BBB</BackgroundDark>
+    <BackgroundLight>#2A3820AA</BackgroundLight>
+    <BackgroundAccent>#3C783220</BackgroundAccent>
+    <BackgroundHover>#3C783240</BackgroundHover>
+    <BackgroundSelected>#3C783260</BackgroundSelected>
+    <Border>#C8AA32AA</Border>
+    <BorderMuted>#C8AA3255</BorderMuted>
+    <BorderHighlight>#F0DC50FF</BorderHighlight>
+    <BorderSecondary>#3C7832AA</BorderSecondary>
+    <ButtonBackground>#3C783225</ButtonBackground>
+    <ButtonHover>#3C783250</ButtonHover>
+    <ButtonPressed>#3C783280</ButtonPressed>
+    <ButtonDisabled>#40503844</ButtonDisabled>
+    <ButtonBorder>#C8AA32CC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#FFA500</Warning>
+    <Error>#DC143C</Error>
+    <Info>#4169E1</Info>
+    <Gold>#C8AA32</Gold>
+    <Experience>#6B8E23</Experience>
+    <Health>#DC143C</Health>
+    <Morale>#32CD32</Morale>
+    <Shadow>#0F160B88</Shadow>
+    <Glow>#C8AA3266</Glow>
+  </ColorScheme>
+</Theme>

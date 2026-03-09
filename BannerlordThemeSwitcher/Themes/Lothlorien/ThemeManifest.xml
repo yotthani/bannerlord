@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Realm of Lothlórien</Name>
+  <Description>The Golden Wood — ancient elven grace, starlight and mallorn.</Description>
+  <Author>BannerlordThemeSwitcher (LOTR Test)</Author>
+  <Version>1.0.0</Version>
+  <BaseCulture>battania</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>battania</Kingdom>
+  </BoundKingdoms>
+  <Components Brushes="true" Sprites="true" />
+  <ColorScheme>
+    <Primary>#C8BE64</Primary>
+    <Secondary>#508C50</Secondary>
+    <Tertiary>#DCD296</Tertiary>
+    <Text>#FFFFF0EE</Text>
+    <TextMuted>#C8C8A0</TextMuted>
+    <TextHighlight>#F0E6AA</TextHighlight>
+    <TextTitle>#C8BE64</TextTitle>
+    <TextOnPrimary>#14190F</TextOnPrimary>
+    <TextDisabled>#707060</TextDisabled>
+    <Background>#14190F99</Background>
+    <BackgroundDark>#0A0F08BB</BackgroundDark>
+    <BackgroundLight>#2A321EAA</BackgroundLight>
+    <BackgroundAccent>#C8BE6420</BackgroundAccent>
+    <BackgroundHover>#C8BE6440</BackgroundHover>
+    <BackgroundSelected>#C8BE6460</BackgroundSelected>
+    <Border>#B4AA50AA</Border>
+    <BorderMuted>#B4AA5055</BorderMuted>
+    <BorderHighlight>#F0E6AAFF</BorderHighlight>
+    <BorderSecondary>#508C50AA</BorderSecondary>
+    <ButtonBackground>#508C5025</ButtonBackground>
+    <ButtonHover>#508C5050</ButtonHover>
+    <ButtonPressed>#508C5080</ButtonPressed>
+    <ButtonDisabled>#50504044</ButtonDisabled>
+    <ButtonBorder>#B4AA50CC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#FFA500</Warning>
+    <Error>#DC143C</Error>
+    <Info>#4169E1</Info>
+    <Gold>#F0E6AA</Gold>
+    <Experience>#C8BE64</Experience>
+    <Health>#DC143C</Health>
+    <Morale>#50C850</Morale>
+    <Shadow>#0A0F0888</Shadow>
+    <Glow>#C8BE6466</Glow>
+  </ColorScheme>
+</Theme>

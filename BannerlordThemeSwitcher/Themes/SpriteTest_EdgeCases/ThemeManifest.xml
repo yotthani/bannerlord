@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Sprite Edge Case Tests</Name>
+  <Description>Tests edge cases: tiny sprites, large sprites, subfolders, aliases, empty folders</Description>
+  <Author>BannerlordThemeSwitcher (Test)</Author>
+  <Version>1.0.0</Version>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms />
+  <Components Brushes="false" Sprites="true" />
+  <ColorScheme>
+    <Primary>#808080</Primary>
+    <Secondary>#606060</Secondary>
+  </ColorScheme>
+</Theme>

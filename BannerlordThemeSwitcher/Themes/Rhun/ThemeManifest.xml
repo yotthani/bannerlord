@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Theme>
+  <Name>Confederacy of Rhûn</Name>
+  <Description>Eastern steppe riders — bronze and dark iron, endless plains.</Description>
+  <Author>BannerlordThemeSwitcher (LOTR Test)</Author>
+  <Version>1.0.0</Version>
+  <BaseCulture>khuzait</BaseCulture>
+  <AutoTheme>false</AutoTheme>
+  <BoundKingdoms>
+    <Kingdom>khuzait</Kingdom>
+  </BoundKingdoms>
+  <Components Brushes="true" Sprites="true" />
+  <ColorScheme>
+    <Primary>#A05028</Primary>
+    <Secondary>#503C32</Secondary>
+    <Tertiary>#C87832</Tertiary>
+    <Text>#F0E0D0EE</Text>
+    <TextMuted>#B49878</TextMuted>
+    <TextHighlight>#DCA050</TextHighlight>
+    <TextTitle>#C87832</TextTitle>
+    <TextOnPrimary>#1E140F</TextOnPrimary>
+    <TextDisabled>#706050</TextDisabled>
+    <Background>#1E140F99</Background>
+    <BackgroundDark>#140E0ABB</BackgroundDark>
+    <BackgroundLight>#322218AA</BackgroundLight>
+    <BackgroundAccent>#A0502820</BackgroundAccent>
+    <BackgroundHover>#A0502840</BackgroundHover>
+    <BackgroundSelected>#A0502860</BackgroundSelected>
+    <Border>#B46432AA</Border>
+    <BorderMuted>#B4643255</BorderMuted>
+    <BorderHighlight>#DCA050FF</BorderHighlight>
+    <BorderSecondary>#503C32AA</BorderSecondary>
+    <ButtonBackground>#A0502825</ButtonBackground>
+    <ButtonHover>#A0502850</ButtonHover>
+    <ButtonPressed>#A0502880</ButtonPressed>
+    <ButtonDisabled>#50403044</ButtonDisabled>
+    <ButtonBorder>#B46432CC</ButtonBorder>
+    <Success>#32CD32</Success>
+    <Warning>#FFA500</Warning>
+    <Error>#DC143C</Error>
+    <Info>#4169E1</Info>
+    <Gold>#DCA050</Gold>
+    <Experience>#C87832</Experience>
+    <Health>#DC143C</Health>
+    <Morale>#32CD32</Morale>
+    <Shadow>#140E0A88</Shadow>
+    <Glow>#A0502866</Glow>
+  </ColorScheme>
+</Theme>
