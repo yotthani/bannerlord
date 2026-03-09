@@ -31,6 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- .NET Framework References -->
+    <Reference Include="System.Drawing" />
+
     <!-- Core TaleWorlds References from game binaries -->
     <Reference Include="TaleWorlds.Core">
       <HintPath>$(GameBinaries)\TaleWorlds.Core.dll</HintPath>
@@ -39,6 +42,10 @@
     <Reference Include="TaleWorlds.Library">
       <HintPath>$(GameBinaries)\TaleWorlds.Library.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.DotNet">
+      <HintPath>$(GameBinaries)\TaleWorlds.DotNet.dll</HintPath>
+      <Private>false</Private>
     </Reference>
     <Reference Include="TaleWorlds.Engine">
       <HintPath>$(GameBinaries)\TaleWorlds.Engine.dll</HintPath>

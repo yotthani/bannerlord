@@ -14,7 +14,8 @@ namespace BannerlordThemeSwitcher
     {
         private Harmony _harmony;
         private ThemeManager _themeManager;
-        
+        private Sprites.SpriteThemeManager _spriteThemeManager;
+
         private const string HarmonyId = "com.bannerlord.themeswitcher";
 
         protected override void OnSubModuleLoad()
@@ -36,7 +37,11 @@ namespace BannerlordThemeSwitcher
                 
                 // Initialize BrushModifier (will use ColorScheme from themes at runtime)
                 BrushModifier.Initialize();
-                
+
+                // Initialize sprite theme manager for dynamic sprite loading
+                _spriteThemeManager = new Sprites.SpriteThemeManager();
+                _spriteThemeManager.Initialize(_harmony);
+
                 Debug.Print("[ThemeSwitcher] === OnSubModuleLoad COMPLETE ===");
             }
             catch (Exception ex)
@@ -48,6 +53,7 @@ namespace BannerlordThemeSwitcher
         protected override void OnSubModuleUnloaded()
         {
             base.OnSubModuleUnloaded();
+            _spriteThemeManager?.Dispose();
             _harmony?.UnpatchAll(HarmonyId);
             _themeManager?.Dispose();
         }

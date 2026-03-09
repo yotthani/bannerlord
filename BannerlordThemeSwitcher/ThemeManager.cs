@@ -188,6 +188,12 @@ namespace BannerlordThemeSwitcher
                 theme.HasBrushOverrides = Directory.Exists(Path.Combine(themeDir, "GUI", "Brushes"));
             }
 
+            // Auto-detect sprite assets if not explicitly set in manifest
+            if (!theme.HasSpriteOverrides)
+            {
+                theme.HasSpriteOverrides = Sprites.SpriteThemeManager.DetectSpriteAssets(themeDir);
+            }
+
             // Load base culture for default color scheme
             var baseCultureNode = root.SelectSingleNode("BaseCulture");
             if (baseCultureNode != null)
@@ -268,7 +274,10 @@ namespace BannerlordThemeSwitcher
             
             // Apply theme using BrushModifier (directly modifies brush objects)
             Patches.BrushModifier.ApplyTheme(themeId);
-            
+
+            // Apply sprite overrides (if theme has custom sprites)
+            Sprites.SpriteThemeManager.Instance?.LoadThemeSprites(theme);
+
             // Trigger UI refresh
             RefreshUI();
             
@@ -374,6 +383,7 @@ namespace BannerlordThemeSwitcher
         public void Dispose()
         {
             if (_disposed) return;
+            Sprites.SpriteThemeManager.Instance?.Dispose();
             _themes.Clear();
             _kingdomToTheme.Clear();
             _instance = null;
