@@ -601,13 +601,7 @@ namespace BannerlordThemeSwitcher.Patches
                                     layer.ColorFactor = 1.5f;
                                 }
                             }
-                            // HSV boost on Default layers that did NOT get sprite replacement
-                            if (!data.ReplaceDefaultSprite && layer.Name == "Default" && layer.Sprite != null)
-                            {
-                                layer.SaturationFactor = -100f;
-                                layer.ValueFactor = 80f;
-                                layer.ColorFactor = 1.5f;
-                            }
+                            // Non-background brushes: color tint only (preserves ornamental textures)
                             layer.Color = new Color(color.Red, color.Green, color.Blue, layer.Color.Alpha);
                         }
                     }
