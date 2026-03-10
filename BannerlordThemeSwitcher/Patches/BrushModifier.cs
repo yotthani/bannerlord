@@ -68,17 +68,55 @@ namespace BannerlordThemeSwitcher.Patches
                     var category = new SpriteCategory("theme_tintable", 1, false);
                     category.SpriteSheets.Add(twoDimTexture);
 
+                    // Register category in SpriteData (required for rendering)
+                    var spriteData = UIResourceManager.SpriteData;
+                    if (spriteData != null)
+                    {
+                        if (!spriteData.SpriteCategories.ContainsKey("theme_tintable"))
+                            spriteData.SpriteCategories.Add("theme_tintable", category);
+                        else
+                            spriteData.SpriteCategories["theme_tintable"] = category;
+                    }
+
+                    // Load category (initializes UV coordinates from sheet sizes)
+                    try
+                    {
+                        category.Load(UIResourceManager.ResourceContext, UIResourceManager.ResourceDepot);
+                    }
+                    catch (Exception loadEx)
+                    {
+                        Debug.Print($"[ThemeSwitcher] Category.Load info: {loadEx.Message}");
+                    }
+
                     var spritePart = new SpritePart("theme_tintable_part", category, 16, 16);
-                    spritePart.SheetID = 1;
+                    spritePart.SheetID = 1;  // 1-based index
                     spritePart.SheetX = 0;
                     spritePart.SheetY = 0;
                     spritePart.UpdateInitValues();
+
+                    // Register SpritePart in SpriteData
+                    if (spriteData != null)
+                    {
+                        if (!spriteData.SpriteParts.ContainsKey("theme_tintable_part"))
+                            spriteData.SpriteParts.Add("theme_tintable_part", spritePart);
+                        else
+                            spriteData.SpriteParts["theme_tintable_part"] = spritePart;
+                    }
 
                     // Nine-patch with 4px borders for proper scaling of buttons/frames
                     var ninePatch = new SpriteNinePatchParameters(4, 4, 4, 4);
                     _tintableSprite = new SpriteGeneric("theme_tintable", spritePart, in ninePatch);
 
-                    Debug.Print("[ThemeSwitcher] Created tintable white sprite for dramatic theming");
+                    // Register Sprite in SpriteData
+                    if (spriteData != null)
+                    {
+                        if (!spriteData.Sprites.ContainsKey("theme_tintable"))
+                            spriteData.Sprites.Add("theme_tintable", _tintableSprite);
+                        else
+                            spriteData.Sprites["theme_tintable"] = _tintableSprite;
+                    }
+
+                    Debug.Print("[ThemeSwitcher] Created tintable white sprite (registered in SpriteData)");
                 }
                 catch (Exception ex)
                 {
@@ -545,17 +583,25 @@ namespace BannerlordThemeSwitcher.Patches
 
                         if (hasColor)
                         {
-                            layer.Color = new Color(color.Red, color.Green, color.Blue, layer.Color.Alpha);
-
-                            // Boost HSV factors on Default layer to make theme colors dramatic.
-                            // Desaturate + brighten the sprite texture so the multiply-tint
-                            // produces vivid theme color while preserving sprite shape.
+                            // Replace sprite on Default layer with white tintable for dramatic color.
+                            // Also boost HSV as fallback if sprite replacement fails.
+                            var tintable = GetTintableSprite();
                             if (layer.Name == "Default" && layer.Sprite != null)
                             {
-                                layer.SaturationFactor = -100f;  // fully desaturate sprite
-                                layer.ValueFactor = 80f;         // brighten to near-white
-                                layer.ColorFactor = 1.5f;        // boost final color intensity
+                                if (tintable != null)
+                                {
+                                    layer.Sprite = tintable;
+                                    _spriteReplacementCount++;
+                                }
+                                else
+                                {
+                                    // Fallback: HSV boosting if sprite creation failed
+                                    layer.SaturationFactor = -100f;
+                                    layer.ValueFactor = 80f;
+                                    layer.ColorFactor = 1.5f;
+                                }
                             }
+                            layer.Color = new Color(color.Red, color.Green, color.Blue, layer.Color.Alpha);
                         }
                     }
                 }
