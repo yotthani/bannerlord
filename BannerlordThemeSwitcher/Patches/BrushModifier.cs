@@ -532,7 +532,6 @@ namespace BannerlordThemeSwitcher.Patches
                 // Without this, buttons/panels become nearly invisible.
                 if (data.LayerColors.Count > 0 || data.HasLayerColor)
                 {
-                    var tintable = GetTintableSprite();
                     foreach (var layer in themed.Layers)
                     {
                         Color color;
@@ -546,14 +545,6 @@ namespace BannerlordThemeSwitcher.Patches
 
                         if (hasColor)
                         {
-                            // Replace dark textured sprite with white tintable on Default layer
-                            // so multiply-tint produces dramatic color (white x color = color).
-                            // Only Default - preserve border/overlay sprite shapes on other layers.
-                            if (tintable != null && layer.Sprite != null && layer.Name == "Default")
-                            {
-                                layer.Sprite = tintable;
-                                _spriteReplacementCount++;
-                            }
                             layer.Color = new Color(color.Red, color.Green, color.Blue, layer.Color.Alpha);
                         }
                     }
