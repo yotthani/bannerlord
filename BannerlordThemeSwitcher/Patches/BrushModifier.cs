@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.GauntletUI;
 using TaleWorlds.Library;
+using TaleWorlds.TwoDimension;
 
 namespace BannerlordThemeSwitcher.Patches
 {
@@ -35,6 +37,57 @@ namespace BannerlordThemeSwitcher.Patches
         
         // Theme settings
         private static Dictionary<string, bool> _themeAutoMode = new Dictionary<string, bool>();
+        private static int _spriteReplacementCount = 0;
+
+        // Tintable white sprite: replaces dark textured sprites so multiply-tint
+        // produces dramatic theme colors (white x color = color)
+        private static TaleWorlds.TwoDimension.Sprite _tintableSprite;
+        private static bool _tintableSpriteInitAttempted;
+
+        /// <summary>
+        /// Lazily creates a 16x16 pure white sprite for use as a tintable base.
+        /// When layer.Sprite is set to this, layer.Color produces the exact theme color
+        /// instead of a subtle multiply-tint on a dark textured sprite.
+        /// </summary>
+        private static TaleWorlds.TwoDimension.Sprite GetTintableSprite()
+        {
+            if (!_tintableSpriteInitAttempted)
+            {
+                _tintableSpriteInitAttempted = true;
+                try
+                {
+                    // 16x16 pure white RGBA pixels
+                    byte[] whitePixels = new byte[16 * 16 * 4];
+                    for (int i = 0; i < whitePixels.Length; i++)
+                        whitePixels[i] = 255;
+
+                    var engineTexture = TaleWorlds.Engine.Texture.CreateFromByteArray(whitePixels, 16, 16);
+                    var twoDimTexture = new TaleWorlds.TwoDimension.Texture(
+                        new EngineTexture(engineTexture));
+
+                    var category = new SpriteCategory("theme_tintable", 1, false);
+                    category.SpriteSheets.Add(twoDimTexture);
+
+                    var spritePart = new SpritePart("theme_tintable_part", category, 16, 16);
+                    spritePart.SheetID = 1;
+                    spritePart.SheetX = 0;
+                    spritePart.SheetY = 0;
+                    spritePart.UpdateInitValues();
+
+                    // Nine-patch with 4px borders for proper scaling of buttons/frames
+                    var ninePatch = new SpriteNinePatchParameters(4, 4, 4, 4);
+                    _tintableSprite = new SpriteGeneric("theme_tintable", spritePart, in ninePatch);
+
+                    Debug.Print("[ThemeSwitcher] Created tintable white sprite for dramatic theming");
+                }
+                catch (Exception ex)
+                {
+                    Debug.Print($"[ThemeSwitcher] Error creating tintable sprite: {ex.Message}");
+                    _tintableSprite = null;
+                }
+            }
+            return _tintableSprite;
+        }
 
         public static void Initialize()
         {
@@ -118,7 +171,7 @@ namespace BannerlordThemeSwitcher.Patches
                     }
                 }
                 
-                Debug.Print($"[ThemeSwitcher] Loaded {loadedCount} brushes from {Path.GetFileName(xmlPath)}");
+                Debug.Print($"[ThemeSwitcher] Loaded {loadedCount} brushes from {System.IO.Path.GetFileName(xmlPath)}");
             }
             catch (Exception ex)
             {
@@ -314,6 +367,7 @@ namespace BannerlordThemeSwitcher.Patches
                 var themeBrushes = _themeBrushData.TryGetValue(themeId, out var data) ? data : null;
                 int xmlModified = 0;
                 int autoModified = 0;
+                _spriteReplacementCount = 0;
 
                 foreach (var kvp in brushes.ToList())
                 {
@@ -380,7 +434,7 @@ namespace BannerlordThemeSwitcher.Patches
                 // color (wrong for text). Clones set correct per-layer and per-style colors.
                 BrushRendererPatch.SetThemeColors(null);
 
-                Debug.Print($"[ThemeSwitcher] Modified: {xmlModified} from XML, {autoModified} from AutoTheme");
+                Debug.Print($"[ThemeSwitcher] Modified: {xmlModified} from XML, {autoModified} from AutoTheme, {_spriteReplacementCount} sprite replacements");
                 Debug.Print($"[ThemeSwitcher] Total game brushes: {brushes.Count}");
                 Debug.Print($"[ThemeSwitcher] ═══════════════════════════════════════════════════════");
             }
@@ -396,13 +450,13 @@ namespace BannerlordThemeSwitcher.Patches
         private static void LoadThemeBrushFiles(string themeId, ColorScheme scheme)
         {
             var theme = ThemeManager.Instance?.GetTheme(themeId);
-            var modPath = Path.Combine(BasePath.Name, "Modules", "BannerlordThemeSwitcher");
+            var modPath = System.IO.Path.Combine(BasePath.Name, "Modules", "BannerlordThemeSwitcher");
             
             Debug.Print($"[ThemeSwitcher] LoadThemeBrushFiles for {themeId}");
             Debug.Print($"[ThemeSwitcher] Module path: {modPath}");
             
             // Load shared brushes from Data folder (not GUI/Brushes to avoid game auto-loading)
-            var sharedBrushes = Path.Combine(modPath, "Data", "ThemedBrushes.xml");
+            var sharedBrushes = System.IO.Path.Combine(modPath, "Data", "ThemedBrushes.xml");
             Debug.Print($"[ThemeSwitcher] Looking for shared brushes at: {sharedBrushes}");
             
             if (File.Exists(sharedBrushes))
@@ -421,7 +475,7 @@ namespace BannerlordThemeSwitcher.Patches
             Debug.Print($"[ThemeSwitcher] Theme path: {theme.ThemePath}");
             
             // Load theme-specific brush files from theme's Data folder
-            var themeDataPath = Path.Combine(theme.ThemePath, "Data");
+            var themeDataPath = System.IO.Path.Combine(theme.ThemePath, "Data");
             if (Directory.Exists(themeDataPath))
             {
                 foreach (var file in Directory.GetFiles(themeDataPath, "*.xml"))
@@ -432,7 +486,7 @@ namespace BannerlordThemeSwitcher.Patches
             }
             
             // Also check GUI/Brushes for backwards compatibility (theme authors)
-            var brushesPath = Path.Combine(theme.ThemePath, "GUI", "Brushes");
+            var brushesPath = System.IO.Path.Combine(theme.ThemePath, "GUI", "Brushes");
             if (Directory.Exists(brushesPath))
             {
                 foreach (var file in Directory.GetFiles(brushesPath, "*.xml"))
@@ -476,12 +530,30 @@ namespace BannerlordThemeSwitcher.Patches
                 // Theme ColorScheme alphas are designed for overlay rendering (e.g., ButtonBackground
                 // #00BFFF25 = 14% alpha), but layer.Color.Alpha controls sprite layer OPACITY.
                 // Without this, buttons/panels become nearly invisible.
-                if (data.LayerColors.Count > 0)
+                if (data.LayerColors.Count > 0 || data.HasLayerColor)
                 {
+                    var tintable = GetTintableSprite();
                     foreach (var layer in themed.Layers)
                     {
-                        if (data.LayerColors.TryGetValue(layer.Name, out var color))
+                        Color color;
+                        bool hasColor = data.LayerColors.TryGetValue(layer.Name, out color);
+                        // Fallback: AutoTheme sets data.LayerColor for all layers
+                        if (!hasColor && data.HasLayerColor)
                         {
+                            color = data.LayerColor;
+                            hasColor = true;
+                        }
+
+                        if (hasColor)
+                        {
+                            // Replace dark textured sprite with white tintable on Default layer
+                            // so multiply-tint produces dramatic color (white x color = color).
+                            // Only Default - preserve border/overlay sprite shapes on other layers.
+                            if (tintable != null && layer.Sprite != null && layer.Name == "Default")
+                            {
+                                layer.Sprite = tintable;
+                                _spriteReplacementCount++;
+                            }
                             layer.Color = new Color(color.Red, color.Green, color.Blue, layer.Color.Alpha);
                         }
                     }
@@ -513,7 +585,16 @@ namespace BannerlordThemeSwitcher.Patches
                             {
                                 foreach (var layerKvp in styleLayers)
                                 {
-                                    if (styleData.LayerColors.TryGetValue(layerKvp.Key, out var layerColor))
+                                    Color layerColor;
+                                    bool hasLayerColor = styleData.LayerColors.TryGetValue(layerKvp.Key, out layerColor);
+                                    // Fallback: AutoTheme sets styleData.LayerColor for all style layers
+                                    if (!hasLayerColor && styleData.HasLayerColor)
+                                    {
+                                        layerColor = styleData.LayerColor;
+                                        hasLayerColor = true;
+                                    }
+
+                                    if (hasLayerColor)
                                     {
                                         var origAlpha = layerKvp.Value.Color.Alpha;
                                         layerKvp.Value.Color = new Color(layerColor.Red, layerColor.Green, layerColor.Blue, origAlpha);
