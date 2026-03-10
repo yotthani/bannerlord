@@ -546,6 +546,16 @@ namespace BannerlordThemeSwitcher.Patches
                         if (hasColor)
                         {
                             layer.Color = new Color(color.Red, color.Green, color.Blue, layer.Color.Alpha);
+
+                            // Boost HSV factors on Default layer to make theme colors dramatic.
+                            // Desaturate + brighten the sprite texture so the multiply-tint
+                            // produces vivid theme color while preserving sprite shape.
+                            if (layer.Name == "Default" && layer.Sprite != null)
+                            {
+                                layer.SaturationFactor = -100f;  // fully desaturate sprite
+                                layer.ValueFactor = 80f;         // brighten to near-white
+                                layer.ColorFactor = 1.5f;        // boost final color intensity
+                            }
                         }
                     }
                 }
