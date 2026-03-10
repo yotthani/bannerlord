@@ -25,6 +25,7 @@ namespace BannerlordThemeSwitcher.Behaviors
             CampaignEvents.OnClanChangedKingdomEvent.AddNonSerializedListener(this, OnClanChangedKingdom);
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, OnSessionLaunched);
             CampaignEvents.OnNewGameCreatedEvent.AddNonSerializedListener(this, OnNewGameCreated);
+            CampaignEvents.OnGameLoadedEvent.AddNonSerializedListener(this, OnGameLoaded);
         }
 
         public override void SyncData(IDataStore dataStore)
@@ -42,6 +43,12 @@ namespace BannerlordThemeSwitcher.Behaviors
         {
             Debug.Print("[ThemeSwitcher] New game created");
             ApplyThemeForKingdom(null);
+        }
+
+        private void OnGameLoaded(CampaignGameStarter starter)
+        {
+            Debug.Print("[ThemeSwitcher] Save game loaded - checking kingdom/culture");
+            CheckCurrentKingdom();
         }
 
         private void OnClanChangedKingdom(Clan clan, Kingdom oldKingdom, Kingdom newKingdom,
@@ -72,6 +79,14 @@ namespace BannerlordThemeSwitcher.Behaviors
 
                 var kingdom = Clan.PlayerClan.Kingdom;
                 var kingdomId = kingdom?.StringId;
+                
+                // Fallback: if no kingdom, use culture ID (matches kingdom IDs)
+                if (string.IsNullOrEmpty(kingdomId))
+                {
+                    var cultureId = Clan.PlayerClan.Culture?.StringId;
+                    Debug.Print($"[ThemeSwitcher] No kingdom, using culture: {cultureId ?? "none"}");
+                    kingdomId = cultureId;
+                }
                 
                 Debug.Print($"[ThemeSwitcher] Current kingdom: {kingdomId ?? "none"}");
                 ApplyThemeForKingdom(kingdomId);
