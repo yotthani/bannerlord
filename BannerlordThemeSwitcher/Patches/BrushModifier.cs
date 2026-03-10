@@ -472,15 +472,17 @@ namespace BannerlordThemeSwitcher.Patches
 
                 // Apply layer colors to explicitly named layers (including sprite-textured ones).
                 // In Bannerlord, layer.Color is a multiply-tint — this IS how you theme sprites.
-                // Only layers explicitly named in ThemedBrushes.xml get colors; unspecified layers
-                // keep their vanilla colors (no aggressive fallback).
+                // We apply only the RGB from the theme color, PRESERVING the original layer alpha.
+                // Theme ColorScheme alphas are designed for overlay rendering (e.g., ButtonBackground
+                // #00BFFF25 = 14% alpha), but layer.Color.Alpha controls sprite layer OPACITY.
+                // Without this, buttons/panels become nearly invisible.
                 if (data.LayerColors.Count > 0)
                 {
                     foreach (var layer in themed.Layers)
                     {
                         if (data.LayerColors.TryGetValue(layer.Name, out var color))
                         {
-                            layer.Color = color;
+                            layer.Color = new Color(color.Red, color.Green, color.Blue, layer.Color.Alpha);
                         }
                     }
                 }
@@ -513,7 +515,8 @@ namespace BannerlordThemeSwitcher.Patches
                                 {
                                     if (styleData.LayerColors.TryGetValue(layerKvp.Key, out var layerColor))
                                     {
-                                        layerKvp.Value.Color = layerColor;
+                                        var origAlpha = layerKvp.Value.Color.Alpha;
+                                        layerKvp.Value.Color = new Color(layerColor.Red, layerColor.Green, layerColor.Blue, origAlpha);
                                     }
                                 }
                             }
