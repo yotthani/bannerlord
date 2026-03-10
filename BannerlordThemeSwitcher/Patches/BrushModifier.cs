@@ -586,7 +586,7 @@ namespace BannerlordThemeSwitcher.Patches
                             // Replace sprite on Default layer with white tintable for dramatic color.
                             // Also boost HSV as fallback if sprite replacement fails.
                             var tintable = GetTintableSprite();
-                            if (layer.Name == "Default" && layer.Sprite != null)
+                            if (data.ReplaceDefaultSprite && layer.Name == "Default" && layer.Sprite != null)
                             {
                                 if (tintable != null)
                                 {
@@ -600,6 +600,13 @@ namespace BannerlordThemeSwitcher.Patches
                                     layer.ValueFactor = 80f;
                                     layer.ColorFactor = 1.5f;
                                 }
+                            }
+                            // HSV boost on Default layers that did NOT get sprite replacement
+                            if (!data.ReplaceDefaultSprite && layer.Name == "Default" && layer.Sprite != null)
+                            {
+                                layer.SaturationFactor = -100f;
+                                layer.ValueFactor = 80f;
+                                layer.ColorFactor = 1.5f;
                             }
                             layer.Color = new Color(color.Red, color.Green, color.Blue, layer.Color.Alpha);
                         }
@@ -851,6 +858,7 @@ namespace BannerlordThemeSwitcher.Patches
                 data.LayerColor = c.Background;
             }
             data.HasLayerColor = true;
+            data.ReplaceDefaultSprite = true; // Backgrounds benefit from flat tint
             data.StyleColors["hovered"] = new StyleColorData { LayerColor = c.BackgroundHover, HasLayerColor = true };
             data.StyleColors["selected"] = new StyleColorData { LayerColor = c.BackgroundSelected, HasLayerColor = true };
             return true;
@@ -983,6 +991,7 @@ namespace BannerlordThemeSwitcher.Patches
             public bool HasLayerColor;
             public Dictionary<string, Color> LayerColors = new Dictionary<string, Color>();
             public Dictionary<string, StyleColorData> StyleColors = new Dictionary<string, StyleColorData>();
+            public bool ReplaceDefaultSprite; // Only backgrounds should replace sprites
         }
         
         private class StyleColorData
