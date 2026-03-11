@@ -763,11 +763,27 @@ namespace BannerlordThemeSwitcher.Patches
         
         private static bool ShouldSkipBrush(string name)
         {
-            return name.Contains("debug") || name.Contains("empty") || name.Contains("invisible") ||
-                   name.Contains("transparent") || name.Contains("clear") ||
-                   (name.Contains("icon") && !name.Contains("background") && !name.Contains("frame")) ||
-                   (name.Contains("sprite") && !name.Contains("background")) ||
-                   name.Contains("crest") || name.Contains("sigil") || name.Contains("emblem");
+            // Skip debug/invisible brushes
+            if (name.Contains("debug") || name.Contains("empty") || name.Contains("invisible") ||
+                name.Contains("transparent") || name.Contains("clear"))
+                return true;
+
+            // Skip icon/sprite brushes (except backgrounds/frames)
+            if ((name.Contains("icon") && !name.Contains("background") && !name.Contains("frame")) ||
+                (name.Contains("sprite") && !name.Contains("background")) ||
+                name.Contains("crest") || name.Contains("sigil") || name.Contains("emblem"))
+                return true;
+
+            // Skip battle/combat UI — health bars, troop cards, order panels etc.
+            if (name.Contains("health") || name.Contains("hitpoint") || name.Contains("hp") ||
+                name.Contains("shield") || name.Contains("armor") ||
+                name.Contains("troop") || name.Contains("soldier") || name.Contains("agent") ||
+                name.Contains("combat") || name.Contains("battle") || name.Contains("mission") ||
+                name.Contains("order") || name.Contains("formation") ||
+                name.Contains("morale") || name.Contains("stamina") || name.Contains("courage"))
+                return true;
+
+            return false;
         }
         
         private static bool IsTextBrush(string name)
@@ -947,13 +963,7 @@ namespace BannerlordThemeSwitcher.Patches
             // Progress bars
             if (name.Contains("progress") || name.Contains("bar") || name.Contains("meter"))
             {
-                if (name.Contains("health") || name.Contains("hp"))
-                    data.LayerColor = c.Health;
-                else if (name.Contains("experience") || name.Contains("xp"))
-                    data.LayerColor = c.Experience;
-                else if (name.Contains("morale"))
-                    data.LayerColor = c.Morale;
-                else if (name.Contains("fill"))
+                if (name.Contains("fill"))
                     data.LayerColor = c.Primary;
                 else
                     data.LayerColor = c.BackgroundDark;
