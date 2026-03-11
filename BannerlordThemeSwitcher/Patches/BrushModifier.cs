@@ -45,9 +45,9 @@ namespace BannerlordThemeSwitcher.Patches
         private static bool _tintableSpriteInitAttempted;
 
         /// <summary>
-        /// Lazily creates a 16x16 pure white sprite for use as a tintable base.
-        /// When layer.Sprite is set to this, layer.Color produces the exact theme color
-        /// instead of a subtle multiply-tint on a dark textured sprite.
+        /// Loads a sprite from an external PNG file and registers it in SpriteData.
+        /// This is the core proof that themes can include custom sprite assets.
+        /// Falls back to a programmatic white sprite if file loading fails.
         /// </summary>
         private static TaleWorlds.TwoDimension.Sprite GetTintableSprite()
         {
@@ -56,12 +56,56 @@ namespace BannerlordThemeSwitcher.Patches
                 _tintableSpriteInitAttempted = true;
                 try
                 {
-                    // 16x16 pure white RGBA pixels
-                    byte[] whitePixels = new byte[16 * 16 * 4];
-                    for (int i = 0; i < whitePixels.Length; i++)
-                        whitePixels[i] = 255;
+                    TaleWorlds.Engine.Texture engineTexture = null;
+                    int texWidth = 16, texHeight = 16; // Track actual dimensions
 
-                    var engineTexture = TaleWorlds.Engine.Texture.CreateFromByteArray(whitePixels, 16, 16);
+                    // PRIMARY: Try loading from external PNG file
+                    var modPath = System.IO.Path.Combine(
+                        TaleWorlds.Library.BasePath.Name, "Modules", "BannerlordThemeSwitcher", "Themes", "test_sprite.png");
+
+                    if (File.Exists(modPath))
+                    {
+                        try
+                        {
+                            var pngBytes = File.ReadAllBytes(modPath);
+                            engineTexture = TaleWorlds.Engine.Texture.CreateFromMemory(pngBytes);
+                            texWidth = engineTexture.Width;
+                            texHeight = engineTexture.Height;
+                            Debug.Print($"[ThemeSwitcher] Loaded external sprite: {modPath} ({pngBytes.Length} bytes, {texWidth}x{texHeight})");
+                        }
+                        catch (Exception fileEx)
+                        {
+                            Debug.Print($"[ThemeSwitcher] CreateFromMemory failed: {fileEx.Message}");
+                            try
+                            {
+                                var dir = System.IO.Path.GetDirectoryName(modPath);
+                                var file = System.IO.Path.GetFileName(modPath);
+                                engineTexture = TaleWorlds.Engine.Texture.LoadTextureFromPath(file, dir);
+                                texWidth = engineTexture.Width;
+                                texHeight = engineTexture.Height;
+                                Debug.Print($"[ThemeSwitcher] LoadTextureFromPath succeeded: {file} ({texWidth}x{texHeight})");
+                            }
+                            catch (Exception pathEx)
+                            {
+                                Debug.Print($"[ThemeSwitcher] LoadTextureFromPath also failed: {pathEx.Message}");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.Print($"[ThemeSwitcher] External sprite not found: {modPath}");
+                    }
+
+                    // FALLBACK: Create white sprite from byte array if file loading failed
+                    if (engineTexture == null)
+                    {
+                        Debug.Print("[ThemeSwitcher] Falling back to programmatic white sprite (16x16)");
+                        texWidth = 16; texHeight = 16;
+                        byte[] whitePixels = new byte[texWidth * texHeight * 4];
+                        for (int i = 0; i < whitePixels.Length; i++)
+                            whitePixels[i] = 255;
+                        engineTexture = TaleWorlds.Engine.Texture.CreateFromByteArray(whitePixels, texWidth, texHeight);
+                    }
                     var twoDimTexture = new TaleWorlds.TwoDimension.Texture(
                         new EngineTexture(engineTexture));
 
@@ -88,7 +132,7 @@ namespace BannerlordThemeSwitcher.Patches
                         Debug.Print($"[ThemeSwitcher] Category.Load info: {loadEx.Message}");
                     }
 
-                    var spritePart = new SpritePart("theme_tintable_part", category, 16, 16);
+                    var spritePart = new SpritePart("theme_tintable_part", category, texWidth, texHeight);
                     spritePart.SheetID = 1;  // 1-based index
                     spritePart.SheetX = 0;
                     spritePart.SheetY = 0;
@@ -104,7 +148,8 @@ namespace BannerlordThemeSwitcher.Patches
                     }
 
                     // Nine-patch with 4px borders for proper scaling of buttons/frames
-                    var ninePatch = new SpriteNinePatchParameters(4, 4, 4, 4);
+                    int border = Math.Max(2, Math.Min(texWidth, texHeight) / 8);
+                    var ninePatch = new SpriteNinePatchParameters(border, border, border, border);
                     _tintableSprite = new SpriteGeneric("theme_tintable", spritePart, in ninePatch);
 
                     // Register Sprite in SpriteData
