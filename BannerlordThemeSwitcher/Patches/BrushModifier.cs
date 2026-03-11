@@ -59,41 +59,44 @@ namespace BannerlordThemeSwitcher.Patches
                     TaleWorlds.Engine.Texture engineTexture = null;
                     int texWidth = 16, texHeight = 16; // Track actual dimensions
 
-                    // PRIMARY: Try loading from external PNG file
-                    var modPath = System.IO.Path.Combine(
-                        TaleWorlds.Library.BasePath.Name, "Modules", "BannerlordThemeSwitcher", "Themes", "test_sprite.png");
+                    // PRIMARY: Try loading from disk via engine's native loader
+                    var themesDir = System.IO.Path.Combine(
+                        TaleWorlds.Library.BasePath.Name, "Modules", "BannerlordThemeSwitcher", "Themes");
+                    var spriteFile = "test_sprite.png";
+                    var fullPath = System.IO.Path.Combine(themesDir, spriteFile);
 
-                    if (File.Exists(modPath))
+                    if (File.Exists(fullPath))
                     {
+                        // Method 1: Engine disk loader (preferred — handles format natively)
                         try
                         {
-                            var pngBytes = File.ReadAllBytes(modPath);
-                            engineTexture = TaleWorlds.Engine.Texture.CreateFromMemory(pngBytes);
+                            engineTexture = TaleWorlds.Engine.Texture.LoadTextureFromPath(spriteFile, themesDir);
                             texWidth = engineTexture.Width;
                             texHeight = engineTexture.Height;
-                            Debug.Print($"[ThemeSwitcher] Loaded external sprite: {modPath} ({pngBytes.Length} bytes, {texWidth}x{texHeight})");
+                            Debug.Print($"[ThemeSwitcher] Loaded sprite from disk: {fullPath} ({texWidth}x{texHeight})");
                         }
-                        catch (Exception fileEx)
+                        catch (Exception diskEx)
                         {
-                            Debug.Print($"[ThemeSwitcher] CreateFromMemory failed: {fileEx.Message}");
+                            Debug.Print($"[ThemeSwitcher] LoadTextureFromPath failed: {diskEx.Message}");
+
+                            // Method 2: Read bytes and let engine decode (fallback)
                             try
                             {
-                                var dir = System.IO.Path.GetDirectoryName(modPath);
-                                var file = System.IO.Path.GetFileName(modPath);
-                                engineTexture = TaleWorlds.Engine.Texture.LoadTextureFromPath(file, dir);
+                                var pngBytes = File.ReadAllBytes(fullPath);
+                                engineTexture = TaleWorlds.Engine.Texture.CreateFromMemory(pngBytes);
                                 texWidth = engineTexture.Width;
                                 texHeight = engineTexture.Height;
-                                Debug.Print($"[ThemeSwitcher] LoadTextureFromPath succeeded: {file} ({texWidth}x{texHeight})");
+                                Debug.Print($"[ThemeSwitcher] Loaded sprite via CreateFromMemory: {fullPath} ({pngBytes.Length} bytes, {texWidth}x{texHeight})");
                             }
-                            catch (Exception pathEx)
+                            catch (Exception memEx)
                             {
-                                Debug.Print($"[ThemeSwitcher] LoadTextureFromPath also failed: {pathEx.Message}");
+                                Debug.Print($"[ThemeSwitcher] CreateFromMemory also failed: {memEx.Message}");
                             }
                         }
                     }
                     else
                     {
-                        Debug.Print($"[ThemeSwitcher] External sprite not found: {modPath}");
+                        Debug.Print($"[ThemeSwitcher] External sprite not found: {fullPath}");
                     }
 
                     // FALLBACK: Create white sprite from byte array if file loading failed
