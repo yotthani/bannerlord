@@ -1,14 +1,13 @@
 # DualWieldPrototype
 
-Frischer Bannerlord-Testmod fuer Dual-Wield-Prototyping ohne Abhaengigkeit vom bestehenden `HoN/DualWield`.
+Sauberer Neustart fuer das Dual-Wield-Prototyping in Bannerlord 1.3.
 
-Aktuelle Idee:
+Aktueller Fokus:
 
-- zweite 1h-Nahkampfwaffe wird an den linken Hand-Bone angeheftet
-- linke Native-Actions werden direkt ausgelost
-- Steuerung und Playback laufen ueber MCM
-- das Dateilog enthaelt jetzt zusaetzlich Mainhand-/Offhand-Usage und `GetIsLeftStance()`
-  zur Eingrenzung, ob der fehlende Trigger im Engine-Kontext oder in den Actions liegt
+- zweite 1h-Waffe links anheften
+- `RMB` startet nur noch einen groben linken Proxy-Angriff ueber `act_quick_release_swingleft_fist_left_stance`
+- optionaler `Unarmed Trace Mode`, um nativen Faustkampf ohne Prototyp-Eingriff zu analysieren
+- optionales `Trace Native Channel Calls`, um `Agent.SetActionChannel` fuer den Main-Agent mitzuschneiden
 
 MCM:
 
@@ -18,57 +17,34 @@ MCM:
 - `Deep Action Logging`
 - `Trace Native Channel Calls`
 - `Unarmed Trace Mode`
-- `Control Mode`
-- `Playback Mode`
-- `Off-Hand Cooldown`
-- `RMB Trigger Mode`
-- `Off-Hand Test Action`
-- `Ignore Action Priority`
-- `Fallback To Overlay`
+- `Proxy Cooldown`
 - `Rotation Preset`
 - `Offset X/Y/Z`
 
-Modi:
+Verhalten:
 
-- `SplitMouse`: `LMB` bleibt main hand, `RMB` versucht linken Angriff, `LMB+RMB` laesst natives Blocken in Ruhe
-- `AutoAlternate`: jeder zweite `LMB` versucht einen linken Angriff
-- aktueller Vergleichspfad fuer `SplitMouse`:
-- `RMB Trigger Mode`:
-- `DirectSlash`: `RMB` feuert den Offhand-Slash direkt, sobald das linke Fenster offen ist
-- `FistProxy`: `RMB` feuert direkt `act_quick_release_swingleft_fist_left_stance`, waehrend die Offhand-Waffe weiter links angeheftet bleibt
-- `ReleaseFollowUp`: `RMB` versucht den alten Timing-Pfad nachzubauen: RH-Release erkennen, kurzer Delay, `ch1` clear, dann LH auf `ch0`
-- `PrimedSlashLeft`: `RMB` versucht zuerst einen LH-Thrust als Primer auf `ch0`, dann nach kurzem Delay `slashleft`
-- `LegacyCycle`: `RMB` stellt den alten Testzustand wieder her und iteriert pro Klick durch `slashright probe -> thrust -> slashleft`, inklusive Historien-Logging
-- `RMB` erzwingt im Test weiter nur `act_quick_release_slashleft_1h_left_stance`
-- `V` erzwingt nur `act_quick_release_thrust_1h_left_stance`
-- `Off-Hand Test Action`:
-- `Sequence`: nutzt das aktuelle Offhand-Profil
-- `SlashLeftOnly`: erzwingt nur `act_quick_release_slashleft_1h_left_stance`
-- `ThrustOnly`: erzwingt nur `act_quick_release_thrust_1h_left_stance`
-- `FistLeftOnly`: erzwingt nur `act_quick_release_swingleft_fist_left_stance`
+- normaler Testmodus:
+- `LMB` bleibt Vanilla-Mainhand
+- `RMB` blockt nicht mehr, sondern startet einmal pro Klick den linken `FistProxy`
+- die Offhand-Waffe bleibt links angeheftet, damit der Faustschlag wie ein grober linker Waffenangriff wirkt
 
-- Playback:
-- `Channel0Combat`: aktiver Testpfad fuer die bestaetigten linken Angriffe
-- `Channel1Overlay`: fuer die aktuellen `*_left_stance`-Actions praktisch unbrauchbar und wird zur Laufzeit auf `Channel0Combat` zurueckgebogen
+- `Unarmed Trace Mode = true`:
+- keine Dual-Wield-Steuerung
+- keine angeheftete Offhand
+- nur nativer Faustkampf plus Logging
 
-- Logging:
-- bei aktiviertem `Debug File Logging` schreibt das Modul nach `Modules/DualWieldPrototype/dualwieldprototype.log`
-- beim Missionsstart werden `mission_init supported=... mode=... scene=...` geloggt
-- `attack_diag ...` schreibt bei aktiviertem `Deep Action Logging` den genauen Vor-/Nachzustand
-  pro erzwungenem Offhand-Angriff ins Dateilog
-- `legacy_cycle_probe ...` und `legacy_cycle_resolved ...` loggen im Legacy-Zyklus zusaetzlich die letzten beiden erzwungenen Offhand-Actions
-- `Trace Native Channel Calls` loggt zusaetzlich jeden `Agent.SetActionChannel`-Call fuer den Main-Agent in supported missions
-- `Unarmed Trace Mode` deaktiviert die Dual-Wield-Eingriffslogik und dient nur dazu, nativen Faustkampf sauber zu tracen
+Logging:
 
-Anmerkung:
+- Logdatei: `Modules/DualWieldPrototype/dualwieldprototype.log`
+- wichtige Zeilen:
+- `settings_applied ...`
+- `loadout ...`
+- `attach ...`
+- `attack_request ...`
+- `attack_started ...`
+- `attack_diag ...`
+- `trace_setaction ...`
+- `unarmed_trace_state ...`
+- `leftstance_change ...`
 
-Diese erste Version ist absichtlich ein Testbett. Fuer den aktuellen Stand gelten nur drei bestaetigte Linkshand-Patterns als brauchbar:
-
-- `act_quick_release_slashleft_1h_left_stance`
-- `act_quick_release_thrust_1h_left_stance`
-- `act_quick_release_swingleft_fist_left_stance`
-
-Bei den anderen `*_left_stance`-Actions ist in 1.3 oft nur die Fussstellung links, nicht der eigentliche Waffenangriff.
-
-Die XML-Testdateien bleiben im Repo als Referenz fuer den alten `left_stance`-Bootstrap,
-sind aber aktuell nicht mehr als aktive Test-Items im Modul registriert.
+Dieser Stand ist bewusst klein gehalten. Alte Legacy-/Cycle-/Follow-up-Experimente wurden entfernt, damit neue Tests auf einem klaren Basispunkt starten.

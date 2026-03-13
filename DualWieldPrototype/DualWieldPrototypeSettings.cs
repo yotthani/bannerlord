@@ -1,7 +1,6 @@
 using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Base.Global;
-using MCM.Common;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 
@@ -19,7 +18,7 @@ namespace DualWieldPrototype
             "Enable Prototype",
             Order = 0,
             RequireRestart = false,
-            HintText = "Master toggle for the current dual-wield prototype.")]
+            HintText = "Master toggle for the current clean prototype.")]
         public bool EnablePrototype { get; set; } = true;
 
         [SettingPropertyGroup("General", GroupOrder = 0)]
@@ -27,7 +26,7 @@ namespace DualWieldPrototype
             "Live Messages",
             Order = 1,
             RequireRestart = false,
-            HintText = "Show short on-screen debug help during missions. File logging is the primary debug output.")]
+            HintText = "Show short on-screen debug help during missions. File logging stays the primary output.")]
         public bool LiveMessages { get; set; } = false;
 
         [SettingPropertyGroup("General", GroupOrder = 0)]
@@ -35,7 +34,7 @@ namespace DualWieldPrototype
             "Debug File Logging",
             Order = 2,
             RequireRestart = false,
-            HintText = "Write detailed runtime diagnostics to dualwieldprototype.log in the module folder.")]
+            HintText = "Write runtime diagnostics to dualwieldprototype.log in the module folder.")]
         public bool DebugFileLogging { get; set; } = true;
 
         [SettingPropertyGroup("General", GroupOrder = 0)]
@@ -43,7 +42,7 @@ namespace DualWieldPrototype
             "Deep Action Logging",
             Order = 3,
             RequireRestart = false,
-            HintText = "Adds pre/post action state, stages, weights and movement flags for each forced off-hand attack.")]
+            HintText = "Adds pre/post action state, stages, weights and movement flags for forced left-hand proxy attacks.")]
         public bool DeepActionLogging { get; set; } = true;
 
         [SettingPropertyGroup("General", GroupOrder = 0)]
@@ -51,7 +50,7 @@ namespace DualWieldPrototype
             "Trace Native Channel Calls",
             Order = 4,
             RequireRestart = false,
-            HintText = "Logs every Agent.SetActionChannel call for the main agent in supported missions, including caller fingerprints and our own scope markers.")]
+            HintText = "Logs every Agent.SetActionChannel call for the main agent in supported missions.")]
         public bool TraceNativeChannelCalls { get; set; } = false;
 
         [SettingPropertyGroup("General", GroupOrder = 0)]
@@ -59,96 +58,19 @@ namespace DualWieldPrototype
             "Unarmed Trace Mode",
             Order = 5,
             RequireRestart = false,
-            HintText = "Disables the dual-wield control logic and only traces native unarmed combat for the main agent.")]
+            HintText = "Disables the prototype combat override and only traces native unarmed combat.")]
         public bool UnarmedTraceMode { get; set; } = false;
 
-        [SettingPropertyGroup("Control", GroupOrder = 1)]
-        [SettingPropertyDropdown(
-            "Control Mode",
-            Order = 0,
-            RequireRestart = false,
-            HintText = "SplitMouse keeps LMB on the main hand and uses RMB for the off hand. AutoAlternate uses every second LMB for the off hand.")]
-        public Dropdown<string> ControlMode { get; set; } = new Dropdown<string>(
-            new[]
-            {
-                "SplitMouse",
-                "AutoAlternate"
-            },
-            0);
-
-        [SettingPropertyGroup("Control", GroupOrder = 1)]
-        [SettingPropertyDropdown(
-            "Playback Mode",
-            Order = 1,
-            RequireRestart = false,
-            HintText = "Current left-hand prototype actions only work reliably on Channel0Combat. Channel1Overlay is kept only for diagnostics and is forced back to Channel0 at runtime.")]
-        public Dropdown<string> PlaybackMode { get; set; } = new Dropdown<string>(
-            new[]
-            {
-                "Channel0Combat",
-                "Channel1Overlay"
-            },
-            0);
-
-        [SettingPropertyGroup("Control", GroupOrder = 1)]
+        [SettingPropertyGroup("Combat", GroupOrder = 1)]
         [SettingPropertyFloatingInteger(
-            "Off-Hand Cooldown",
+            "Proxy Cooldown",
             0.1f,
             1.0f,
             "#0.00",
-            Order = 2,
+            Order = 0,
             RequireRestart = false,
-            HintText = "Minimum time between two forced off-hand attacks.")]
+            HintText = "Minimum time between two forced left-fist proxy attacks on RMB.")]
         public float OffHandCooldownSeconds { get; set; } = 0.32f;
-
-        [SettingPropertyGroup("Control", GroupOrder = 1)]
-        [SettingPropertyDropdown(
-            "RMB Trigger Mode",
-            Order = 3,
-            RequireRestart = false,
-            HintText = "DirectSlash fires the off-hand slash once the left-stance window opens. FistProxy uses the native left fist swing while the off-hand weapon stays attached for a crude first-hit prototype. ReleaseFollowUp reproduces the older timing: detect a right-hand release, wait briefly, then fire left-hand on channel 0. LegacyCycle restores the older multi-action RMB iteration for state comparison.")]
-        public Dropdown<string> RmbTriggerMode { get; set; } = new Dropdown<string>(
-            new[]
-            {
-                "DirectSlash",
-                "FistProxy",
-                "ReleaseFollowUp",
-                "PrimedSlashLeft",
-                "LegacyCycle"
-            },
-            0);
-
-        [SettingPropertyGroup("Control", GroupOrder = 1)]
-        [SettingPropertyDropdown(
-            "Off-Hand Test Action",
-            Order = 4,
-            RequireRestart = false,
-            HintText = "Sequence cycles through the current off-hand profile. The fixed modes force one action for comparison logging.")]
-        public Dropdown<string> OffHandTestAction { get; set; } = new Dropdown<string>(
-            new[]
-            {
-                "Sequence",
-                "SlashLeftOnly",
-                "ThrustOnly",
-                "FistLeftOnly"
-            },
-            0);
-
-        [SettingPropertyGroup("Control", GroupOrder = 1)]
-        [SettingPropertyBool(
-            "Ignore Action Priority",
-            Order = 5,
-            RequireRestart = false,
-            HintText = "Lets forced off-hand attacks override more native actions. Stronger, but more invasive.")]
-        public bool IgnoreActionPriority { get; set; } = true;
-
-        [SettingPropertyGroup("Control", GroupOrder = 1)]
-        [SettingPropertyBool(
-            "Fallback To Overlay",
-            Order = 6,
-            RequireRestart = false,
-            HintText = "Deprecated for the current prototype. Left-hand stance actions are treated as Channel0-only.")]
-        public bool FallbackToOverlay { get; set; } = false;
 
         [SettingPropertyGroup("Attach", GroupOrder = 2)]
         [SettingPropertyInteger(
