@@ -23,6 +23,7 @@ namespace DualWieldPrototype
         internal enum RmbTriggerMode
         {
             DirectSlash,
+            FistProxy,
             ReleaseFollowUp,
             PrimedSlashLeft,
             LegacyCycle
@@ -205,6 +206,8 @@ namespace DualWieldPrototype
 
             _rmbTriggerMode = settings.RmbTriggerMode?.SelectedValue == "ReleaseFollowUp"
                 ? RmbTriggerMode.ReleaseFollowUp
+                : settings.RmbTriggerMode?.SelectedValue == "FistProxy"
+                    ? RmbTriggerMode.FistProxy
                 : settings.RmbTriggerMode?.SelectedValue == "PrimedSlashLeft"
                     ? RmbTriggerMode.PrimedSlashLeft
                     : settings.RmbTriggerMode?.SelectedValue == "LegacyCycle"
@@ -522,6 +525,18 @@ namespace DualWieldPrototype
 
                 bool started = TryStartLegacyCycleAttack(_playerState);
                 DualWieldPrototypeLogger.Log($"controltick_override mode=SplitMouse success={started} legacy=true");
+                return !started;
+            }
+
+            if (_rmbTriggerMode == RmbTriggerMode.FistProxy)
+            {
+                if (!inputContext.IsGameKeyPressed(10))
+                {
+                    return false;
+                }
+
+                bool started = TryStartSpecificOffhandAttack(_playerState, AttackVariant.FistSwingLeft, "rmb_fist_proxy");
+                DualWieldPrototypeLogger.Log($"controltick_override mode=SplitMouse success={started} fistProxy=true");
                 return !started;
             }
 

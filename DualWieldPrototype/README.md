@@ -35,6 +35,7 @@ Modi:
 - aktueller Vergleichspfad fuer `SplitMouse`:
 - `RMB Trigger Mode`:
 - `DirectSlash`: `RMB` feuert den Offhand-Slash direkt, sobald das linke Fenster offen ist
+- `FistProxy`: `RMB` feuert direkt `act_quick_release_swingleft_fist_left_stance`, waehrend die Offhand-Waffe weiter links angeheftet bleibt
 - `ReleaseFollowUp`: `RMB` versucht den alten Timing-Pfad nachzubauen: RH-Release erkennen, kurzer Delay, `ch1` clear, dann LH auf `ch0`
 - `PrimedSlashLeft`: `RMB` versucht zuerst einen LH-Thrust als Primer auf `ch0`, dann nach kurzem Delay `slashleft`
 - `LegacyCycle`: `RMB` stellt den alten Testzustand wieder her und iteriert pro Klick durch `slashright probe -> thrust -> slashleft`, inklusive Historien-Logging

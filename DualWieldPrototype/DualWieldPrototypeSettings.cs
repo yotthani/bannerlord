@@ -106,11 +106,12 @@ namespace DualWieldPrototype
             "RMB Trigger Mode",
             Order = 3,
             RequireRestart = false,
-            HintText = "DirectSlash fires the off-hand action as soon as the left-stance window opens. ReleaseFollowUp reproduces the older timing: detect a right-hand release, wait briefly, then fire left-hand on channel 0. LegacyCycle restores the older multi-action RMB iteration for state comparison.")]
+            HintText = "DirectSlash fires the off-hand slash once the left-stance window opens. FistProxy uses the native left fist swing while the off-hand weapon stays attached for a crude first-hit prototype. ReleaseFollowUp reproduces the older timing: detect a right-hand release, wait briefly, then fire left-hand on channel 0. LegacyCycle restores the older multi-action RMB iteration for state comparison.")]
         public Dropdown<string> RmbTriggerMode { get; set; } = new Dropdown<string>(
             new[]
             {
                 "DirectSlash",
+                "FistProxy",
                 "ReleaseFollowUp",
                 "PrimedSlashLeft",
                 "LegacyCycle"
