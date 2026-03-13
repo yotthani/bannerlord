@@ -1,8 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <item_usage_sets>
-  <item_usage_set id="dwp_fist_style_offhand" base_set="hand_shield" />
+  <item_usage_set id="dwp_fist_style_offhand" base_set="hand_shield">
+    <movement_sets>
+      <movement_set id="dwp_dual_1h" />
+    </movement_sets>
+  </item_usage_set>
 
   <item_usage_set id="dwp_fist_style_1h" base_set="onehanded_shield_swing_thrust">
+    <idles>
+      <idle
+        action="act_idle_1h_with_shield_1"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand" />
+      <idle
+        action="act_idle_1h_with_shield_1_left_stance"
+        is_left_stance="True"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand" />
+      <idle action="act_idle_1h_without_shield_1" require_free_left_hand="False" />
+      <idle
+        action="act_idle_1h_without_shield_1_left_stance"
+        is_left_stance="True"
+        require_free_left_hand="False" />
+    </idles>
+
+    <movement_sets>
+      <movement_set id="dwp_dual_1h" require_left_hand_usage_root_set="dwp_fist_style_offhand" />
+      <movement_set id="onehanded_swing_cantblock" />
+    </movement_sets>
+
     <usages>
       <usage
         style="attack_up"
@@ -31,6 +57,21 @@
         require_free_left_hand="True"
         is_left_stance="True"
         strike_type="swing" />
+      <usage
+        style="attack_up"
+        ready_action="act_ready_overswing_1h_left_stance"
+        ready_from_up_action="act_ready_from_up_overswing_1h_left_stance"
+        ready_from_left_action="act_ready_from_left_overswing_1h_left_stance"
+        ready_from_right_action="act_ready_from_right_overswing_1h_left_stance"
+        quick_release_action="act_quick_release_overswing_1h_left_stance"
+        release_action="act_release_overswing_1h_left_stance"
+        quick_blocked_action="act_quick_blocked_overswing_1h_left_stance"
+        blocked_action="act_blocked_overswing_1h_left_stance"
+        is_mounted="False"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
+        is_left_stance="True"
+        strike_type="swing" />
 
       <usage
         style="attack_down"
@@ -55,6 +96,20 @@
         stuck_action="act_stuck_thrust_1h_left_stance"
         is_mounted="False"
         require_free_left_hand="True"
+        is_left_stance="True"
+        strike_type="thrust" />
+      <usage
+        style="attack_down"
+        ready_action="act_ready_thrust_1h_left_stance"
+        quick_release_action="act_quick_release_thrust_1h_left_stance"
+        release_action="act_release_thrust_1h_left_stance"
+        quick_blocked_action="act_quick_blocked_thrust_1h_left_stance"
+        blocked_action="act_blocked_thrust_1h_left_stance"
+        quick_stuck_action="act_stuck_quick_thrust_1h_left_stance"
+        stuck_action="act_stuck_thrust_1h_left_stance"
+        is_mounted="False"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
         is_left_stance="True"
         strike_type="thrust" />
 
@@ -83,6 +138,20 @@
         require_free_left_hand="True"
         is_left_stance="True"
         strike_type="swing" />
+      <usage
+        style="attack_left"
+        ready_action="act_ready_slashleft_1h_left_stance"
+        ready_from_up_action="act_ready_from_up_slashleft_1h_left_stance"
+        ready_from_left_action="act_ready_from_left_slashleft_1h_left_stance"
+        quick_release_action="act_quick_release_slashleft_1h_left_stance"
+        release_action="act_release_slashleft_1h_left_stance"
+        quick_blocked_action="act_quick_blocked_slashleft_1h_left_stance"
+        blocked_action="act_blocked_slashleft_1h_left_stance"
+        is_mounted="False"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
+        is_left_stance="True"
+        strike_type="swing" />
 
       <usage
         style="attack_right"
@@ -109,6 +178,20 @@
         require_free_left_hand="False"
         is_left_stance="True"
         strike_type="swing" />
+      <usage
+        style="attack_right"
+        ready_action="act_ready_slashright_1h_left_stance"
+        ready_from_up_action="act_ready_from_up_slashright_1h_left_stance"
+        ready_from_right_action="act_ready_from_right_slashright_1h_left_stance"
+        quick_release_action="act_quick_release_slashright_1h_left_stance"
+        release_action="act_release_slashright_1h_left_stance"
+        quick_blocked_action="act_quick_blocked_slashright_1h_left_stance"
+        blocked_action="act_blocked_slashright_1h_left_stance"
+        is_mounted="False"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
+        is_left_stance="True"
+        strike_type="swing" />
 
       <usage
         style="defend_up"
@@ -124,6 +207,15 @@
         defend_parry_light_action="act_defend_up_1h_parry_light_left_stance"
         is_mounted="False"
         require_free_left_hand="True"
+        is_left_stance="True" />
+      <usage
+        style="defend_up"
+        defend_action="act_defend_up_1h_passive_left_stance"
+        defend_active_action="act_defend_up_1h_active_left_stance"
+        defend_parry_light_action="act_defend_up_1h_parry_light_left_stance"
+        is_mounted="False"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
         is_left_stance="True" />
 
       <usage
@@ -141,6 +233,15 @@
         is_mounted="False"
         require_free_left_hand="True"
         is_left_stance="True" />
+      <usage
+        style="defend_down"
+        defend_action="act_defend_forward_1h_passive_left_stance"
+        defend_active_action="act_defend_forward_1h_active_left_stance"
+        defend_parry_light_action="act_defend_forward_1h_parry_light_left_stance"
+        is_mounted="False"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
+        is_left_stance="True" />
 
       <usage
         style="defend_left"
@@ -156,6 +257,15 @@
         defend_parry_light_action="act_defend_left_1h_parry_light_left_stance"
         is_mounted="False"
         require_free_left_hand="True"
+        is_left_stance="True" />
+      <usage
+        style="defend_left"
+        defend_action="act_defend_left_1h_passive_left_stance"
+        defend_active_action="act_defend_left_1h_active_left_stance"
+        defend_parry_light_action="act_defend_left_1h_parry_light_left_stance"
+        is_mounted="False"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
         is_left_stance="True" />
 
       <usage
@@ -173,6 +283,130 @@
         is_mounted="False"
         require_free_left_hand="True"
         is_left_stance="True" />
+      <usage
+        style="defend_right"
+        defend_action="act_defend_right_1h_passive_left_stance"
+        defend_active_action="act_defend_right_1h_active_left_stance"
+        defend_parry_light_action="act_defend_right_1h_parry_light_left_stance"
+        is_mounted="False"
+        require_free_left_hand="False"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
+        is_left_stance="True" />
     </usages>
+
+    <guards>
+      <guard
+        style="up"
+        action="act_guard_up_1h"
+        hand_position="0,0.1,0.2"
+        hand_rotation="0,0"
+        arm_rotation="0,0"
+        arm_length="0" />
+      <guard
+        style="up"
+        action="act_guard_up_1h_left_stance"
+        is_left_stance="True"
+        hand_position="0,0.1,0.2"
+        hand_rotation="0,0"
+        arm_rotation="0,0"
+        arm_length="0" />
+      <guard
+        style="up"
+        action="act_guard_up_1h_left_stance"
+        is_left_stance="True"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
+        hand_position="0,0.1,0.2"
+        hand_rotation="0,0"
+        arm_rotation="0,0"
+        arm_length="0" />
+
+      <guard
+        style="down"
+        action="act_guard_bottom_1h"
+        hand_position="0,0.1,-0.3"
+        hand_rotation="0,-72"
+        arm_rotation="0,0"
+        arm_length="0" />
+      <guard
+        style="down"
+        action="act_guard_bottom_1h_left_stance"
+        is_left_stance="True"
+        hand_position="0,0.1,-0.3"
+        hand_rotation="0,-72"
+        arm_rotation="0,0"
+        arm_length="0" />
+      <guard
+        style="down"
+        action="act_guard_bottom_1h_left_stance"
+        is_left_stance="True"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
+        hand_position="0,0.1,-0.3"
+        hand_rotation="0,-72"
+        arm_rotation="0,0"
+        arm_length="0" />
+
+      <guard
+        style="left"
+        action="act_guard_left_1h"
+        hand_position="-0.2,0.1,-0.2"
+        hand_rotation="-36,0"
+        arm_rotation="0,0"
+        arm_length="0" />
+      <guard
+        style="left"
+        action="act_guard_left_1h_left_stance"
+        is_left_stance="True"
+        hand_position="-0.2,0.1,-0.2"
+        hand_rotation="-36,0"
+        arm_rotation="0,0"
+        arm_length="0" />
+      <guard
+        style="left"
+        action="act_guard_left_1h_left_stance"
+        is_left_stance="True"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
+        hand_position="-0.2,0.1,-0.2"
+        hand_rotation="-36,0"
+        arm_rotation="0,0"
+        arm_length="0" />
+
+      <guard
+        style="right"
+        action="act_guard_right_1h"
+        hand_position="0.2,0.1,-0.2"
+        hand_rotation="36,0"
+        arm_rotation="0,0"
+        arm_length="0" />
+      <guard
+        style="right"
+        action="act_guard_right_1h_left_stance"
+        is_left_stance="True"
+        hand_position="0.2,0.1,-0.2"
+        hand_rotation="36,0"
+        arm_rotation="0,0"
+        arm_length="0" />
+      <guard
+        style="right"
+        action="act_guard_right_1h_left_stance"
+        is_left_stance="True"
+        require_left_hand_usage_root_set="dwp_fist_style_offhand"
+        hand_position="0.2,0.1,-0.2"
+        hand_rotation="36,0"
+        arm_rotation="0,0"
+        arm_length="0" />
+    </guards>
+
+    <kick_usages>
+      <kick_usage
+        release_action="act_1h_bash"
+        hit_action="act_hit_1h_bash"
+        left_hand_empty="True"
+        is_left_stance="False" />
+      <kick_usage
+        release_action="act_1h_bash_left_stance"
+        hit_action="act_hit_1h_bash_left_stance"
+        left_hand_empty="True"
+        is_left_stance="True" />
+    </kick_usages>
   </item_usage_set>
 </item_usage_sets>

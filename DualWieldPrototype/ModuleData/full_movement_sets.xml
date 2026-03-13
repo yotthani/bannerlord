@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full_movement_sets>
+  <full_movement_set id="dwp_dual_1h" base_set="1h_with_hand_shield" />
+</full_movement_sets>

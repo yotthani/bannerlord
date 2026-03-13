@@ -1,64 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Items>
   <Item
-    id="dwp_xml_mainhand"
-    name="DWP XML Mainhand"
-    mesh="training_sword"
-    culture="Culture.sturgia"
-    item_category="weapon"
+    id="dwp_control_mainhand"
+    name="{=dwp_control_mainhand}DWP Control Mainhand"
     is_merchandise="false"
+    body_name="bo_mace_a"
+    recalculate_body="true"
+    mesh="horse_whip"
+    weight="0.2"
     value="1"
-    weight="1.1"
     Type="OneHandedWeapon"
-    holster_body_name="bo_training_sword"
     item_holsters="sword_left_hip">
     <ItemComponent>
       <Weapon
         weapon_class="OneHandedSword"
-        speed_rating="98"
-        physics_material="metal_weapon"
-        weapon_length="95"
-        swing_damage="42"
-        swing_damage_type="Cut"
-        thrust_damage="21"
-        thrust_damage_type="Pierce"
-        thrust_speed="85"
         weapon_balance="100"
-        item_usage="dwp_fist_style_1h">
-        <WeaponFlags MeleeWeapon="true" NotUsableWithOneHand="false" />
+        thrust_speed="79"
+        speed_rating="99"
+        physics_material="wood_weapon"
+        missile_speed="0"
+        weapon_length="95"
+        thrust_damage="6"
+        thrust_damage_type="Blunt"
+        swing_damage="5"
+        swing_damage_type="Blunt"
+        item_usage="onehanded_block_shield_swing">
+        <WeaponFlags MeleeWeapon="true" />
       </Weapon>
     </ItemComponent>
-    <Flags Civilian="true" UseTeamColor="false" />
+    <Flags />
+  </Item>
+
+  <Item
+    id="dwp_control_offhand"
+    name="{=dwp_control_offhand}DWP Control Offhand"
+    is_merchandise="false"
+    body_name="bo_mace_a"
+    recalculate_body="true"
+    mesh="torch_g"
+    prefab="torch_a_wm_only_flame"
+    weight="0.2"
+    value="4"
+    Type="OneHandedWeapon"
+    item_holsters="abdomen_left">
+    <ItemComponent>
+      <Weapon
+        weapon_class="OneHandedAxe"
+        weapon_balance="100"
+        thrust_speed="78"
+        speed_rating="97"
+        physics_material="metal_weapon"
+        missile_speed="0"
+        weapon_length="65"
+        swing_damage="6"
+        swing_damage_type="Blunt"
+        item_usage="banner">
+        <WeaponFlags MeleeWeapon="true" />
+      </Weapon>
+    </ItemComponent>
+    <Flags Stealth="true" DropOnWeaponChange="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" HasToBeHeldUp="true" />
+  </Item>
+
+  <Item
+    id="dwp_xml_mainhand"
+    name="{=dwp_xml_mainhand}DWP XML Mainhand"
+    is_merchandise="false"
+    body_name="bo_mace_a"
+    recalculate_body="true"
+    mesh="horse_whip"
+    weight="0.2"
+    value="1"
+    Type="OneHandedWeapon"
+    item_holsters="sword_left_hip">
+    <ItemComponent>
+      <Weapon
+        weapon_class="OneHandedSword"
+        weapon_balance="100"
+        thrust_speed="79"
+        speed_rating="99"
+        physics_material="wood_weapon"
+        missile_speed="0"
+        weapon_length="95"
+        thrust_damage="6"
+        thrust_damage_type="Blunt"
+        swing_damage="5"
+        swing_damage_type="Blunt"
+        item_usage="dwp_fist_style_1h">
+        <WeaponFlags MeleeWeapon="true" />
+      </Weapon>
+    </ItemComponent>
+    <Flags />
   </Item>
 
   <Item
     id="dwp_xml_offhand"
-    name="DWP XML Offhand"
-    mesh="training_sword"
-    culture="Culture.sturgia"
-    item_category="weapon"
+    name="{=dwp_xml_offhand}DWP XML Offhand"
     is_merchandise="false"
-    value="1"
-    weight="1.1"
+    body_name="bo_mace_a"
+    recalculate_body="true"
+    mesh="torch_g"
+    prefab="torch_a_wm_only_flame"
+    weight="0.2"
+    value="4"
     Type="OneHandedWeapon"
-    holster_body_name="bo_training_sword"
-    item_holsters="sword_left_hip">
+    item_holsters="abdomen_left">
     <ItemComponent>
       <Weapon
-        weapon_class="OneHandedSword"
-        speed_rating="98"
-        physics_material="metal_weapon"
-        weapon_length="95"
-        swing_damage="42"
-        swing_damage_type="Cut"
-        thrust_damage="21"
-        thrust_damage_type="Pierce"
-        thrust_speed="85"
+        weapon_class="OneHandedAxe"
         weapon_balance="100"
+        thrust_speed="78"
+        speed_rating="97"
+        physics_material="metal_weapon"
+        missile_speed="0"
+        weapon_length="65"
+        swing_damage="6"
+        swing_damage_type="Blunt"
         item_usage="dwp_fist_style_offhand">
-        <WeaponFlags MeleeWeapon="true" NotUsableWithOneHand="false" />
+        <WeaponFlags MeleeWeapon="true" />
       </Weapon>
     </ItemComponent>
-    <Flags Civilian="true" UseTeamColor="false" WoodenParry="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" />
+    <Flags Stealth="true" DropOnWeaponChange="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" HasToBeHeldUp="true" />
   </Item>
 </Items>

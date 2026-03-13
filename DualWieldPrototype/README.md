@@ -66,6 +66,8 @@ XML-Diagnosetest:
 - `dwp_xml_offhand`
 - `dwp_fist_style_1h`
 - `dwp_fist_style_offhand`
+- `ModuleData/project.mbproj` registriert `item_usage_sets.xml`
+- `SubModule.xml` laedt nur die Test-Items
 
 Ziel des XML-Tests:
 
