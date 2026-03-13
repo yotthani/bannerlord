@@ -46,6 +46,22 @@ namespace DualWieldPrototype
             HintText = "Adds pre/post action state, stages, weights and movement flags for each forced off-hand attack.")]
         public bool DeepActionLogging { get; set; } = true;
 
+        [SettingPropertyGroup("General", GroupOrder = 0)]
+        [SettingPropertyBool(
+            "Trace Native Channel Calls",
+            Order = 4,
+            RequireRestart = false,
+            HintText = "Logs every Agent.SetActionChannel call for the main agent in supported missions, including caller fingerprints and our own scope markers.")]
+        public bool TraceNativeChannelCalls { get; set; } = false;
+
+        [SettingPropertyGroup("General", GroupOrder = 0)]
+        [SettingPropertyBool(
+            "Unarmed Trace Mode",
+            Order = 5,
+            RequireRestart = false,
+            HintText = "Disables the dual-wield control logic and only traces native unarmed combat for the main agent.")]
+        public bool UnarmedTraceMode { get; set; } = false;
+
         [SettingPropertyGroup("Control", GroupOrder = 1)]
         [SettingPropertyDropdown(
             "Control Mode",

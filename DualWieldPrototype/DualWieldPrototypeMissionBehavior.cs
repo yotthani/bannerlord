@@ -75,6 +75,7 @@ namespace DualWieldPrototype
             public int LegacyCycleIndex;
             public string LastForcedOffhandActionName;
             public string PreviousForcedOffhandActionName;
+            public string LastLoggedUnarmedTraceSignature;
         }
 
         private static readonly AttackVariant[] DefaultWeaponSequence =
@@ -120,6 +121,7 @@ namespace DualWieldPrototype
         private PlaybackMode _playbackMode = PlaybackMode.Channel0Combat;
         private RmbTriggerMode _rmbTriggerMode = RmbTriggerMode.DirectSlash;
         private TestActionMode _testActionMode = TestActionMode.Sequence;
+        private bool _unarmedTraceMode;
         private PlayerState _playerState;
         private bool _loggedForcedChannel0;
         private bool _vWasDown;
@@ -158,6 +160,15 @@ namespace DualWieldPrototype
 
             EnsurePlayerState(mainAgent);
             ApplySettings(settings);
+
+            if (_unarmedTraceMode)
+            {
+                ClearCurrentAttachment();
+                LogUnarmedTraceStateIfChanged(_playerState);
+                TrackActionChanges(_playerState);
+                TrackLeftStanceTransitions(_playerState);
+                return;
+            }
 
             if (!TryRefreshLoadout(_playerState))
             {
@@ -207,6 +218,7 @@ namespace DualWieldPrototype
                 "FistLeftOnly" => TestActionMode.FistLeftOnly,
                 _ => TestActionMode.Sequence
             };
+            _unarmedTraceMode = settings.UnarmedTraceMode;
 
             _playbackMode = PlaybackMode.Channel0Combat;
             if (settings.PlaybackMode?.SelectedValue == "Channel1Overlay" && !_loggedForcedChannel0)
@@ -217,7 +229,8 @@ namespace DualWieldPrototype
 
             string settingsSignature =
                 $"control={_controlMode} rmb={_rmbTriggerMode} testAction={_testActionMode} cooldown={settings.OffHandCooldownSeconds:0.00} " +
-                $"ignorePriority={settings.IgnoreActionPriority} fallbackOverlay={settings.FallbackToOverlay}";
+                $"ignorePriority={settings.IgnoreActionPriority} fallbackOverlay={settings.FallbackToOverlay} " +
+                $"traceNative={settings.TraceNativeChannelCalls} unarmedTrace={settings.UnarmedTraceMode}";
             if (settingsSignature != _lastLoggedSettingsSignature)
             {
                 _lastLoggedSettingsSignature = settingsSignature;
@@ -388,6 +401,11 @@ namespace DualWieldPrototype
 
             DualWieldPrototypeSettings settings = DualWieldPrototypeSettings.Get();
             if (!settings.EnablePrototype)
+            {
+                return isDown;
+            }
+
+            if (settings.UnarmedTraceMode)
             {
                 return isDown;
             }
@@ -620,22 +638,30 @@ namespace DualWieldPrototype
             else if (channel1Action != ActionIndexCache.act_none)
             {
                 ActionIndexCache clearAction = ActionIndexCache.act_none;
-                bool cleared = state.Agent.SetActionChannel(1, in clearAction, true, 0);
+                bool cleared;
+                using (DualWieldPrototypeTraceContext.Push($"behavior:{phaseTag}:clear_ch1"))
+                {
+                    cleared = state.Agent.SetActionChannel(1, in clearAction, true, 0);
+                }
                 DualWieldPrototypeLogger.Log($"channel1_clear before={channel1Action.GetName()} cleared={cleared}");
             }
 
-            bool started = isLegacyCycleCall
-                ? state.Agent.SetActionChannel(channel, in action, true, 0)
-                : state.Agent.SetActionChannel(
-                    channel,
-                    in action,
-                    true,
-                    0,
-                    0f,
-                    1f,
-                    0.03f,
-                    0.15f,
-                    0f);
+            bool started;
+            using (DualWieldPrototypeTraceContext.Push($"behavior:{phaseTag}:set_ch{channel}"))
+            {
+                started = isLegacyCycleCall
+                    ? state.Agent.SetActionChannel(channel, in action, true, 0)
+                    : state.Agent.SetActionChannel(
+                        channel,
+                        in action,
+                        true,
+                        0,
+                        0f,
+                        1f,
+                        0.03f,
+                        0.15f,
+                        0f);
+            }
             if (isLegacyCycleCall)
             {
                 DualWieldPrototypeLogger.Log("legacy_cycle_call signature=minimal");
@@ -1011,6 +1037,27 @@ namespace DualWieldPrototype
             _playerState.OffhandSlot = EquipmentIndex.None;
             _playerState.AttachConfigHash = 0;
             DualWieldPrototypeLogger.Log("attachment_cleared");
+        }
+
+        private static void LogUnarmedTraceStateIfChanged(PlayerState state)
+        {
+            if (state?.Agent == null)
+            {
+                return;
+            }
+
+            EquipmentIndex primary = state.Agent.GetPrimaryWieldedItemIndex();
+            EquipmentIndex offhand = state.Agent.GetOffhandWieldedItemIndex();
+            string signature =
+                $"primary={(int)primary} offhand={(int)offhand} leftStance={state.Agent.GetIsLeftStance()} " +
+                $"ch0={state.Agent.GetCurrentAction(0).GetName()} ch1={state.Agent.GetCurrentAction(1).GetName()}";
+            if (signature == state.LastLoggedUnarmedTraceSignature)
+            {
+                return;
+            }
+
+            state.LastLoggedUnarmedTraceSignature = signature;
+            DualWieldPrototypeLogger.Log($"unarmed_trace_state {signature}");
         }
 
         private static int BuildAttachConfigHash()

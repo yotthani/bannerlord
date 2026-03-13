@@ -16,6 +16,8 @@ MCM:
 - `Live Messages`
 - `Debug File Logging`
 - `Deep Action Logging`
+- `Trace Native Channel Calls`
+- `Unarmed Trace Mode`
 - `Control Mode`
 - `Playback Mode`
 - `Off-Hand Cooldown`
@@ -54,6 +56,8 @@ Modi:
 - `attack_diag ...` schreibt bei aktiviertem `Deep Action Logging` den genauen Vor-/Nachzustand
   pro erzwungenem Offhand-Angriff ins Dateilog
 - `legacy_cycle_probe ...` und `legacy_cycle_resolved ...` loggen im Legacy-Zyklus zusaetzlich die letzten beiden erzwungenen Offhand-Actions
+- `Trace Native Channel Calls` loggt zusaetzlich jeden `Agent.SetActionChannel`-Call fuer den Main-Agent in supported missions
+- `Unarmed Trace Mode` deaktiviert die Dual-Wield-Eingriffslogik und dient nur dazu, nativen Faustkampf sauber zu tracen
 
 Anmerkung:
 
