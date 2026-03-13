@@ -1,60 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Items>
-  <Item id="dwp_test_mainhand"
-        name="DWP Test Mainhand"
-        is_merchandise="false"
-        body_name="bo_mace_a"
-        recalculate_body="false"
-        mesh="vlandia_twohanded_sword_a"
-        weight="0.2"
-        value="1"
-        Type="OneHandedWeapon"
-        item_holsters="sword_left_hip">
+  <Item
+    id="dwp_xml_mainhand"
+    name="DWP XML Mainhand"
+    mesh="training_sword"
+    culture="Culture.sturgia"
+    item_category="weapon"
+    is_merchandise="false"
+    value="1"
+    weight="1.1"
+    Type="OneHandedWeapon"
+    holster_body_name="bo_training_sword"
+    item_holsters="sword_left_hip">
     <ItemComponent>
-      <Weapon weapon_class="OneHandedSword"
-              weapon_balance="100"
-              thrust_speed="79"
-              speed_rating="99"
-              physics_material="wood_weapon"
-              missile_speed="0"
-              weapon_length="95"
-              thrust_damage="6"
-              thrust_damage_type="Pierce"
-              swing_damage="50"
-              swing_damage_type="Cut"
-              item_usage="dw_test_mainhand_swing_thrust">
-        <WeaponFlags MeleeWeapon="true"/>
+      <Weapon
+        weapon_class="OneHandedSword"
+        speed_rating="98"
+        physics_material="metal_weapon"
+        weapon_length="95"
+        swing_damage="42"
+        swing_damage_type="Cut"
+        thrust_damage="21"
+        thrust_damage_type="Pierce"
+        thrust_speed="85"
+        weapon_balance="100"
+        item_usage="dwp_fist_style_1h">
+        <WeaponFlags MeleeWeapon="true" NotUsableWithOneHand="false" />
       </Weapon>
     </ItemComponent>
-    <Flags/>
+    <Flags Civilian="true" UseTeamColor="false" />
   </Item>
 
-  <Item id="dwp_test_offhand"
-        name="DWP Test Offhand"
-        is_merchandise="false"
-        body_name="bo_mace_a"
-        recalculate_body="false"
-        mesh="vlandia_twohanded_sword_a"
-        weight="0.2"
-        value="1"
-        Type="OneHandedWeapon"
-        item_holsters="sword_left_hip">
+  <Item
+    id="dwp_xml_offhand"
+    name="DWP XML Offhand"
+    mesh="training_sword"
+    culture="Culture.sturgia"
+    item_category="weapon"
+    is_merchandise="false"
+    value="1"
+    weight="1.1"
+    Type="OneHandedWeapon"
+    holster_body_name="bo_training_sword"
+    item_holsters="sword_left_hip">
     <ItemComponent>
-      <Weapon weapon_class="OneHandedSword"
-              weapon_balance="100"
-              thrust_speed="79"
-              speed_rating="99"
-              physics_material="wood_weapon"
-              missile_speed="0"
-              weapon_length="95"
-              thrust_damage="6"
-              thrust_damage_type="Pierce"
-              swing_damage="50"
-              swing_damage_type="Cut"
-              item_usage="dw_test_offhand">
-        <WeaponFlags MeleeWeapon="true"/>
+      <Weapon
+        weapon_class="OneHandedSword"
+        speed_rating="98"
+        physics_material="metal_weapon"
+        weapon_length="95"
+        swing_damage="42"
+        swing_damage_type="Cut"
+        thrust_damage="21"
+        thrust_damage_type="Pierce"
+        thrust_speed="85"
+        weapon_balance="100"
+        item_usage="dwp_fist_style_offhand">
+        <WeaponFlags MeleeWeapon="true" NotUsableWithOneHand="false" />
       </Weapon>
     </ItemComponent>
-    <Flags WoodenParry="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true"/>
+    <Flags Civilian="true" UseTeamColor="false" WoodenParry="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" />
   </Item>
 </Items>

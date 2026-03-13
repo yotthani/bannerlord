@@ -59,3 +59,16 @@ Logging:
 - `leftstance_change ...`
 
 Dieser Stand ist bewusst klein gehalten. Alte Legacy-/Cycle-/Follow-up-Experimente wurden entfernt, damit neue Tests auf einem klaren Basispunkt starten.
+
+XML-Diagnosetest:
+
+- `dwp_xml_mainhand`
+- `dwp_xml_offhand`
+- `dwp_fist_style_1h`
+- `dwp_fist_style_offhand`
+
+Ziel des XML-Tests:
+
+- ein 1h-Usage-Set im Stil der Faust-Usages pruefen
+- insbesondere die `require_free_left_hand`- und `is_left_stance`-Kombinationen
+- ohne zu behaupten, dass beliebige Vanilla-/Fremditems zur Laufzeit auf ein anderes `item_usage` umgebogen werden koennen

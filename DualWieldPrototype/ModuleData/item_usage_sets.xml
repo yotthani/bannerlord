@@ -1,131 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
 <item_usage_sets>
-  <item_usage_set id="dw_test_offhand" base_set="hand_shield">
-    <movement_sets>
-    </movement_sets>
-  </item_usage_set>
+  <item_usage_set id="dwp_fist_style_offhand" base_set="hand_shield" />
 
-  <item_usage_set id="dw_test_mainhand_swing"
-                  switch_to_alternate_action="act_switch_back_alternate_knife"
-                  switch_to_alternate_action_left_stance="act_switch_back_alternate_knife_left_stance"
-                  equip_sound="event:/mission/combat/equip/sword_equip"
-                  unequip_sound="event:/mission/combat/equip/sword_unequip">
-    <idles>
-      <idle action="act_idle_1h_with_shield_1" require_free_left_hand="False"/>
-      <idle action="act_idle_1h_with_shield_1_left_stance" is_left_stance="True" require_free_left_hand="False"/>
-      <idle action="act_idle_1h_without_shield_1" require_free_left_hand="False"/>
-      <idle action="act_idle_1h_without_shield_1_left_stance" is_left_stance="True" require_free_left_hand="False"/>
-    </idles>
-    <movement_sets>
-      <movement_set id="1h_with_hand_shield"/>
-      <movement_set id="onehanded_swing_cantblock"/>
-    </movement_sets>
+  <item_usage_set id="dwp_fist_style_1h" base_set="onehanded_shield_swing_thrust">
     <usages>
-      <usage style="attack_up"
-             ready_action="act_ready_overswing_1h"
-             ready_from_up_action="act_ready_from_up_overswing_1h"
-             ready_from_left_action="act_ready_from_left_overswing_1h"
-             ready_from_right_action="act_ready_from_right_overswing_1h"
-             quick_release_action="act_quick_release_overswing_1h"
-             release_action="act_release_overswing_1h"
-             quick_blocked_action="act_quick_blocked_overswing_1h"
-             blocked_action="act_blocked_overswing_1h"
-             is_mounted="False"
-             require_free_left_hand="False"
-             strike_type="swing"/>
+      <usage
+        style="attack_up"
+        ready_action="act_ready_overswing_1h"
+        ready_from_up_action="act_ready_from_up_overswing_1h"
+        ready_from_left_action="act_ready_from_left_overswing_1h"
+        ready_from_right_action="act_ready_from_right_overswing_1h"
+        quick_release_action="act_quick_release_overswing_1h"
+        release_action="act_release_overswing_1h"
+        quick_blocked_action="act_quick_blocked_overswing_1h"
+        blocked_action="act_blocked_overswing_1h"
+        is_mounted="False"
+        require_free_left_hand="False"
+        strike_type="swing" />
+      <usage
+        style="attack_up"
+        ready_action="act_ready_overswing_1h_left_stance"
+        ready_from_up_action="act_ready_from_up_overswing_1h_left_stance"
+        ready_from_left_action="act_ready_from_left_overswing_1h_left_stance"
+        ready_from_right_action="act_ready_from_right_overswing_1h_left_stance"
+        quick_release_action="act_quick_release_overswing_1h_left_stance"
+        release_action="act_release_overswing_1h_left_stance"
+        quick_blocked_action="act_quick_blocked_overswing_1h_left_stance"
+        blocked_action="act_blocked_overswing_1h_left_stance"
+        is_mounted="False"
+        require_free_left_hand="True"
+        is_left_stance="True"
+        strike_type="swing" />
 
-      <usage style="attack_right"
-             ready_action="act_ready_slashright_1h"
-             ready_from_up_action="act_ready_from_up_slashright_1h"
-             ready_from_right_action="act_ready_from_right_slashright_1h"
-             quick_release_action="act_quick_release_slashright_1h"
-             release_action="act_release_slashright_1h"
-             quick_blocked_action="act_quick_blocked_slashright_1h"
-             blocked_action="act_blocked_slashright_1h"
-             is_mounted="False"
-             require_free_left_hand="False"
-             strike_type="swing"/>
+      <usage
+        style="attack_down"
+        ready_action="act_ready_thrust_1h"
+        quick_release_action="act_quick_release_thrust_1h"
+        release_action="act_release_thrust_1h"
+        quick_blocked_action="act_quick_blocked_thrust_1h"
+        blocked_action="act_blocked_thrust_1h"
+        quick_stuck_action="act_stuck_quick_thrust_1h"
+        stuck_action="act_stuck_thrust_1h"
+        is_mounted="False"
+        require_free_left_hand="False"
+        strike_type="thrust" />
+      <usage
+        style="attack_down"
+        ready_action="act_ready_thrust_1h_left_stance"
+        quick_release_action="act_quick_release_thrust_1h_left_stance"
+        release_action="act_release_thrust_1h_left_stance"
+        quick_blocked_action="act_quick_blocked_thrust_1h_left_stance"
+        blocked_action="act_blocked_thrust_1h_left_stance"
+        quick_stuck_action="act_stuck_quick_thrust_1h_left_stance"
+        stuck_action="act_stuck_thrust_1h_left_stance"
+        is_mounted="False"
+        require_free_left_hand="True"
+        is_left_stance="True"
+        strike_type="thrust" />
 
-      <usage style="attack_left"
-             ready_action="act_ready_slashleft_1h"
-             ready_from_up_action="act_ready_from_up_slashleft_1h"
-             ready_from_left_action="act_ready_from_left_slashleft_1h"
-             quick_release_action="act_quick_release_slashleft_1h"
-             release_action="act_release_slashleft_1h"
-             quick_blocked_action="act_quick_blocked_slashleft_1h"
-             blocked_action="act_blocked_slashleft_1h"
-             is_mounted="False"
-             require_free_left_hand="False"
-             strike_type="swing"/>
+      <usage
+        style="attack_left"
+        ready_action="act_ready_slashleft_1h"
+        ready_from_up_action="act_ready_from_up_slashleft_1h"
+        ready_from_left_action="act_ready_from_left_slashleft_1h"
+        quick_release_action="act_quick_release_slashleft_1h"
+        release_action="act_release_slashleft_1h"
+        quick_blocked_action="act_quick_blocked_slashleft_1h"
+        blocked_action="act_blocked_slashleft_1h"
+        is_mounted="False"
+        require_free_left_hand="True"
+        strike_type="swing" />
+      <usage
+        style="attack_left"
+        ready_action="act_ready_slashleft_1h_left_stance"
+        ready_from_up_action="act_ready_from_up_slashleft_1h_left_stance"
+        ready_from_left_action="act_ready_from_left_slashleft_1h_left_stance"
+        quick_release_action="act_quick_release_slashleft_1h_left_stance"
+        release_action="act_release_slashleft_1h_left_stance"
+        quick_blocked_action="act_quick_blocked_slashleft_1h_left_stance"
+        blocked_action="act_blocked_slashleft_1h_left_stance"
+        is_mounted="False"
+        require_free_left_hand="True"
+        is_left_stance="True"
+        strike_type="swing" />
 
-      <usage style="attack_up"
-             is_left_stance="True"
-             ready_action="act_ready_overswing_1h_left_stance"
-             ready_from_up_action="act_ready_from_up_overswing_1h_left_stance"
-             ready_from_left_action="act_ready_from_left_overswing_1h_left_stance"
-             ready_from_right_action="act_ready_from_right_overswing_1h_left_stance"
-             quick_release_action="act_quick_release_overswing_1h_left_stance"
-             release_action="act_release_overswing_1h_left_stance"
-             quick_blocked_action="act_quick_blocked_overswing_1h_left_stance"
-             blocked_action="act_blocked_overswing_1h_left_stance"
-             is_mounted="False"
-             require_free_left_hand="False"
-             strike_type="swing"/>
+      <usage
+        style="attack_right"
+        ready_action="act_ready_slashright_1h"
+        ready_from_up_action="act_ready_from_up_slashright_1h"
+        ready_from_right_action="act_ready_from_right_slashright_1h"
+        quick_release_action="act_quick_release_slashright_1h"
+        release_action="act_release_slashright_1h"
+        quick_blocked_action="act_quick_blocked_slashright_1h"
+        blocked_action="act_blocked_slashright_1h"
+        is_mounted="False"
+        require_free_left_hand="False"
+        strike_type="swing" />
+      <usage
+        style="attack_right"
+        ready_action="act_ready_slashright_1h_left_stance"
+        ready_from_up_action="act_ready_from_up_slashright_1h_left_stance"
+        ready_from_right_action="act_ready_from_right_slashright_1h_left_stance"
+        quick_release_action="act_quick_release_slashright_1h_left_stance"
+        release_action="act_release_slashright_1h_left_stance"
+        quick_blocked_action="act_quick_blocked_slashright_1h_left_stance"
+        blocked_action="act_blocked_slashright_1h_left_stance"
+        is_mounted="False"
+        require_free_left_hand="False"
+        is_left_stance="True"
+        strike_type="swing" />
 
-      <usage style="attack_right"
-             is_left_stance="True"
-             ready_action="act_ready_slashright_1h_left_stance"
-             ready_from_up_action="act_ready_from_up_slashright_1h_left_stance"
-             ready_from_right_action="act_ready_from_right_slashright_1h_left_stance"
-             quick_release_action="act_quick_release_slashright_1h_left_stance"
-             release_action="act_release_slashright_1h_left_stance"
-             quick_blocked_action="act_quick_blocked_slashright_1h_left_stance"
-             blocked_action="act_blocked_slashright_1h_left_stance"
-             is_mounted="False"
-             require_free_left_hand="False"
-             strike_type="swing"/>
+      <usage
+        style="defend_up"
+        defend_action="act_defend_up_1h_passive"
+        defend_active_action="act_defend_up_1h_active"
+        defend_parry_light_action="act_defend_up_1h_parry_light"
+        is_mounted="False"
+        require_free_left_hand="True" />
+      <usage
+        style="defend_up"
+        defend_action="act_defend_up_1h_passive_left_stance"
+        defend_active_action="act_defend_up_1h_active_left_stance"
+        defend_parry_light_action="act_defend_up_1h_parry_light_left_stance"
+        is_mounted="False"
+        require_free_left_hand="True"
+        is_left_stance="True" />
 
-      <usage style="attack_left"
-             is_left_stance="True"
-             ready_action="act_ready_slashleft_1h_left_stance"
-             ready_from_up_action="act_ready_from_up_slashleft_1h_left_stance"
-             ready_from_left_action="act_ready_from_left_slashleft_1h_left_stance"
-             quick_release_action="act_quick_release_slashleft_1h_left_stance"
-             release_action="act_release_slashleft_1h_left_stance"
-             quick_blocked_action="act_quick_blocked_slashleft_1h_left_stance"
-             blocked_action="act_blocked_slashleft_1h_left_stance"
-             is_mounted="False"
-             require_free_left_hand="False"
-             strike_type="swing"/>
-    </usages>
-  </item_usage_set>
+      <usage
+        style="defend_down"
+        defend_action="act_defend_forward_1h_passive"
+        defend_active_action="act_defend_forward_1h_active"
+        defend_parry_light_action="act_defend_forward_1h_parry_light"
+        is_mounted="False"
+        require_free_left_hand="True" />
+      <usage
+        style="defend_down"
+        defend_action="act_defend_forward_1h_passive_left_stance"
+        defend_active_action="act_defend_forward_1h_active_left_stance"
+        defend_parry_light_action="act_defend_forward_1h_parry_light_left_stance"
+        is_mounted="False"
+        require_free_left_hand="True"
+        is_left_stance="True" />
 
-  <item_usage_set id="dw_test_mainhand_swing_thrust" base_set="dw_test_mainhand_swing">
-    <usages>
-      <usage style="attack_down"
-             ready_action="act_ready_thrust_1h"
-             quick_release_action="act_quick_release_thrust_1h"
-             release_action="act_release_thrust_1h"
-             quick_blocked_action="act_quick_blocked_thrust_1h"
-             blocked_action="act_blocked_thrust_1h"
-             quick_stuck_action="act_stuck_quick_thrust_1h"
-             stuck_action="act_stuck_thrust_1h"
-             is_mounted="False"
-             require_free_left_hand="False"
-             strike_type="thrust"/>
+      <usage
+        style="defend_left"
+        defend_action="act_defend_left_1h_passive"
+        defend_active_action="act_defend_left_1h_active"
+        defend_parry_light_action="act_defend_left_1h_parry_light"
+        is_mounted="False"
+        require_free_left_hand="True" />
+      <usage
+        style="defend_left"
+        defend_action="act_defend_left_1h_passive_left_stance"
+        defend_active_action="act_defend_left_1h_active_left_stance"
+        defend_parry_light_action="act_defend_left_1h_parry_light_left_stance"
+        is_mounted="False"
+        require_free_left_hand="True"
+        is_left_stance="True" />
 
-      <usage style="attack_down"
-             is_left_stance="True"
-             ready_action="act_ready_thrust_1h_left_stance"
-             quick_release_action="act_quick_release_thrust_1h_left_stance"
-             release_action="act_release_thrust_1h_left_stance"
-             quick_blocked_action="act_quick_blocked_thrust_1h_left_stance"
-             blocked_action="act_blocked_thrust_1h_left_stance"
-             quick_stuck_action="act_stuck_quick_thrust_1h_left_stance"
-             stuck_action="act_stuck_thrust_1h_left_stance"
-             is_mounted="False"
-             require_free_left_hand="False"
-             strike_type="thrust"/>
+      <usage
+        style="defend_right"
+        defend_action="act_defend_right_1h_passive"
+        defend_active_action="act_defend_right_1h_active"
+        defend_parry_light_action="act_defend_right_1h_parry_light"
+        is_mounted="False"
+        require_free_left_hand="True" />
+      <usage
+        style="defend_right"
+        defend_action="act_defend_right_1h_passive_left_stance"
+        defend_active_action="act_defend_right_1h_active_left_stance"
+        defend_parry_light_action="act_defend_right_1h_parry_light_left_stance"
+        is_mounted="False"
+        require_free_left_hand="True"
+        is_left_stance="True" />
     </usages>
   </item_usage_set>
 </item_usage_sets>
