@@ -72,7 +72,7 @@ namespace DualWieldPrototype
             }
 
             Mission mission = Mission.Current;
-            if (mission == null || !DualWieldPrototypeMissionFilters.IsSupportedMission(mission))
+            if (!DualWieldPrototypeMissionFilters.IsSupportedCombatContext(mission, __instance))
             {
                 return;
             }

@@ -36,12 +36,22 @@ namespace DualWieldPrototype
                 return false;
             }
 
+            if (mission.CurrentState != Mission.State.Continuing)
+            {
+                return false;
+            }
+
             if (agent == null || !agent.IsActive() || !agent.IsMainAgent)
             {
                 return false;
             }
 
             if (mission.MainAgent != agent)
+            {
+                return false;
+            }
+
+            if (!agent.IsPlayerControlled || agent.Controller != AgentControllerType.Player)
             {
                 return false;
             }

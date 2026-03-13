@@ -17,7 +17,10 @@ MCM:
 - `Deep Action Logging`
 - `Trace Native Channel Calls`
 - `Unarmed Trace Mode`
+- `Fist Compare Mode`
+- `Proxy Attack Action`
 - `Proxy Cooldown`
+- `Gate Slash Proxy To Left Stance`
 - `Rotation Preset`
 - `Offset X/Y/Z`
 
@@ -25,8 +28,16 @@ Verhalten:
 
 - normaler Testmodus:
 - `LMB` bleibt Vanilla-Mainhand
-- `RMB` blockt nicht mehr, sondern startet einmal pro Klick den linken `FistProxy`
-- die Offhand-Waffe bleibt links angeheftet, damit der Faustschlag wie ein grober linker Waffenangriff wirkt
+- `RMB` blockt nicht mehr, sondern startet einmal pro Klick den aktuell gewaehlten Proxy-Angriff
+- `Fist Compare Mode = true`:
+- `LMB` startet `act_quick_release_swingright_fist`
+- `RMB` startet `act_quick_release_swingleft_fist_left_stance`
+- beide laufen weiter mit angehefteter Offhand-Waffe und sind nur fuer Diagnosen gedacht
+- `Proxy Attack Action`:
+- `LeftFistSwing`: `act_quick_release_swingleft_fist_left_stance`
+- `SlashLeft1hLeftStance`: `act_quick_release_slashleft_1h_left_stance`
+- `Gate Slash Proxy To Left Stance`: wartet fuer `SlashLeft1hLeftStance` auf ein echtes `leftStance=true`, bevor der Proxy gestartet wird
+- die Offhand-Waffe bleibt links angeheftet, damit der Proxy wie ein grober linker Waffenangriff wirkt
 
 - `Unarmed Trace Mode = true`:
 - keine Dual-Wield-Steuerung

@@ -62,15 +62,45 @@ namespace DualWieldPrototype
         public bool UnarmedTraceMode { get; set; } = false;
 
         [SettingPropertyGroup("Combat", GroupOrder = 1)]
+        [SettingPropertyBool(
+            "Fist Compare Mode",
+            Order = 0,
+            RequireRestart = false,
+            HintText = "Overrides both mouse buttons for diagnostics: LMB forces right-fist proxy, RMB forces left-fist proxy.")]
+        public bool FistCompareMode { get; set; } = false;
+
+        [SettingPropertyGroup("Combat", GroupOrder = 1)]
+        [SettingPropertyDropdown(
+            "Proxy Attack Action",
+            Order = 1,
+            RequireRestart = false,
+            HintText = "Selects which action the clean RMB proxy path uses. This keeps the same input/context path and swaps only the played action.")]
+        public MCM.Common.Dropdown<string> ProxyAttackAction { get; set; } = new MCM.Common.Dropdown<string>(
+            new[]
+            {
+                "LeftFistSwing",
+                "SlashLeft1hLeftStance"
+            },
+            0);
+
+        [SettingPropertyGroup("Combat", GroupOrder = 1)]
         [SettingPropertyFloatingInteger(
             "Proxy Cooldown",
             0.1f,
             1.0f,
             "#0.00",
-            Order = 0,
+            Order = 2,
             RequireRestart = false,
             HintText = "Minimum time between two forced left-fist proxy attacks on RMB.")]
         public float OffHandCooldownSeconds { get; set; } = 0.32f;
+
+        [SettingPropertyGroup("Combat", GroupOrder = 1)]
+        [SettingPropertyBool(
+            "Gate Slash Proxy To Left Stance",
+            Order = 3,
+            RequireRestart = false,
+            HintText = "If SlashLeft1hLeftStance is selected, wait for a real left_stance window before firing the proxy action.")]
+        public bool GateSlashProxyToLeftStance { get; set; } = true;
 
         [SettingPropertyGroup("Attach", GroupOrder = 2)]
         [SettingPropertyInteger(

@@ -26,9 +26,14 @@ namespace DualWieldPrototype
             public string LastLoggedUnarmedTraceSignature;
             public bool LastObservedLeftStance;
             public bool RightMouseConsumedUntilRelease;
+            public bool LeftMouseConsumedUntilRelease;
+            public bool PendingSlashProxy;
+            public float PendingSlashProxyArmedAt;
         }
 
         private readonly ActionIndexCache _leftFistProxy = ActionIndexCache.Create("act_quick_release_swingleft_fist_left_stance");
+        private readonly ActionIndexCache _rightFistProxy = ActionIndexCache.Create("act_quick_release_swingright_fist");
+        private readonly ActionIndexCache _leftSlashProxy = ActionIndexCache.Create("act_quick_release_slashleft_1h_left_stance");
 
         private PlayerState _playerState;
         private string _lastLoggedSettingsSignature;
@@ -41,15 +46,52 @@ namespace DualWieldPrototype
             _playerState = new PlayerState();
         }
 
+        public override void OnMissionModeChange(MissionMode oldMissionMode, bool atStart)
+        {
+            base.OnMissionModeChange(oldMissionMode, atStart);
+            DualWieldPrototypeLogger.Log($"mission_mode_change old={oldMissionMode} current={Mission?.Mode} atStart={atStart}");
+            if (DualWieldPrototypeMissionFilters.IsSupportedMission(Mission))
+            {
+                DualWieldPrototypeSubModule.EnsureRuntimePatches("mode_change_supported");
+            }
+            else
+            {
+                DualWieldPrototypeSubModule.DisableRuntimePatches("mode_change_unsupported");
+                ResetRuntimeState(clearAttachment: true, reason: "mode_change_unsupported");
+            }
+        }
+
+        public override void OnMissionStateDeactivated()
+        {
+            base.OnMissionStateDeactivated();
+            DualWieldPrototypeSubModule.DisableRuntimePatches("mission_state_deactivated");
+            ResetRuntimeState(clearAttachment: true, reason: "mission_state_deactivated");
+        }
+
+        public override void OnClearScene()
+        {
+            base.OnClearScene();
+            DualWieldPrototypeSubModule.DisableRuntimePatches("clear_scene");
+            ResetRuntimeState(clearAttachment: true, reason: "clear_scene");
+        }
+
+        protected override void OnEndMission()
+        {
+            DualWieldPrototypeSubModule.DisableRuntimePatches("end_mission");
+            ResetRuntimeState(clearAttachment: true, reason: "end_mission");
+            base.OnEndMission();
+        }
+
+        public override void OnRemoveBehavior()
+        {
+            DualWieldPrototypeSubModule.DisableRuntimePatches("remove_behavior");
+            ResetRuntimeState(clearAttachment: true, reason: "remove_behavior");
+            base.OnRemoveBehavior();
+        }
+
         public override void OnMissionTick(float dt)
         {
             base.OnMissionTick(dt);
-
-            if (!DualWieldPrototypeMissionFilters.IsSupportedMission(Mission))
-            {
-                ClearCurrentAttachment();
-                return;
-            }
 
             DualWieldPrototypeSettings settings = DualWieldPrototypeSettings.Get();
             if (!settings.EnablePrototype)
@@ -59,8 +101,9 @@ namespace DualWieldPrototype
             }
 
             Agent mainAgent = Agent.Main;
-            if (mainAgent == null || !mainAgent.IsActive())
+            if (!DualWieldPrototypeMissionFilters.IsSupportedCombatContext(Mission, mainAgent))
             {
+                ClearCurrentAttachment();
                 return;
             }
 
@@ -83,6 +126,7 @@ namespace DualWieldPrototype
             }
 
             EnsureOffhandAttached(_playerState);
+            ProcessPendingSlashProxy(_playerState);
             TrackActionChanges(_playerState);
             TrackLeftStanceTransitions(_playerState);
         }
@@ -98,11 +142,35 @@ namespace DualWieldPrototype
             }
         }
 
+        private void ResetRuntimeState(bool clearAttachment, string reason)
+        {
+            if (clearAttachment)
+            {
+                ClearCurrentAttachment();
+            }
+
+            if (_playerState != null)
+            {
+                _playerState.RightMouseConsumedUntilRelease = false;
+                _playerState.LeftMouseConsumedUntilRelease = false;
+                _playerState.PendingSlashProxy = false;
+                _playerState.PendingSlashProxyArmedAt = 0f;
+                _playerState.CooldownUntil = 0f;
+                _playerState.LastChannel0ActionIndex = int.MinValue;
+                _playerState.LastChannel1ActionIndex = int.MinValue;
+                _playerState.LastLoggedLoadoutSignature = null;
+                _playerState.LastLoggedUnarmedTraceSignature = null;
+                _playerState.LastObservedLeftStance = false;
+            }
+
+            DualWieldPrototypeLogger.Log($"runtime_reset reason={reason}");
+        }
+
         private void LogSettingsIfChanged(DualWieldPrototypeSettings settings)
         {
             string settingsSignature =
-                $"cooldown={settings.OffHandCooldownSeconds:0.00} traceNative={settings.TraceNativeChannelCalls} " +
-                $"unarmedTrace={settings.UnarmedTraceMode} live={settings.LiveMessages}";
+                $"proxyAction={settings.ProxyAttackAction?.SelectedValue ?? "LeftFistSwing"} cooldown={settings.OffHandCooldownSeconds:0.00} traceNative={settings.TraceNativeChannelCalls} " +
+                $"unarmedTrace={settings.UnarmedTraceMode} live={settings.LiveMessages} gateSlash={settings.GateSlashProxyToLeftStance} fistCompare={settings.FistCompareMode}";
             if (settingsSignature == _lastLoggedSettingsSignature)
             {
                 return;
@@ -120,19 +188,14 @@ namespace DualWieldPrototype
                 return isDown;
             }
 
-            if (!DualWieldPrototypeMissionFilters.IsSupportedMission(Mission))
+            Agent mainAgent = Agent.Main;
+            if (!DualWieldPrototypeMissionFilters.IsSupportedCombatContext(Mission, mainAgent))
             {
                 return isDown;
             }
 
             DualWieldPrototypeSettings settings = DualWieldPrototypeSettings.Get();
             if (!settings.EnablePrototype || settings.UnarmedTraceMode)
-            {
-                return isDown;
-            }
-
-            Agent mainAgent = Agent.Main;
-            if (mainAgent == null || !mainAgent.IsActive())
             {
                 return isDown;
             }
@@ -146,10 +209,49 @@ namespace DualWieldPrototype
 
             if (gameKey == 9)
             {
+                if (settings.FistCompareMode)
+                {
+                    return ShouldAllowVanillaAttack(inputContext, isDown);
+                }
+
                 return isDown;
             }
 
             return ShouldAllowVanillaDefend(inputContext, isDown);
+        }
+
+        private bool ShouldAllowVanillaAttack(IInputContext inputContext, bool leftDown)
+        {
+            if (!leftDown)
+            {
+                _playerState.LeftMouseConsumedUntilRelease = false;
+                return false;
+            }
+
+            if (inputContext.IsGameKeyDown(10))
+            {
+                _playerState.LeftMouseConsumedUntilRelease = false;
+                return true;
+            }
+
+            if (_playerState.LeftMouseConsumedUntilRelease)
+            {
+                return false;
+            }
+
+            if (!inputContext.IsGameKeyPressed(9))
+            {
+                return false;
+            }
+
+            bool started = TryStartSpecificProxyAttack(_playerState, _rightFistProxy, "RightFistSwing", "lmb_right_fist_proxy");
+            DualWieldPrototypeLogger.Log($"controltick_override mode=FistCompare side=right success={started}");
+            if (started)
+            {
+                _playerState.LeftMouseConsumedUntilRelease = true;
+            }
+
+            return false;
         }
 
         private bool ShouldAllowVanillaDefend(IInputContext inputContext, bool rightDown)
@@ -157,12 +259,16 @@ namespace DualWieldPrototype
             if (!rightDown)
             {
                 _playerState.RightMouseConsumedUntilRelease = false;
+                _playerState.PendingSlashProxy = false;
+                _playerState.PendingSlashProxyArmedAt = 0f;
                 return false;
             }
 
             if (inputContext.IsGameKeyDown(9))
             {
                 _playerState.RightMouseConsumedUntilRelease = false;
+                _playerState.PendingSlashProxy = false;
+                _playerState.PendingSlashProxyArmedAt = 0f;
                 return true;
             }
 
@@ -173,17 +279,125 @@ namespace DualWieldPrototype
 
             if (!inputContext.IsGameKeyPressed(10))
             {
+                return _playerState.PendingSlashProxy;
+            }
+
+            if (DualWieldPrototypeSettings.Get().FistCompareMode)
+            {
+                bool compareStarted = TryStartSpecificProxyAttack(_playerState, _leftFistProxy, "LeftFistSwingCompare", "rmb_left_fist_compare");
+                DualWieldPrototypeLogger.Log($"controltick_override mode=FistCompare side=left success={compareStarted}");
+                if (compareStarted)
+                {
+                    _playerState.RightMouseConsumedUntilRelease = true;
+                }
+
                 return false;
             }
 
-            bool started = TryStartLeftFistProxy(_playerState, "rmb_fist_proxy");
-            DualWieldPrototypeLogger.Log($"controltick_override mode=FistProxy success={started}");
+            if (ShouldGateSlashProxy())
+            {
+                _playerState.PendingSlashProxy = true;
+                _playerState.PendingSlashProxyArmedAt = Mission.CurrentTime;
+                DualWieldPrototypeLogger.Log(
+                    $"controltick_override mode=Proxy arm_pending_slash leftStance={_playerState.Agent.GetIsLeftStance()} " +
+                    $"ch1={_playerState.Agent.GetCurrentAction(1).GetName()}");
+                return true;
+            }
+
+            bool started = TryStartProxyAttack(_playerState, "rmb_proxy");
+            DualWieldPrototypeLogger.Log($"controltick_override mode=Proxy success={started}");
             if (started)
             {
                 _playerState.RightMouseConsumedUntilRelease = true;
             }
 
             return false;
+        }
+
+        private void ProcessPendingSlashProxy(PlayerState state)
+        {
+            if (state == null || !state.PendingSlashProxy)
+            {
+                return;
+            }
+
+            if (!Input.IsKeyDown(InputKey.RightMouseButton))
+            {
+                state.PendingSlashProxy = false;
+                state.PendingSlashProxyArmedAt = 0f;
+                DualWieldPrototypeLogger.Log("pending_slash_proxy canceled reason=button_released");
+                return;
+            }
+
+            bool leftStanceReady = state.Agent.GetIsLeftStance();
+            float pendingAge = Mission.CurrentTime - state.PendingSlashProxyArmedAt;
+            bool timeoutFallback = pendingAge >= 0.20f;
+
+            if (!leftStanceReady && !timeoutFallback)
+            {
+                return;
+            }
+
+            if (leftStanceReady)
+            {
+                ClearChannel1PassiveDefendState(state, "pending_slash_proxy");
+            }
+
+            bool started = TryStartProxyAttack(state, "pending_slash_proxy");
+            DualWieldPrototypeLogger.Log(
+                $"pending_slash_proxy resolved started={started} leftStance={state.Agent.GetIsLeftStance()} " +
+                $"timeoutFallback={timeoutFallback} age={pendingAge:0.000} ch1={state.Agent.GetCurrentAction(1).GetName()}");
+            if (started)
+            {
+                state.RightMouseConsumedUntilRelease = true;
+            }
+
+            state.PendingSlashProxy = false;
+            state.PendingSlashProxyArmedAt = 0f;
+        }
+
+        private static void ClearChannel1PassiveDefendState(PlayerState state, string reason)
+        {
+            if (state?.Agent == null)
+            {
+                return;
+            }
+
+            ActionIndexCache current = state.Agent.GetCurrentAction(1);
+            if (!ShouldClearChannel1BeforeSlash(state.Agent, current))
+            {
+                return;
+            }
+
+            string before = current.GetName();
+            using (DualWieldPrototypeTraceContext.Push($"behavior:{reason}:clear_ch1"))
+            {
+                state.Agent.SetActionChannel(1, ActionIndexCache.act_none, true, 0);
+            }
+
+            DualWieldPrototypeLogger.Log(
+                $"slash_proxy_clear_ch1 reason={reason} before={before} after={state.Agent.GetCurrentAction(1).GetName()}");
+        }
+
+        private static bool ShouldClearChannel1BeforeSlash(Agent agent, ActionIndexCache current)
+        {
+            string currentName = current.GetName();
+            if (string.IsNullOrEmpty(currentName) || current == ActionIndexCache.act_none)
+            {
+                return false;
+            }
+
+            if (currentName.Contains("_passive_left_stance"))
+            {
+                return true;
+            }
+
+            string actionTypeName = agent.GetCurrentActionType(1).ToString();
+            return actionTypeName.Contains("DefendUp1h") ||
+                   actionTypeName.Contains("DefendDown1h") ||
+                   actionTypeName.Contains("DefendLeft1h") ||
+                   actionTypeName.Contains("DefendRight1h") ||
+                   actionTypeName.Contains("Guard");
         }
 
         private bool TryRefreshLoadout(PlayerState state)
@@ -232,17 +446,21 @@ namespace DualWieldPrototype
         private static void LogLoadoutIfChanged(PlayerState state)
         {
             string signature =
-                $"{state.MainhandItem?.StringId}|{state.MainhandUsageId}|{state.OffhandItem?.StringId}|{state.OffhandUsageId}|leftStance={state.Agent.GetIsLeftStance()}";
+                $"{state.MainhandItem?.StringId}|{state.MainhandUsageId}|{state.OffhandItem?.StringId}|{state.OffhandUsageId}|leftStance={state.Agent.GetIsLeftStance()}|" +
+                $"actionSet={state.Agent.ActionSet.GetHashCode()}|primary={(int)state.Agent.GetPrimaryWieldedItemIndex()}|offhand={(int)state.Agent.GetOffhandWieldedItemIndex()}";
             if (signature == state.LastLoggedLoadoutSignature)
             {
                 return;
             }
 
             state.LastLoggedLoadoutSignature = signature;
+            state.Agent.GetOldWieldedItemInfo(out int oldRightSlot, out int oldRightUsage, out int oldLeftSlot, out int oldLeftUsage);
             DualWieldPrototypeLogger.Log(
                 $"loadout mainSlot={(int)state.MainSlot} mainItem={state.MainhandItem?.StringId ?? "none"} mainUsage={state.MainhandUsageId ?? "none"} " +
                 $"offSlot={(int)state.OffhandSlot} offItem={state.OffhandItem?.StringId ?? "none"} offUsage={state.OffhandUsageId ?? "none"} " +
-                $"leftStance={state.Agent.GetIsLeftStance()}");
+                $"leftStance={state.Agent.GetIsLeftStance()} actionSet={state.Agent.ActionSet.GetHashCode()} " +
+                $"primaryWielded={(int)state.Agent.GetPrimaryWieldedItemIndex()} offhandWielded={(int)state.Agent.GetOffhandWieldedItemIndex()} " +
+                $"oldRightSlot={oldRightSlot} oldRightUsage={oldRightUsage} oldLeftSlot={oldLeftSlot} oldLeftUsage={oldLeftUsage}");
         }
 
         private EquipmentIndex FindOffhandCandidate(Agent agent, EquipmentIndex mainSlot)
@@ -319,9 +537,21 @@ namespace DualWieldPrototype
                 $"offset=({DualWieldPrototypeSettings.Get().OffsetX:0.00},{DualWieldPrototypeSettings.Get().OffsetY:0.00},{DualWieldPrototypeSettings.Get().OffsetZ:0.00})");
         }
 
-        private bool TryStartLeftFistProxy(PlayerState state, string phaseTag)
+        private bool TryStartProxyAttack(PlayerState state, string phaseTag)
+        {
+            ActionIndexCache action = ResolveProxyAction();
+            string proxyKind = DualWieldPrototypeSettings.Get().ProxyAttackAction?.SelectedValue ?? "LeftFistSwing";
+            return TryStartSpecificProxyAttack(state, action, proxyKind, phaseTag);
+        }
+
+        private bool TryStartSpecificProxyAttack(PlayerState state, in ActionIndexCache action, string proxyKind, string phaseTag)
         {
             if (state == null || state.Agent == null || !state.Agent.IsActive())
+            {
+                return false;
+            }
+
+            if (action == ActionIndexCache.act_none)
             {
                 return false;
             }
@@ -331,17 +561,21 @@ namespace DualWieldPrototype
                 return false;
             }
 
-            string actionName = _leftFistProxy.GetName();
+            string actionName = action.GetName();
+            state.Agent.GetOldWieldedItemInfo(out int oldRightSlot, out int oldRightUsage, out int oldLeftSlot, out int oldLeftUsage);
             DualWieldPrototypeLogger.Log(
-                $"attack_request mode=FistProxy channel=0 action={actionName} mainItem={state.MainhandItem?.StringId ?? "none"} " +
-                $"offItem={state.OffhandItem?.StringId ?? "none"} leftStance={state.Agent.GetIsLeftStance()} " +
+                $"attack_request mode=Proxy proxyKind={proxyKind} channel=0 action={actionName} mainItem={state.MainhandItem?.StringId ?? "none"} " +
+                $"mainUsage={state.MainhandUsageId ?? "none"} offItem={state.OffhandItem?.StringId ?? "none"} offUsage={state.OffhandUsageId ?? "none"} " +
+                $"leftStance={state.Agent.GetIsLeftStance()} actionSet={state.Agent.ActionSet.GetHashCode()} " +
+                $"primaryWielded={(int)state.Agent.GetPrimaryWieldedItemIndex()} offhandWielded={(int)state.Agent.GetOffhandWieldedItemIndex()} " +
+                $"oldRightSlot={oldRightSlot} oldRightUsage={oldRightUsage} oldLeftSlot={oldLeftSlot} oldLeftUsage={oldLeftUsage} " +
                 $"ch0={state.Agent.GetCurrentAction(0).GetName()} ch1={state.Agent.GetCurrentAction(1).GetName()}");
             LogAttackDiagnostics(state, actionName, phaseTag, "pre");
 
             bool started;
             using (DualWieldPrototypeTraceContext.Push($"behavior:{phaseTag}:set_ch0"))
             {
-                started = state.Agent.SetActionChannel(0, in _leftFistProxy, true, 0);
+                started = state.Agent.SetActionChannel(0, in action, true, 0);
             }
 
             if (!started)
@@ -356,6 +590,24 @@ namespace DualWieldPrototype
             return true;
         }
 
+        private ActionIndexCache ResolveProxyAction()
+        {
+            string selected = DualWieldPrototypeSettings.Get().ProxyAttackAction?.SelectedValue ?? "LeftFistSwing";
+            if (selected == "SlashLeft1hLeftStance")
+            {
+                return _leftSlashProxy;
+            }
+
+            return _leftFistProxy;
+        }
+
+        private static bool ShouldGateSlashProxy()
+        {
+            DualWieldPrototypeSettings settings = DualWieldPrototypeSettings.Get();
+            return settings.GateSlashProxyToLeftStance &&
+                   string.Equals(settings.ProxyAttackAction?.SelectedValue, "SlashLeft1hLeftStance", System.StringComparison.Ordinal);
+        }
+
         private static void LogAttackDiagnostics(PlayerState state, string actionName, string phaseTag, string edge)
         {
             if (!DualWieldPrototypeSettings.Get().DeepActionLogging || state?.Agent == null)
@@ -367,6 +619,7 @@ namespace DualWieldPrototype
             DualWieldPrototypeLogger.Log(
                 $"attack_diag phase={phaseTag} edge={edge} action={actionName} leftStance={agent.GetIsLeftStance()} " +
                 $"move={agent.MovementFlags} defend={agent.GetDefendMovementFlag()} attackDir={agent.GetAttackDirection()} " +
+                $"primaryWielded={(int)agent.GetPrimaryWieldedItemIndex()} offhandWielded={(int)agent.GetOffhandWieldedItemIndex()} actionSet={agent.ActionSet.GetHashCode()} " +
                 $"ch0Action={agent.GetCurrentAction(0).GetName()} ch0Type={agent.GetCurrentActionType(0)} ch0Stage={agent.GetCurrentActionStage(0)} " +
                 $"ch0Prog={agent.GetCurrentActionProgress(0):0.00} ch0W={agent.GetActionChannelWeight(0):0.00} ch0CW={agent.GetActionChannelCurrentActionWeight(0):0.00} " +
                 $"ch1Action={agent.GetCurrentAction(1).GetName()} ch1Type={agent.GetCurrentActionType(1)} ch1Stage={agent.GetCurrentActionStage(1)} " +
