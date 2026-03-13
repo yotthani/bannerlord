@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Items>
+  <Item id="dwp_test_mainhand"
+        name="DWP Test Mainhand"
+        is_merchandise="false"
+        body_name="bo_mace_a"
+        recalculate_body="false"
+        mesh="vlandia_twohanded_sword_a"
+        weight="0.2"
+        value="1"
+        Type="OneHandedWeapon"
+        item_holsters="sword_left_hip">
+    <ItemComponent>
+      <Weapon weapon_class="OneHandedSword"
+              weapon_balance="100"
+              thrust_speed="79"
+              speed_rating="99"
+              physics_material="wood_weapon"
+              missile_speed="0"
+              weapon_length="95"
+              thrust_damage="6"
+              thrust_damage_type="Pierce"
+              swing_damage="50"
+              swing_damage_type="Cut"
+              item_usage="dw_test_mainhand_swing_thrust">
+        <WeaponFlags MeleeWeapon="true"/>
+      </Weapon>
+    </ItemComponent>
+    <Flags/>
+  </Item>
+
+  <Item id="dwp_test_offhand"
+        name="DWP Test Offhand"
+        is_merchandise="false"
+        body_name="bo_mace_a"
+        recalculate_body="false"
+        mesh="vlandia_twohanded_sword_a"
+        weight="0.2"
+        value="1"
+        Type="OneHandedWeapon"
+        item_holsters="sword_left_hip">
+    <ItemComponent>
+      <Weapon weapon_class="OneHandedSword"
+              weapon_balance="100"
+              thrust_speed="79"
+              speed_rating="99"
+              physics_material="wood_weapon"
+              missile_speed="0"
+              weapon_length="95"
+              thrust_damage="6"
+              thrust_damage_type="Pierce"
+              swing_damage="50"
+              swing_damage_type="Cut"
+              item_usage="dw_test_offhand">
+        <WeaponFlags MeleeWeapon="true"/>
+      </Weapon>
+    </ItemComponent>
+    <Flags WoodenParry="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true"/>
+  </Item>
+</Items>
