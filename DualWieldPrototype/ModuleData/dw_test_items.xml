@@ -36,29 +36,30 @@
     name="{=dwp_control_offhand}DWP Control Offhand"
     is_merchandise="false"
     body_name="bo_mace_a"
-    recalculate_body="true"
-    mesh="torch_g"
-    prefab="torch_a_wm_only_flame"
+    recalculate_body="false"
+    mesh="vlandia_twohanded_sword_a"
     weight="0.2"
-    value="4"
+    value="1"
     Type="OneHandedWeapon"
-    item_holsters="abdomen_left">
+    item_holsters="sword_left_hip">
     <ItemComponent>
       <Weapon
-        weapon_class="OneHandedAxe"
+        weapon_class="OneHandedSword"
         weapon_balance="100"
-        thrust_speed="78"
-        speed_rating="97"
-        physics_material="metal_weapon"
+        thrust_speed="79"
+        speed_rating="99"
+        physics_material="wood_weapon"
         missile_speed="0"
-        weapon_length="65"
-        swing_damage="6"
-        swing_damage_type="Blunt"
-        item_usage="banner">
+        weapon_length="95"
+        thrust_damage="6"
+        thrust_damage_type="Pierce"
+        swing_damage="50"
+        swing_damage_type="Cut"
+        item_usage="onehanded_block_shield_swing_thrust">
         <WeaponFlags MeleeWeapon="true" />
       </Weapon>
     </ItemComponent>
-    <Flags Stealth="true" DropOnWeaponChange="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" HasToBeHeldUp="true" />
+    <Flags WoodenParry="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" />
   </Item>
 
   <Item
@@ -85,7 +86,7 @@
         thrust_damage_type="Blunt"
         swing_damage="5"
         swing_damage_type="Blunt"
-        item_usage="dwp_fist_style_1h">
+        item_usage="dwp_dual_swing_thrust">
         <WeaponFlags MeleeWeapon="true" />
       </Weapon>
     </ItemComponent>
@@ -93,32 +94,157 @@
   </Item>
 
   <Item
+    id="dwp_mainctx_mainhand"
+    name="{=dwp_mainctx_mainhand}DWP MainCtx Mainhand"
+    is_merchandise="false"
+    body_name="bo_mace_a"
+    recalculate_body="true"
+    mesh="horse_whip"
+    weight="0.2"
+    value="1"
+    Type="OneHandedWeapon"
+    item_holsters="sword_left_hip">
+    <ItemComponent>
+      <Weapon
+        weapon_class="OneHandedSword"
+        weapon_balance="100"
+        thrust_speed="79"
+        speed_rating="99"
+        physics_material="wood_weapon"
+        missile_speed="0"
+        weapon_length="95"
+        thrust_damage="6"
+        thrust_damage_type="Blunt"
+        swing_damage="5"
+        swing_damage_type="Blunt"
+        item_usage="dwp_dual_swing_thrust">
+        <WeaponFlags MeleeWeapon="true" />
+      </Weapon>
+    </ItemComponent>
+    <Flags />
+  </Item>
+
+  <Item
+    id="dwp_mainctx_offhand"
+    name="{=dwp_mainctx_offhand}DWP MainCtx Offhand"
+    is_merchandise="false"
+    body_name="bo_mace_a"
+    recalculate_body="false"
+    mesh="vlandia_twohanded_sword_a"
+    weight="0.2"
+    value="1"
+    Type="OneHandedWeapon"
+    item_holsters="sword_left_hip">
+    <ItemComponent>
+      <Weapon
+        weapon_class="OneHandedSword"
+        weapon_balance="100"
+        thrust_speed="79"
+        speed_rating="99"
+        physics_material="wood_weapon"
+        missile_speed="0"
+        weapon_length="95"
+        thrust_damage="6"
+        thrust_damage_type="Pierce"
+        swing_damage="50"
+        swing_damage_type="Cut"
+        item_usage="onehanded_block_shield_swing_thrust">
+        <WeaponFlags MeleeWeapon="true" />
+      </Weapon>
+    </ItemComponent>
+    <Flags WoodenParry="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" />
+  </Item>
+
+  <Item
     id="dwp_xml_offhand"
     name="{=dwp_xml_offhand}DWP XML Offhand"
     is_merchandise="false"
     body_name="bo_mace_a"
-    recalculate_body="true"
-    mesh="torch_g"
-    prefab="torch_a_wm_only_flame"
+    recalculate_body="false"
+    mesh="vlandia_twohanded_sword_a"
     weight="0.2"
-    value="4"
+    value="1"
     Type="OneHandedWeapon"
-    item_holsters="abdomen_left">
+    item_holsters="sword_left_hip">
     <ItemComponent>
       <Weapon
-        weapon_class="OneHandedAxe"
+        weapon_class="OneHandedSword"
         weapon_balance="100"
-        thrust_speed="78"
-        speed_rating="97"
-        physics_material="metal_weapon"
+        thrust_speed="79"
+        speed_rating="99"
+        physics_material="wood_weapon"
         missile_speed="0"
-        weapon_length="65"
-        swing_damage="6"
-        swing_damage_type="Blunt"
-        item_usage="dwp_fist_style_offhand">
+        weapon_length="95"
+        thrust_damage="6"
+        thrust_damage_type="Pierce"
+        swing_damage="50"
+        swing_damage_type="Cut"
+        item_usage="dwp_dual_offhand">
         <WeaponFlags MeleeWeapon="true" />
       </Weapon>
     </ItemComponent>
-    <Flags Stealth="true" DropOnWeaponChange="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" HasToBeHeldUp="true" />
+    <Flags WoodenParry="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" />
+  </Item>
+
+  <Item
+    id="dwp_offctx_mainhand"
+    name="{=dwp_offctx_mainhand}DWP OffCtx Mainhand"
+    is_merchandise="false"
+    body_name="bo_mace_a"
+    recalculate_body="true"
+    mesh="horse_whip"
+    weight="0.2"
+    value="1"
+    Type="OneHandedWeapon"
+    item_holsters="sword_left_hip">
+    <ItemComponent>
+      <Weapon
+        weapon_class="OneHandedSword"
+        weapon_balance="100"
+        thrust_speed="79"
+        speed_rating="99"
+        physics_material="wood_weapon"
+        missile_speed="0"
+        weapon_length="95"
+        thrust_damage="6"
+        thrust_damage_type="Blunt"
+        swing_damage="5"
+        swing_damage_type="Blunt"
+        item_usage="onehanded_block_shield_swing">
+        <WeaponFlags MeleeWeapon="true" />
+      </Weapon>
+    </ItemComponent>
+    <Flags />
+  </Item>
+
+  <Item
+    id="dwp_offctx_offhand"
+    name="{=dwp_offctx_offhand}DWP OffCtx Offhand"
+    is_merchandise="false"
+    body_name="bo_mace_a"
+    recalculate_body="false"
+    mesh="vlandia_twohanded_sword_a"
+    weight="0.2"
+    value="1"
+    Type="OneHandedWeapon"
+    item_holsters="sword_left_hip">
+    <ItemComponent>
+      <Weapon
+        weapon_class="OneHandedSword"
+        weapon_balance="100"
+        thrust_speed="79"
+        speed_rating="99"
+        physics_material="wood_weapon"
+        missile_speed="0"
+        weapon_length="95"
+        thrust_damage="6"
+        thrust_damage_type="Pierce"
+        swing_damage="50"
+        swing_damage_type="Cut"
+        item_usage="dwp_dual_offhand">
+        <WeaponFlags MeleeWeapon="true" />
+      </Weapon>
+    </ItemComponent>
+    <Flags WoodenParry="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true" />
   </Item>
 </Items>
