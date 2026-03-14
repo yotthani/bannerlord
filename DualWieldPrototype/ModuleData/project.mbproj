@@ -2,4 +2,10 @@
 <base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="solution">
   <file id="dwp_item_usage_sets" name="ModuleData/item_usage_sets.xml" type="item_usage_set" />
   <file id="dwp_full_movement_sets" name="ModuleData/full_movement_sets.xml" type="full_movement_set" />
+  <file id="dwp_rotclone_item_usage_sets" name="ModuleData/rotclone_item_usage_sets.xml" type="item_usage_set" />
+  <file id="dwp_rotclone_movement_sets" name="ModuleData/rotclone_movement_sets.xml" type="movement_set" />
+  <file id="dwp_rotclone_full_movement_sets" name="ModuleData/rotclone_full_movement_sets.xml" type="full_movement_set" />
+  <file id="dwp_rotclone_item_holsters" name="ModuleData/rotclone_item_holsters.xml" type="item_holster" />
+  <file id="dwp_rotfull_action_types" name="ModuleData/rotfull_action_types.xml" type="action_type" />
+  <file id="dwp_rotdual_action_sets_generated" name="ModuleData/rotdual_action_sets_generated.xml" type="action_set" />
 </base>
