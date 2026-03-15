@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      type="string">
+  <tags>
+    <tag language="English" />
+  </tags>
+  <strings>
+    <string id="dw_mod_name" text="Dual Wield" />
+    <string id="dw_enabled" text="Dual Wield enabled for {AGENT_NAME}" />
+    <string id="dw_offhand_strike" text="Off-hand strike!" />
+  </strings>
+</base>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  DualWield Mod - Movement sets for dual wield stance.
+  Reuses vanilla hand_shield movement animations (h_shld suffix).
+  Based on ROT 8.0's movement_sets.xml structure.
+-->
+<movement_sets>
+
+  <!-- Walk with dual wield (normal stance) -->
+  <movement_set id="walk_1h_with_dw">
+    <movement position="idle" animation="walk_idle_1h_with_h_shld"/>
+    <movement position="forward" animation="walk_forward_1h_with_h_shld"/>
+    <movement position="backward" animation="walk_backward_1h_with_h_shld"/>
+    <movement position="left" animation="walk_left_1h_with_h_shld"/>
+    <movement position="right" animation="walk_right_1h_with_h_shld"/>
+    <movement position="rotate_left" animation="walk_rotate_left_1h_with_h_shld"/>
+    <movement position="rotate_right" animation="walk_rotate_right_1h_with_h_shld"/>
+  </movement_set>
+
+  <!-- Walk with dual wield (left stance) -->
+  <movement_set id="walk_1h_with_dw_left_stance">
+    <movement position="idle" animation="walk_idle_1h_with_h_shld_left_stance"/>
+    <movement position="forward" animation="walk_forward_1h_with_h_shld_left_stance"/>
+    <movement position="backward" animation="walk_backward_1h_with_h_shld_left_stance"/>
+    <movement position="left" animation="walk_left_1h_with_h_shld_left_stance"/>
+    <movement position="right" animation="walk_right_1h_with_h_shld_left_stance"/>
+    <movement position="rotate_left" animation="walk_rotate_left_1h_with_h_shld_left_stance"/>
+    <movement position="rotate_right" animation="walk_rotate_right_1h_with_h_shld_left_stance"/>
+  </movement_set>
+
+  <!-- Run with dual wield (normal stance) -->
+  <movement_set id="run_1h_with_dw">
+    <movement position="idle" animation="run_idle_1h_with_h_shld"/>
+    <movement position="forward" animation="run_forward_1h_with_h_shld"/>
+    <movement position="backward" animation="run_backward_1h_with_h_shld"/>
+    <movement position="left" animation="run_left_1h_with_h_shld"/>
+    <movement position="right" animation="run_right_1h_with_h_shld"/>
+    <movement position="rotate_left" animation="run_rotate_left_1h_with_h_shld"/>
+    <movement position="rotate_right" animation="run_rotate_right_1h_with_h_shld"/>
+  </movement_set>
+
+  <!-- Run with dual wield (left stance) -->
+  <movement_set id="run_1h_with_dw_left_stance">
+    <movement position="idle" animation="run_idle_1h_with_h_shld_left_stance"/>
+    <movement position="forward" animation="run_forward_1h_with_h_shld_left_stance"/>
+    <movement position="backward" animation="run_backward_1h_with_h_shld_left_stance"/>
+    <movement position="left" animation="run_left_1h_with_h_shld_left_stance"/>
+    <movement position="right" animation="run_right_1h_with_h_shld_left_stance"/>
+    <movement position="rotate_left" animation="run_rotate_left_1h_with_h_shld_left_stance"/>
+    <movement position="rotate_right" animation="run_rotate_right_1h_with_h_shld_left_stance"/>
+  </movement_set>
+
+  <!-- Crouch walk (reuses hand_shield crouch) -->
+  <movement_set id="crouch_walk_1h_with_dw">
+    <movement position="idle" animation="crouch_walk_idle_1h_with_h_shld"/>
+    <movement position="forward" animation="crouch_walk_forward_1h_with_h_shld"/>
+    <movement position="backward" animation="crouch_walk_backward_1h_with_h_shld"/>
+    <movement position="left" animation="crouch_walk_left_1h_with_h_shld"/>
+    <movement position="right" animation="crouch_walk_right_1h_with_h_shld"/>
+  </movement_set>
+
+  <movement_set id="crouch_walk_1h_with_dw_left_stance">
+    <movement position="idle" animation="crouch_walk_idle_1h_with_h_shld_left_stance"/>
+    <movement position="forward" animation="crouch_walk_forward_1h_with_h_shld_left_stance"/>
+    <movement position="backward" animation="crouch_walk_backward_1h_with_h_shld_left_stance"/>
+    <movement position="left" animation="crouch_walk_left_1h_with_h_shld_left_stance"/>
+    <movement position="right" animation="crouch_walk_right_1h_with_h_shld_left_stance"/>
+  </movement_set>
+
+  <!-- Crouch run (reuses hand_shield crouch) -->
+  <movement_set id="crouch_run_1h_with_dw">
+    <movement position="idle" animation="crouch_run_idle_1h_with_h_shld"/>
+    <movement position="forward" animation="crouch_run_forward_1h_with_h_shld"/>
+    <movement position="backward" animation="crouch_run_backward_1h_with_h_shld"/>
+    <movement position="left" animation="crouch_run_left_1h_with_h_shld"/>
+    <movement position="right" animation="crouch_run_right_1h_with_h_shld"/>
+  </movement_set>
+
+  <movement_set id="crouch_run_1h_with_dw_left_stance">
+    <movement position="idle" animation="crouch_run_idle_1h_with_h_shld_left_stance"/>
+    <movement position="forward" animation="crouch_run_forward_1h_with_h_shld_left_stance"/>
+    <movement position="backward" animation="crouch_run_backward_1h_with_h_shld_left_stance"/>
+    <movement position="left" animation="crouch_run_left_1h_with_h_shld_left_stance"/>
+    <movement position="right" animation="crouch_run_right_1h_with_h_shld_left_stance"/>
+  </movement_set>
+
+</movement_sets>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="solution">
+  <file id="soln_item_usage_sets" name="ModuleData/item_usage_sets.xml" type="item_usage_set" />
+  <file id="soln_dw_action_types" name="ModuleData/dw_action_types.xml" type="action_type" />
+  <file id="soln_dw_action_sets" name="ModuleData/dw_action_sets.xslt" type="action_set" />
+  <file id="soln_dw_movement_sets" name="ModuleData/dw_movement_sets.xml" type="movement_set" />
+  <file id="soln_dw_full_movement_sets" name="ModuleData/dw_full_movement_sets.xml" type="full_movement_set" />
+  <file id="soln_dw_item_holsters" name="ModuleData/dw_item_holsters.xml" type="item_holster" />
+</base>

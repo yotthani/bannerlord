@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name value="Dual Wield" />
+  <Id value="DualWield" />
+  <Version value="v1.0.0" />
+  <SingleplayerModule value="true" />
+  <MultiplayerModule value="false" />
+  <Official value="false" />
+  <DependedModules>
+    <DependedModule Id="Native" DependentVersion="v1.3.0" />
+    <DependedModule Id="SandBoxCore" DependentVersion="v1.3.0" />
+    <DependedModule Id="Sandbox" DependentVersion="v1.3.0" />
+  </DependedModules>
+  <SubModules>
+    <SubModule>
+      <Name value="DualWield" />
+      <DLLName value="DualWield.dll" />
+      <SubModuleClassType value="DualWield.DualWieldSubModule" />
+      <Tags>
+        <Tag key="DedicatedServerType" value="none" />
+        <Tag key="IsNoRenderModeElement" value="false" />
+      </Tags>
+    </SubModule>
+  </SubModules>
+  <Xmls>
+    <!-- item_usage_sets.xml is auto-loaded by engine (standard filename) -->
+    <XmlNode>
+      <XmlName id="Items" path="dw_items"/>
+      <IncludedGameTypes>
+        <GameType value="Campaign"/>
+        <GameType value="CampaignStoryMode"/>
+        <GameType value="CustomGame"/>
+        <GameType value="EditorGame"/>
+      </IncludedGameTypes>
+    </XmlNode>
+  </Xmls>
+</Module>

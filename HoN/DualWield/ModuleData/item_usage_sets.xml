@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  DualWield Mod - Custom Item Usage Sets
+  v7.41b: Fixed left_stance usages to match vanilla pattern EXACTLY.
+  TWO critical fixes from v7.40:
+    1. Actions changed from _fist_left_stance to _1h_left_stance (vanilla pattern)
+    2. Removed require_left_hand_usage_root_set from attack usages (vanilla has NONE)
+  NOTE: base_set="hand_shield" on dw_offhand BROKE loading (cross-file ref).
+  Reverted to standalone dw_offhand.
+-->
+<item_usage_sets>
+
+  <!-- ============================================================ -->
+  <!-- OFF-HAND: inherits from hand_shield for correct bone         -->
+  <!-- orientation + blocking support. Movement set override         -->
+  <!-- uses standard 1h_with_hand_shield (same as vanilla shields). -->
+  <!-- v7.47: Re-enabled base_set="hand_shield" — Native is a      -->
+  <!-- DependedModule so its usage sets load before ours.            -->
+  <!-- ROT 8.0 uses identical approach (dual_shield base hand_shield). -->
+  <!-- ============================================================ -->
+  <item_usage_set id="dw_offhand" base_set="hand_shield">
+    <movement_sets>
+      <movement_set id="1h_with_hand_shield"/>
+    </movement_sets>
+  </item_usage_set>
+
+  <!-- ============================================================ -->
+  <!-- MAINHAND: Standard 1h sword attacks.                         -->
+  <!-- v7.39c: Removed require_left_hand_usage_root_set (engine     -->
+  <!-- can't see AttachWeaponToBone offhand as equipment).           -->
+  <!-- Removed left_stance fist usages (follow-up system handles LH).-->
+  <!-- ============================================================ -->
+  <item_usage_set id="dw_mainhand_swing"
+                  switch_to_alternate_action="act_switch_back_alternate_knife"
+                  switch_to_alternate_action_left_stance="act_switch_back_alternate_knife_left_stance"
+                  equip_sound="event:/mission/combat/equip/sword_equip"
+                  unequip_sound="event:/mission/combat/equip/sword_unequip">
+    <idles>
+      <idle action="act_idle_1h_with_shield_1"
+            require_free_left_hand="False"/>
+      <idle action="act_idle_1h_with_shield_1_left_stance"
+            is_left_stance="True"
+            require_free_left_hand="False"/>
+      <idle action="act_idle_1h_without_shield_1" require_free_left_hand="False"/>
+      <idle action="act_idle_1h_without_shield_1_left_stance"
+            is_left_stance="True"
+            require_free_left_hand="False"/>
+    </idles>
+    <movement_sets>
+      <!-- v7.39d: 1h_with_hand_shield activates the left arm animation layer.
+           Without it, onehanded_swing_cantblock keeps left arm passive →
+           left_stance actions can't move it. Unlike on the OFFHAND (where
+           this caused shield-override issues in v7.34), on the MAINHAND it
+           just provides the animation base for left arm movement. -->
+      <movement_set id="1h_with_hand_shield"/>
+      <movement_set id="onehanded_swing_cantblock"/>
+    </movement_sets>
+    <usages>
+      <!-- ======= STANDARD 1H ATTACK USAGES ======= -->
+      <!-- No require_left_hand_usage_root_set — always available.
+           Produces standard act_release_*_1h actions that the
+           auto follow-up system detects. -->
+
+      <!-- attack_up (overswing) -->
+      <usage style="attack_up"
+             ready_action="act_ready_overswing_1h"
+             ready_from_up_action="act_ready_from_up_overswing_1h"
+             ready_from_left_action="act_ready_from_left_overswing_1h"
+             ready_from_right_action="act_ready_from_right_overswing_1h"
+             quick_release_action="act_quick_release_overswing_1h"
+             release_action="act_release_overswing_1h"
+             quick_blocked_action="act_quick_blocked_overswing_1h"
+             blocked_action="act_blocked_overswing_1h"
+             is_mounted="False"
+             require_free_left_hand="False"
+             strike_type="swing"/>
+
+      <!-- attack_right (slashright) -->
+      <usage style="attack_right"
+             ready_action="act_ready_slashright_1h"
+             ready_from_up_action="act_ready_from_up_slashright_1h"
+             ready_from_right_action="act_ready_from_right_slashright_1h"
+             quick_release_action="act_quick_release_slashright_1h"
+             release_action="act_release_slashright_1h"
+             quick_blocked_action="act_quick_blocked_slashright_1h"
+             blocked_action="act_blocked_slashright_1h"
+             is_mounted="False"
+             require_free_left_hand="False"
+             strike_type="swing"/>
+
+      <!-- attack_left (slashleft) -->
+      <usage style="attack_left"
+             ready_action="act_ready_slashleft_1h"
+             ready_from_up_action="act_ready_from_up_slashleft_1h"
+             ready_from_left_action="act_ready_from_left_slashleft_1h"
+             quick_release_action="act_quick_release_slashleft_1h"
+             release_action="act_release_slashleft_1h"
+             quick_blocked_action="act_quick_blocked_slashleft_1h"
+             blocked_action="act_blocked_slashleft_1h"
+             is_mounted="False"
+             require_free_left_hand="False"
+             strike_type="swing"/>
+
+      <!-- ======= LEFT_STANCE USAGES (vanilla pattern) ======= -->
+      <!-- v7.41: Matching vanilla exactly — is_left_stance="True" with
+           _1h_left_stance actions, NO require_left_hand_usage_root_set.
+           These enable the engine's internal left_stance processing so that
+           _left_stance animations fired via SetActionChannel map to the LEFT arm.
+           Available when engine enters left_stance mode (shield/offhand-based). -->
+
+      <!-- attack_up left_stance -->
+      <usage style="attack_up"
+             is_left_stance="True"
+             ready_action="act_ready_overswing_1h_left_stance"
+             ready_from_up_action="act_ready_from_up_overswing_1h_left_stance"
+             ready_from_left_action="act_ready_from_left_overswing_1h_left_stance"
+             ready_from_right_action="act_ready_from_right_overswing_1h_left_stance"
+             quick_release_action="act_quick_release_overswing_1h_left_stance"
+             release_action="act_release_overswing_1h_left_stance"
+             quick_blocked_action="act_quick_blocked_overswing_1h_left_stance"
+             blocked_action="act_blocked_overswing_1h_left_stance"
+             is_mounted="False"
+             require_free_left_hand="False"
+             strike_type="swing"/>
+
+      <!-- attack_right left_stance -->
+      <usage style="attack_right"
+             is_left_stance="True"
+             ready_action="act_ready_slashright_1h_left_stance"
+             ready_from_up_action="act_ready_from_up_slashright_1h_left_stance"
+             ready_from_right_action="act_ready_from_right_slashright_1h_left_stance"
+             quick_release_action="act_quick_release_slashright_1h_left_stance"
+             release_action="act_release_slashright_1h_left_stance"
+             quick_blocked_action="act_quick_blocked_slashright_1h_left_stance"
+             blocked_action="act_blocked_slashright_1h_left_stance"
+             is_mounted="False"
+             require_free_left_hand="False"
+             strike_type="swing"/>
+
+      <!-- attack_left left_stance -->
+      <usage style="attack_left"
+             is_left_stance="True"
+             ready_action="act_ready_slashleft_1h_left_stance"
+             ready_from_up_action="act_ready_from_up_slashleft_1h_left_stance"
+             ready_from_left_action="act_ready_from_left_slashleft_1h_left_stance"
+             quick_release_action="act_quick_release_slashleft_1h_left_stance"
+             release_action="act_release_slashleft_1h_left_stance"
+             quick_blocked_action="act_quick_blocked_slashleft_1h_left_stance"
+             blocked_action="act_blocked_slashleft_1h_left_stance"
+             is_mounted="False"
+             require_free_left_hand="False"
+             strike_type="swing"/>
+
+    </usages>
+    <guards>
+      <guard style="up"
+             action="act_guard_up_1h"
+             hand_position="0,0.1,0.2"
+             hand_rotation="0,0"
+             arm_rotation="0,0"
+             arm_length="0"/>
+      <guard style="up"
+             is_left_stance="True"
+             action="act_guard_up_1h_left_stance"
+             hand_position="0,0.1,0.2"
+             hand_rotation="0,0"
+             arm_rotation="0,0"
+             arm_length="0"/>
+      <guard style="down"
+             action="act_guard_bottom_1h"
+             hand_position="0,0.1,-0.3"
+             hand_rotation="0,-72"
+             arm_rotation="0,0"
+             arm_length="0"/>
+      <guard style="down"
+             is_left_stance="True"
+             action="act_guard_bottom_1h_left_stance"
+             hand_position="0,0.1,-0.3"
+             hand_rotation="0,-72"
+             arm_rotation="0,0"
+             arm_length="0"/>
+      <guard style="left"
+             action="act_guard_left_1h"
+             hand_position="-0.2,0.1,-0.2"
+             hand_rotation="-36,0"
+             arm_rotation="0,0"
+             arm_length="0"/>
+      <guard style="left"
+             is_left_stance="True"
+             action="act_guard_left_1h_left_stance"
+             hand_position="-0.2,0.1,-0.2"
+             hand_rotation="-36,0"
+             arm_rotation="0,0"
+             arm_length="0"/>
+      <guard style="right"
+             action="act_guard_right_1h"
+             hand_position="0.2,0.1,-0.2"
+             hand_rotation="36,0"
+             arm_rotation="0,0"
+             arm_length="0"/>
+      <guard style="right"
+             is_left_stance="True"
+             action="act_guard_right_1h_left_stance"
+             hand_position="0.2,0.1,-0.2"
+             hand_rotation="36,0"
+             arm_rotation="0,0"
+             arm_length="0"/>
+      <guard style="none"
+             hand_position="0,0,-0.5"
+             hand_rotation="0,-90"
+             arm_rotation="0,0"
+             arm_length="0"/>
+      <guard style="none"
+             is_left_stance="True"
+             hand_position="0,0,-0.5"
+             hand_rotation="0,-90"
+             arm_rotation="0,0"
+             arm_length="0"/>
+    </guards>
+    <kick_usages>
+      <kick_usage release_action="act_1h_bash"
+                  hit_action="act_hit_1h_bash"
+                  is_left_stance="False"
+                  left_hand_empty="True"/>
+      <kick_usage release_action="act_1h_bash_left_stance"
+                  hit_action="act_hit_1h_bash_left_stance"
+                  left_hand_empty="True"
+                  is_left_stance="True"/>
+    </kick_usages>
+  </item_usage_set>
+
+  <!-- Variant with thrust -->
+  <item_usage_set id="dw_mainhand_swing_thrust"
+                  base_set="dw_mainhand_swing">
+    <usages>
+      <!-- thrust (attack_down) -->
+      <usage style="attack_down"
+             ready_action="act_ready_thrust_1h"
+             quick_release_action="act_quick_release_thrust_1h"
+             release_action="act_release_thrust_1h"
+             quick_blocked_action="act_quick_blocked_thrust_1h"
+             blocked_action="act_blocked_thrust_1h"
+             quick_stuck_action="act_stuck_quick_thrust_1h"
+             stuck_action="act_stuck_thrust_1h"
+             is_mounted="False"
+             require_free_left_hand="False"
+             strike_type="thrust"/>
+
+      <!-- attack_down left_stance -->
+      <usage style="attack_down"
+             is_left_stance="True"
+             ready_action="act_ready_thrust_1h_left_stance"
+             quick_release_action="act_quick_release_thrust_1h_left_stance"
+             release_action="act_release_thrust_1h_left_stance"
+             quick_blocked_action="act_quick_blocked_thrust_1h_left_stance"
+             blocked_action="act_blocked_thrust_1h_left_stance"
+             quick_stuck_action="act_stuck_quick_thrust_1h_left_stance"
+             stuck_action="act_stuck_thrust_1h_left_stance"
+             is_mounted="False"
+             require_free_left_hand="False"
+             strike_type="thrust"/>
+    </usages>
+  </item_usage_set>
+
+</item_usage_sets>
