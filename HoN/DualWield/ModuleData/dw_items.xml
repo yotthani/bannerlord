@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Items>
 
-  <!-- MAINHAND test weapon - dw_mainhand_swing_thrust usage -->
+  <!-- MAINHAND test weapon - uses dw_mainhand_swing_thrust usage -->
   <Item id="dw_test_mainhand"
         name="{=DW_mh001}DW Test Mainhand"
         is_merchandise="false"
@@ -24,14 +24,14 @@
               thrust_damage_type="Pierce"
               swing_damage="50"
               swing_damage_type="Cut"
-              item_usage="onehanded_shield_swing_thrust">
+              item_usage="dw_mainhand_swing_thrust">
         <WeaponFlags MeleeWeapon="true"/>
       </Weapon>
     </ItemComponent>
     <Flags/>
   </Item>
 
-  <!-- OFFHAND test weapon - dw_offhand usage (hand_shield base) -->
+  <!-- OFFHAND test weapon - uses dw_offhand usage (hand_shield base) -->
   <Item id="dw_test_offhand"
         name="{=DW_oh001}DW Test Offhand"
         is_merchandise="false"
@@ -41,7 +41,7 @@
         weight="0.2"
         value="1"
         Type="OneHandedWeapon"
-        item_holsters="sword_left_hip">
+        item_holsters="dw_back">
     <ItemComponent>
       <Weapon weapon_class="OneHandedSword"
               weapon_balance="100"
@@ -54,11 +54,12 @@
               thrust_damage_type="Pierce"
               swing_damage="50"
               swing_damage_type="Cut"
-              item_usage="dw_offhand">
+              item_usage="dw_offhand"
+              rotation="0,0,90">
         <WeaponFlags MeleeWeapon="true"/>
       </Weapon>
     </ItemComponent>
-    <Flags WoodenParry="true" ForceAttachOffHandPrimaryItemBone="true" HeldInOffHand="true"/>
+    <Flags WoodenParry="true" HeldInOffHand="true" ForceAttachOffHandPrimaryItemBone="true"/>
   </Item>
 
 </Items>

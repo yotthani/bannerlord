@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   DualWield Mod - Full movement set combining all dual wield movement sets.
-  Referenced by item_usage_sets.xml mainhand usage.
+  Uses child-element format matching vanilla BL structure.
 -->
 <full_movement_sets>
 
-  <full_movement_set id="1h_with_dw"
-                     walking="walk_1h_with_dw"
-                     walking_left_stance="walk_1h_with_dw_left_stance"
-                     running="run_1h_with_dw"
-                     running_left_stance="run_1h_with_dw_left_stance"
-                     crouch_walking="crouch_walk_1h_with_dw"
-                     crouch_walking_left_stance="crouch_walk_1h_with_dw_left_stance"
-                     crouch_running="crouch_run_1h_with_dw"
-                     crouch_running_left_stance="crouch_run_1h_with_dw_left_stance"/>
+  <full_movement_set id="1h_with_dw">
+    <movement_set id="walk_1h_with_dw" left_stance="False" movement_mode="walking" />
+    <movement_set id="run_1h_with_dw" left_stance="False" movement_mode="running" />
+    <movement_set id="crouch_walk_1h_with_dw" left_stance="False" movement_mode="crouch_walking" />
+    <movement_set id="crouch_run_1h_with_dw" left_stance="False" movement_mode="crouch_running" />
+    <movement_set id="walk_1h_with_dw_left_stance" left_stance="True" movement_mode="walking" />
+    <movement_set id="run_1h_with_dw_left_stance" left_stance="True" movement_mode="running" />
+    <movement_set id="crouch_walk_1h_with_dw_left_stance" left_stance="True" movement_mode="crouch_walking" />
+    <movement_set id="crouch_run_1h_with_dw_left_stance" left_stance="True" movement_mode="crouch_running" />
+  </full_movement_set>
 
 </full_movement_sets>

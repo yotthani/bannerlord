@@ -1,122 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  DualWield Mod - Action Type definitions for dual-wield combat.
-  Based on ROT 8.0's dual action system.
+  DualWield Mod - Action Types (MINIMAL)
 
-  Naming: act_dw_[ready|release|blocked]_[direction]_1h[_left_stance]
+  Unlike ROT which defines 76 custom act_dual_* action types,
+  we reuse vanilla 1h action types directly in item_usage_sets.
+  The require_left_hand_usage_root_set mechanism handles the
+  dual-wield vs. solo selection without needing custom types.
 
-  Right-hand actions reuse vanilla 1h animations.
-  Left-hand (_left_stance) actions use fist_left_stance animations
-  (the only ones that actually move the left arm in vanilla engine).
+  This file is intentionally minimal. Custom action types can be
+  added later for combat_parameter tuning if needed.
 -->
 <action_types>
-
-  <!-- ==================== THRUST ==================== -->
-  <action_type name="act_dw_ready_thrust_1h"
-               type="actt_ready_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_ready" combat_parameter_type="SlashRight"/>
-  <action_type name="act_dw_ready_thrust_1h_left_stance"
-               type="actt_ready_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_ready" combat_parameter_type="SlashRight"/>
-
-  <action_type name="act_dw_quick_release_thrust_1h"
-               type="actt_release_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_quick_ready" combat_parameter_type="SlashRight"/>
-  <action_type name="act_dw_quick_release_thrust_1h_left_stance"
-               type="actt_release_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_quick_ready" combat_parameter_type="SlashRight"/>
-
-  <action_type name="act_dw_release_thrust_1h"
-               type="actt_release_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_release" combat_parameter_type="SlashRight"/>
-  <action_type name="act_dw_release_thrust_1h_left_stance"
-               type="actt_release_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_release" combat_parameter_type="SlashRight"/>
-
-  <action_type name="act_dw_quick_blocked_thrust_1h"
-               type="actt_blocked_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_quick_ready"/>
-  <action_type name="act_dw_quick_blocked_thrust_1h_left_stance"
-               type="actt_blocked_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_quick_ready"/>
-
-  <action_type name="act_dw_blocked_thrust_1h"
-               type="actt_blocked_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_release"/>
-  <action_type name="act_dw_blocked_thrust_1h_left_stance"
-               type="actt_blocked_melee" usage_direction="ud_attack_down"
-               action_stage="as_attack_release"/>
-
-  <!-- ==================== SLASH RIGHT ==================== -->
-  <action_type name="act_dw_ready_slashright_1h"
-               type="actt_ready_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_ready" combat_parameter_type="SlashRight"/>
-  <action_type name="act_dw_ready_slashright_1h_left_stance"
-               type="actt_ready_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_ready" combat_parameter_type="SlashRight"/>
-
-  <action_type name="act_dw_quick_release_slashright_1h"
-               type="actt_release_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_quick_ready" combat_parameter_type="SlashRight"/>
-  <action_type name="act_dw_quick_release_slashright_1h_left_stance"
-               type="actt_release_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_quick_ready" combat_parameter_type="SlashRight"/>
-
-  <action_type name="act_dw_release_slashright_1h"
-               type="actt_release_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_release" combat_parameter_type="SlashRight"/>
-  <action_type name="act_dw_release_slashright_1h_left_stance"
-               type="actt_release_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_release" combat_parameter_type="SlashRight"/>
-
-  <action_type name="act_dw_quick_blocked_slashright_1h"
-               type="actt_blocked_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_quick_ready"/>
-  <action_type name="act_dw_quick_blocked_slashright_1h_left_stance"
-               type="actt_blocked_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_quick_ready"/>
-
-  <action_type name="act_dw_blocked_slashright_1h"
-               type="actt_blocked_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_release"/>
-  <action_type name="act_dw_blocked_slashright_1h_left_stance"
-               type="actt_blocked_melee" usage_direction="ud_attack_right"
-               action_stage="as_attack_release"/>
-
-  <!-- ==================== SLASH LEFT ==================== -->
-  <action_type name="act_dw_ready_slashleft_1h"
-               type="actt_ready_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_ready" combat_parameter_type="SlashLeft"/>
-  <action_type name="act_dw_ready_slashleft_1h_left_stance"
-               type="actt_ready_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_ready" combat_parameter_type="SlashLeft"/>
-
-  <action_type name="act_dw_quick_release_slashleft_1h"
-               type="actt_release_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_quick_ready" combat_parameter_type="SlashLeft"/>
-  <action_type name="act_dw_quick_release_slashleft_1h_left_stance"
-               type="actt_release_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_quick_ready" combat_parameter_type="SlashLeft"/>
-
-  <action_type name="act_dw_release_slashleft_1h"
-               type="actt_release_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_release" combat_parameter_type="SlashLeft"/>
-  <action_type name="act_dw_release_slashleft_1h_left_stance"
-               type="actt_release_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_release" combat_parameter_type="SlashLeft"/>
-
-  <action_type name="act_dw_quick_blocked_slashleft_1h"
-               type="actt_blocked_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_quick_ready"/>
-  <action_type name="act_dw_quick_blocked_slashleft_1h_left_stance"
-               type="actt_blocked_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_quick_ready"/>
-
-  <action_type name="act_dw_blocked_slashleft_1h"
-               type="actt_blocked_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_release"/>
-  <action_type name="act_dw_blocked_slashleft_1h_left_stance"
-               type="actt_blocked_melee" usage_direction="ud_attack_left"
-               action_stage="as_attack_release"/>
-
 </action_types>

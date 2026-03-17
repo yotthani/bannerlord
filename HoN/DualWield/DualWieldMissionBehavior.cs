@@ -32,10 +32,20 @@ namespace DualWield
         /// <summary>
         /// True only when a real combat mission has this behavior registered.
         /// All Harmony patches check this FIRST to avoid firing during preview/tableau missions.
+        ///
+        /// v7.48: Set in CONSTRUCTOR, not OnMissionTick. Agents spawn BEFORE the first tick,
+        /// so SpawnPatch needs IsActive=true during the spawn phase. The SubModule already
+        /// filters by MissionMode before creating this behavior, so constructor is safe.
         /// </summary>
         public static bool IsActive { get; private set; }
 
+        public DualWieldMissionBehavior()
+        {
+            IsActive = true;
+        }
+
         private readonly HashSet<int> _agentsWithAttachment = new HashSet<int>();
+        private readonly HashSet<int> _needsRotationFix = new HashSet<int>();
         private readonly Dictionary<int, EquipmentIndex> _offHandSlots = new Dictionary<int, EquipmentIndex>();
 
         private bool _indicatorShown;
@@ -87,22 +97,53 @@ namespace DualWield
         // ForceAttachOffHandPrimaryItemBone tells the engine to orient the weapon
         // for left-hand grip. Without it, swords render with right-hand rotation.
         private static readonly Dictionary<ItemObject, ItemFlags> _originalItemFlags = new Dictionary<ItemObject, ItemFlags>();
-        private static PropertyInfo _itemFlagsProp;
+        private static FieldInfo _itemFlagsField;
+        private static bool _fieldLookupDone;
 
         private static void InjectOffHandFlags(ItemObject item)
         {
-            if (item == null) return;
+            if (item == null)
+            {
+                DualWieldLog.Log("[FlagInject] item is NULL — skipping");
+                return;
+            }
+
+            DualWieldLog.Log($"[FlagInject] Checking '{item.StringId}': flags={item.ItemFlags}");
 
             // Already has offhand flag → nothing to do (e.g., our custom dw_items)
-            if ((item.ItemFlags & ItemFlags.ForceAttachOffHandPrimaryItemBone) != 0) return;
-
-            // Cache reflection accessor
-            if (_itemFlagsProp == null)
-                _itemFlagsProp = typeof(ItemObject).GetProperty("ItemFlags", BindingFlags.Public | BindingFlags.Instance);
-
-            if (_itemFlagsProp == null)
+            if ((item.ItemFlags & ItemFlags.ForceAttachOffHandSecondaryItemBone) != 0
+                || (item.ItemFlags & ItemFlags.ForceAttachOffHandPrimaryItemBone) != 0)
             {
-                DualWieldLog.Log("[FlagInject] ItemFlags property not found via reflection");
+                DualWieldLog.Log($"[FlagInject] '{item.StringId}' ALREADY has offhand bone flag — skipping");
+                return;
+            }
+
+            // v7.48: Use backing field directly — more reliable than PropertyInfo.SetValue.
+            // Auto-property backing fields are named <PropertyName>k__BackingField.
+            if (!_fieldLookupDone)
+            {
+                _fieldLookupDone = true;
+                _itemFlagsField = typeof(ItemObject).GetField(
+                    "<ItemFlags>k__BackingField",
+                    BindingFlags.NonPublic | BindingFlags.Instance);
+
+                if (_itemFlagsField == null)
+                {
+                    // Fallback: try common field name patterns
+                    _itemFlagsField = typeof(ItemObject).GetField(
+                        "_itemFlags",
+                        BindingFlags.NonPublic | BindingFlags.Instance);
+                }
+
+                DualWieldLog.Log($"[FlagInject] Backing field: {(_itemFlagsField != null ? _itemFlagsField.Name : "NOT FOUND")}");
+                InformationManager.DisplayMessage(new InformationMessage(
+                    $"[DW] FlagInject field: {(_itemFlagsField != null ? _itemFlagsField.Name : "NOT FOUND")}",
+                    _itemFlagsField != null ? Colors.Green : Colors.Red));
+            }
+
+            if (_itemFlagsField == null)
+            {
+                DualWieldLog.Log("[FlagInject] No backing field found — cannot inject flags");
                 return;
             }
 
@@ -110,12 +151,20 @@ namespace DualWield
             if (!_originalItemFlags.ContainsKey(item))
                 _originalItemFlags[item] = item.ItemFlags;
 
-            var newFlags = item.ItemFlags
-                | ItemFlags.ForceAttachOffHandPrimaryItemBone
+            var oldFlags = item.ItemFlags;
+            var newFlags = oldFlags
+                | ItemFlags.ForceAttachOffHandSecondaryItemBone
                 | ItemFlags.HeldInOffHand;
-            _itemFlagsProp.SetValue(item, newFlags);
+            _itemFlagsField.SetValue(item, newFlags);
 
-            DualWieldLog.Log($"[FlagInject] Set offhand flags on '{item.StringId}': {item.ItemFlags}");
+            // Verify the write actually took effect
+            var verify = item.ItemFlags;
+            bool success = (verify & ItemFlags.ForceAttachOffHandSecondaryItemBone) != 0;
+
+            DualWieldLog.Log($"[FlagInject] '{item.StringId}': {oldFlags} → {verify} (success={success})");
+            InformationManager.DisplayMessage(new InformationMessage(
+                $"[DW] FlagInject '{item.StringId}': {(success ? "OK" : "FAIL")} ({oldFlags} → {verify})",
+                success ? Colors.Green : Colors.Red));
         }
 
         private static void RestoreItemFlags(ItemObject item)
@@ -123,17 +172,17 @@ namespace DualWield
             if (item == null) return;
             if (!_originalItemFlags.TryGetValue(item, out var original)) return;
 
-            _itemFlagsProp?.SetValue(item, original);
+            _itemFlagsField?.SetValue(item, original);
             _originalItemFlags.Remove(item);
             DualWieldLog.Log($"[FlagInject] Restored flags on '{item.StringId}': {original}");
         }
 
         private static void RestoreAllItemFlags()
         {
-            if (_itemFlagsProp == null || _originalItemFlags.Count == 0) return;
+            if (_itemFlagsField == null || _originalItemFlags.Count == 0) return;
             foreach (var kvp in _originalItemFlags)
             {
-                try { _itemFlagsProp.SetValue(kvp.Key, kvp.Value); }
+                try { _itemFlagsField.SetValue(kvp.Key, kvp.Value); }
                 catch { /* ignore cleanup errors */ }
             }
             _originalItemFlags.Clear();
@@ -153,12 +202,17 @@ namespace DualWield
             }
 
             var weapon = agent.Equipment[offHandSlot];
-            if (weapon.IsEmpty) return;
+            if (weapon.IsEmpty)
+            {
+                DualWieldLog.Log($"AttachOffHandWeapon: slot {(int)offHandSlot} is EMPTY — aborting");
+                return;
+            }
 
-            // v7.47: Inject ForceAttachOffHandPrimaryItemBone flag on vanilla weapons
-            // so the engine orients the weapon for left-hand grip.
-            InjectOffHandFlags(weapon.Item);
+            DualWieldLog.Log($"AttachOffHandWeapon: slot {(int)offHandSlot}, item={weapon.Item?.StringId ?? "NULL"}, flags={weapon.Item?.ItemFlags}");
 
+            // v8.1: Back to SetWieldedItemIndexAsClient — renders exactly 1 weapon.
+            // AttachWeaponToBone creates a NEW entity → duplicate weapon visual.
+            // Rotation issue accepted for now; will solve via custom mesh or render hook.
             try
             {
                 int mainUsageIndex = 0;
@@ -168,6 +222,7 @@ namespace DualWield
                     var mainWpn = agent.Equipment[mainIdx];
                     if (!mainWpn.IsEmpty) mainUsageIndex = mainWpn.CurrentUsageIndex;
                 }
+
                 agent.SetWieldedItemIndexAsClient(Agent.HandIndex.OffHand, offHandSlot, true, false, mainUsageIndex);
                 DualWieldLog.Log($"SetWieldedItemIndexAsClient: offhand slot {(int)offHandSlot} for {agent.Name}");
             }
@@ -178,6 +233,38 @@ namespace DualWield
 
             _agentsWithAttachment.Add(agent.Index);
             _offHandSlots[agent.Index] = offHandSlot;
+        }
+
+        /// <summary>
+        /// Rotates the offhand weapon entity 180° around its forward (grip) axis.
+        /// This compensates for right-hand mesh orientation on the left-hand bone.
+        /// </summary>
+        private void RotateOffHandWeaponEntity(Agent agent, EquipmentIndex offHandSlot)
+        {
+            try
+            {
+                var weaponEntity = agent.GetWeaponEntityFromEquipmentSlot(offHandSlot);
+                if (weaponEntity == null)
+                {
+                    DualWieldLog.Log($"[Rotation] Weapon entity NULL for slot {(int)offHandSlot}");
+                    _needsRotationFix.Add(agent.Index);
+                    return;
+                }
+
+                var frame = weaponEntity.GetFrame();
+                frame.rotation.RotateAboutForward((float)Math.PI);
+                weaponEntity.SetFrame(ref frame);
+
+                _needsRotationFix.Remove(agent.Index);
+                DualWieldLog.Log($"[Rotation] Rotated offhand weapon 180° (RotateAboutForward) for {agent.Name}");
+                InformationManager.DisplayMessage(new InformationMessage(
+                    $"[DW] Rotation fix applied for {agent.Name}", Colors.Green));
+            }
+            catch (Exception ex)
+            {
+                DualWieldLog.Log($"[Rotation] Error: {ex.Message}");
+                _needsRotationFix.Add(agent.Index);
+            }
         }
 
         public void RemoveOffHandAttachment(Agent agent)
@@ -192,11 +279,13 @@ namespace DualWield
                 if (!weapon.IsEmpty) RestoreItemFlags(weapon.Item);
             }
 
+            // v8.1: Unwield offhand via SetWieldedItemIndexAsClient(None)
             if (agent.IsActive())
             {
                 try
                 {
                     agent.SetWieldedItemIndexAsClient(Agent.HandIndex.OffHand, EquipmentIndex.None, true, false, 0);
+                    DualWieldLog.Log($"[RemoveOH] Unwielded offhand for {agent.Name}");
                 }
                 catch (Exception ex)
                 {
@@ -219,8 +308,9 @@ namespace DualWield
             if (!_tickLoggedOnce)
             {
                 _tickLoggedOnce = true;
-                IsActive = true;
-                DualWieldLog.Log("OnMissionTick: v7.47 — native scroll cycling, no toggle key");
+                // v7.48: IsActive is now set in constructor (before spawn phase).
+                // First tick just logs diagnostics.
+                DualWieldLog.Log("OnMissionTick: v7.48 — IsActive in ctor, rotation diag, MMB+B input");
                 DualWieldLog.Log($"  LH_Uppercut idx={LH_Uppercut.Index}, LH_Direct idx={LH_Direct.Index}");
                 DualWieldLog.Log($"  LH_SwingR idx={LH_SwingR.Index}, LH_SwingL idx={LH_SwingL.Index}");
                 Patches.ForceLeftStancePatch.ForceLeftStance = false;
@@ -260,6 +350,8 @@ namespace DualWield
                 DualWieldLog.Log($"[Tick] heartbeat #{_tickCount}, tracking {_agentsWithAttachment.Count}, followUps={_followUpCount}");
             }
 
+
+
             // Agent cleanup
             foreach (var agentIndex in _agentsWithAttachment.ToArray())
             {
@@ -278,21 +370,42 @@ namespace DualWield
         private bool _rmbWasDown;
         private int _rmbCooldown;
         private int _rmbAttackIdx; // cycle through LH directions
+        private int _mmbDiagCount; // diagnostic throttle
 
         /// <summary>
-        /// v7.45: SEPARATED mode.
+        /// v7.48: SEPARATED mode.
         /// LMB = normal right-hand attack (engine handles it).
-        /// RMB = left-hand attack via fist_left_stance on ch1.
-        /// LMB+RMB together = block (TODO).
+        /// MMB (or B key fallback) = left-hand attack via fist_left_stance on ch1.
+        /// RMB = block.
         /// </summary>
         private void ProcessSeparatedMode(Agent agent)
         {
             if (_rmbCooldown > 0) { _rmbCooldown--; }
 
+            // v7.48: Try multiple input methods for MMB detection.
+            // Input.IsKeyDown delegates to InputManager.IsKeyDown (native).
+            // Also check IsKeyPressed (single-frame) and B key as fallback.
             bool mmbDown = Input.IsKeyDown(InputKey.MiddleMouseButton);
+            bool mmbPressed = Input.IsKeyPressed(InputKey.MiddleMouseButton);
+            bool bDown = Input.IsKeyDown(InputKey.B);
 
-            // MMB pressed (not held from last tick)
-            if (mmbDown && !_rmbWasDown && _rmbCooldown <= 0)
+            // Diagnostic: show input detection state (first 30 ticks with attachment, then every 300)
+            if (_mmbDiagCount < 30 || _tickCount % 300 == 0)
+            {
+                if (mmbDown || mmbPressed || bDown)
+                {
+                    _mmbDiagCount++;
+                    InformationManager.DisplayMessage(new InformationMessage(
+                        $"[Input] MMB.Down={mmbDown} MMB.Pressed={mmbPressed} B={bDown}",
+                        Colors.Yellow));
+                }
+            }
+
+            // Use either MMB or B key as trigger
+            bool triggerDown = mmbDown || bDown;
+
+            // MMB/B pressed (not held from last tick)
+            if (triggerDown && !_rmbWasDown && _rmbCooldown <= 0)
             {
                 // v7.45b: Only SwingL and Uppercut actually move the LEFT hand.
                 // SwingR and Direct still animate the right hand despite left_stance name.
@@ -324,7 +437,7 @@ namespace DualWield
                 }
                 _rmbCooldown = 30; // ~0.5s between LH attacks
             }
-            _rmbWasDown = mmbDown;
+            _rmbWasDown = triggerDown;
         }
 
         #endregion
@@ -595,6 +708,10 @@ namespace DualWield
             Patches.DualWieldAnimationPatches.ClearAll();
             Patches.DualWieldWieldingPatches.ClearTrackingState();
             DualWieldStateManager.Clear();
+
+            // v7.50: Patches stay active for the campaign session (applied in OnGameStart).
+            // The IsActive guard on each patch prevents firing outside combat.
+            // No RemovePatches() here — that's only on module unload.
         }
 
         // v7.46: Rotation presets removed — engine handles offhand orientation natively

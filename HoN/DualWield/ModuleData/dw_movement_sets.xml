@@ -1,87 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  DualWield Mod - Movement sets for dual wield stance.
-  Reuses vanilla hand_shield movement animations (h_shld suffix).
-  Based on ROT 8.0's movement_sets.xml structure.
+  DualWield Mod - Movement Sets for dual wield stance.
+  Reuses vanilla hand_shield (h_shld) action types directly.
+  Only the movement_set IDs are custom; all actions are vanilla.
 -->
 <movement_sets>
 
-  <!-- Walk with dual wield (normal stance) -->
-  <movement_set id="walk_1h_with_dw">
-    <movement position="idle" animation="walk_idle_1h_with_h_shld"/>
-    <movement position="forward" animation="walk_forward_1h_with_h_shld"/>
-    <movement position="backward" animation="walk_backward_1h_with_h_shld"/>
-    <movement position="left" animation="walk_left_1h_with_h_shld"/>
-    <movement position="right" animation="walk_right_1h_with_h_shld"/>
-    <movement position="rotate_left" animation="walk_rotate_left_1h_with_h_shld"/>
-    <movement position="rotate_right" animation="walk_rotate_right_1h_with_h_shld"/>
-  </movement_set>
+  <!-- ===== WALK ===== -->
+  <movement_set id="walk_1h_with_dw"
+                idle="act_walk_idle_1h_with_h_shld"
+                forward="act_walk_forward_1h_with_h_shld"
+                backward="act_walk_backward_1h_with_h_shld"
+                right="act_walk_right_1h_with_h_shld"
+                right_back="act_walk_right_back_1h_with_h_shld"
+                left="act_walk_left_1h_with_h_shld"
+                left_back="act_walk_left_back_1h_with_h_shld"
+                left_to_right="act_walk_left_to_right_1h_with_h_shld"
+                right_to_left="act_walk_right_to_left_1h_with_h_shld"
+                rotate="act_turn_1h_with_shield"
+                forward_adder="act_walk_forward_adder"
+                backward_adder="act_walk_backward_adder"
+                right_adder="act_walk_right_adder"
+                right_back_adder="act_walk_right_back_adder"
+                left_adder="act_walk_left_adder"
+                left_back_adder="act_walk_left_back_adder"
+                left_to_right_adder="act_walk_left_to_right_adder"
+                right_to_left_adder="act_walk_right_to_left_adder" />
 
-  <!-- Walk with dual wield (left stance) -->
-  <movement_set id="walk_1h_with_dw_left_stance">
-    <movement position="idle" animation="walk_idle_1h_with_h_shld_left_stance"/>
-    <movement position="forward" animation="walk_forward_1h_with_h_shld_left_stance"/>
-    <movement position="backward" animation="walk_backward_1h_with_h_shld_left_stance"/>
-    <movement position="left" animation="walk_left_1h_with_h_shld_left_stance"/>
-    <movement position="right" animation="walk_right_1h_with_h_shld_left_stance"/>
-    <movement position="rotate_left" animation="walk_rotate_left_1h_with_h_shld_left_stance"/>
-    <movement position="rotate_right" animation="walk_rotate_right_1h_with_h_shld_left_stance"/>
-  </movement_set>
+  <movement_set id="walk_1h_with_dw_left_stance"
+                idle="act_walk_idle_1h_with_h_shld_left_stance"
+                forward="act_walk_forward_1h_with_h_shld_left_stance"
+                backward="act_walk_backward_1h_with_h_shld_left_stance"
+                right="act_walk_right_1h_with_h_shld_left_stance"
+                right_back="act_walk_right_back_1h_with_h_shld_left_stance"
+                left="act_walk_left_1h_with_h_shld_left_stance"
+                left_back="act_walk_left_back_1h_with_h_shld_left_stance"
+                left_to_right="act_walk_left_to_right_1h_with_h_shld_left_stance"
+                right_to_left="act_walk_right_to_left_1h_with_h_shld_left_stance"
+                rotate="act_turn_1h_with_shield_left_stance"
+                forward_adder="act_walk_forward_adder"
+                backward_adder="act_walk_backward_adder"
+                right_adder="act_walk_right_adder"
+                right_back_adder="act_walk_right_back_adder"
+                left_adder="act_walk_left_adder"
+                left_back_adder="act_walk_left_back_adder"
+                left_to_right_adder="act_walk_left_to_right_adder"
+                right_to_left_adder="act_walk_right_to_left_adder" />
 
-  <!-- Run with dual wield (normal stance) -->
-  <movement_set id="run_1h_with_dw">
-    <movement position="idle" animation="run_idle_1h_with_h_shld"/>
-    <movement position="forward" animation="run_forward_1h_with_h_shld"/>
-    <movement position="backward" animation="run_backward_1h_with_h_shld"/>
-    <movement position="left" animation="run_left_1h_with_h_shld"/>
-    <movement position="right" animation="run_right_1h_with_h_shld"/>
-    <movement position="rotate_left" animation="run_rotate_left_1h_with_h_shld"/>
-    <movement position="rotate_right" animation="run_rotate_right_1h_with_h_shld"/>
-  </movement_set>
+  <!-- ===== RUN ===== -->
+  <movement_set id="run_1h_with_dw"
+                idle="act_run_idle_1h_with_h_shld"
+                forward="act_run_forward_1h_with_h_shld"
+                backward="act_run_backward_1h_with_h_shld"
+                right="act_run_right_1h_with_h_shld"
+                right_back="act_run_right_back_1h_with_h_shld"
+                left="act_run_left_1h_with_h_shld"
+                left_back="act_run_left_back_1h_with_h_shld"
+                left_to_right="act_run_left_to_right_1h_with_h_shld"
+                right_to_left="act_run_right_to_left_1h_with_h_shld"
+                rotate="act_turn_1h_with_h_shld"
+                forward_adder="act_run_forward_adder"
+                backward_adder="act_run_backward_adder"
+                right_adder="act_run_right_adder"
+                right_back_adder="act_run_right_back_adder"
+                left_adder="act_run_left_adder"
+                left_back_adder="act_run_left_back_adder"
+                left_to_right_adder="act_run_left_to_right_adder"
+                right_to_left_adder="act_run_right_to_left_adder" />
 
-  <!-- Run with dual wield (left stance) -->
-  <movement_set id="run_1h_with_dw_left_stance">
-    <movement position="idle" animation="run_idle_1h_with_h_shld_left_stance"/>
-    <movement position="forward" animation="run_forward_1h_with_h_shld_left_stance"/>
-    <movement position="backward" animation="run_backward_1h_with_h_shld_left_stance"/>
-    <movement position="left" animation="run_left_1h_with_h_shld_left_stance"/>
-    <movement position="right" animation="run_right_1h_with_h_shld_left_stance"/>
-    <movement position="rotate_left" animation="run_rotate_left_1h_with_h_shld_left_stance"/>
-    <movement position="rotate_right" animation="run_rotate_right_1h_with_h_shld_left_stance"/>
-  </movement_set>
+  <movement_set id="run_1h_with_dw_left_stance"
+                idle="act_run_idle_1h_with_h_shld_left_stance"
+                forward="act_run_forward_1h_with_h_shld_left_stance"
+                backward="act_run_backward_1h_with_h_shld_left_stance"
+                right="act_run_right_1h_with_h_shld_left_stance"
+                right_back="act_run_right_back_1h_with_h_shld_left_stance"
+                left="act_run_left_1h_with_h_shld_left_stance"
+                left_back="act_run_left_back_1h_with_h_shld_left_stance"
+                left_to_right="act_run_left_to_right_1h_with_h_shld_left_stance"
+                right_to_left="act_run_right_to_left_1h_with_h_shld_left_stance"
+                rotate="act_turn_1h_with_h_shld_left_stance"
+                forward_adder="act_run_forward_adder"
+                backward_adder="act_run_backward_adder"
+                right_adder="act_run_right_adder"
+                right_back_adder="act_run_right_back_adder"
+                left_adder="act_run_left_adder"
+                left_back_adder="act_run_left_back_adder"
+                left_to_right_adder="act_run_left_to_right_adder"
+                right_to_left_adder="act_run_right_to_left_adder" />
 
-  <!-- Crouch walk (reuses hand_shield crouch) -->
-  <movement_set id="crouch_walk_1h_with_dw">
-    <movement position="idle" animation="crouch_walk_idle_1h_with_h_shld"/>
-    <movement position="forward" animation="crouch_walk_forward_1h_with_h_shld"/>
-    <movement position="backward" animation="crouch_walk_backward_1h_with_h_shld"/>
-    <movement position="left" animation="crouch_walk_left_1h_with_h_shld"/>
-    <movement position="right" animation="crouch_walk_right_1h_with_h_shld"/>
-  </movement_set>
+  <!-- ===== CROUCH WALK ===== -->
+  <movement_set id="crouch_walk_1h_with_dw"
+                idle="act_crouch_walk_idle_1h_with_h_shld"
+                forward="act_crouch_walk_forward_1h_with_h_shld"
+                backward="act_crouch_walk_backward_1h_with_h_shld"
+                right="act_crouch_walk_right_1h_with_h_shld"
+                left="act_crouch_walk_left_1h_with_h_shld" />
 
-  <movement_set id="crouch_walk_1h_with_dw_left_stance">
-    <movement position="idle" animation="crouch_walk_idle_1h_with_h_shld_left_stance"/>
-    <movement position="forward" animation="crouch_walk_forward_1h_with_h_shld_left_stance"/>
-    <movement position="backward" animation="crouch_walk_backward_1h_with_h_shld_left_stance"/>
-    <movement position="left" animation="crouch_walk_left_1h_with_h_shld_left_stance"/>
-    <movement position="right" animation="crouch_walk_right_1h_with_h_shld_left_stance"/>
-  </movement_set>
+  <movement_set id="crouch_walk_1h_with_dw_left_stance"
+                idle="act_crouch_walk_idle_1h_with_h_shld_left_stance"
+                forward="act_crouch_walk_forward_1h_with_h_shld_left_stance"
+                backward="act_crouch_walk_backward_1h_with_h_shld_left_stance"
+                right="act_crouch_walk_right_1h_with_h_shld_left_stance"
+                left="act_crouch_walk_left_1h_with_h_shld_left_stance" />
 
-  <!-- Crouch run (reuses hand_shield crouch) -->
-  <movement_set id="crouch_run_1h_with_dw">
-    <movement position="idle" animation="crouch_run_idle_1h_with_h_shld"/>
-    <movement position="forward" animation="crouch_run_forward_1h_with_h_shld"/>
-    <movement position="backward" animation="crouch_run_backward_1h_with_h_shld"/>
-    <movement position="left" animation="crouch_run_left_1h_with_h_shld"/>
-    <movement position="right" animation="crouch_run_right_1h_with_h_shld"/>
-  </movement_set>
+  <!-- ===== CROUCH RUN ===== -->
+  <movement_set id="crouch_run_1h_with_dw"
+                idle="act_crouch_run_idle_1h_with_h_shld"
+                forward="act_crouch_run_forward_1h_with_h_shld"
+                backward="act_crouch_run_backward_1h_with_h_shld"
+                right="act_crouch_run_right_1h_with_h_shld"
+                left="act_crouch_run_left_1h_with_h_shld" />
 
-  <movement_set id="crouch_run_1h_with_dw_left_stance">
-    <movement position="idle" animation="crouch_run_idle_1h_with_h_shld_left_stance"/>
-    <movement position="forward" animation="crouch_run_forward_1h_with_h_shld_left_stance"/>
-    <movement position="backward" animation="crouch_run_backward_1h_with_h_shld_left_stance"/>
-    <movement position="left" animation="crouch_run_left_1h_with_h_shld_left_stance"/>
-    <movement position="right" animation="crouch_run_right_1h_with_h_shld_left_stance"/>
-  </movement_set>
+  <movement_set id="crouch_run_1h_with_dw_left_stance"
+                idle="act_crouch_run_idle_1h_with_h_shld_left_stance"
+                forward="act_crouch_run_forward_1h_with_h_shld_left_stance"
+                backward="act_crouch_run_backward_1h_with_h_shld_left_stance"
+                right="act_crouch_run_right_1h_with_h_shld_left_stance"
+                left="act_crouch_run_left_1h_with_h_shld_left_stance" />
 
 </movement_sets>
