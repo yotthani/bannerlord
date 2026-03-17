@@ -388,7 +388,13 @@ namespace DualWield
                 else
                     ProcessSeparatedMode(agent);
 
-                ProcessManualTest(agent); // V key = manual LH attack (diagnostic)
+                ProcessManualTest(agent); // V key = toggle bone mirror
+
+                // v10.10: Manually sync weapon entity positions to mirrored bone frames.
+                // The PostIntegrate callback handles mesh rendering (arm mirroring).
+                // We handle weapon entities here using stored bone frames from the callback.
+                if (_mirrorActive)
+                    SyncWeaponEntitiesToMirroredBones(agent);
             }
 
             // DW indicator — delayed to avoid firing during loading
@@ -681,25 +687,22 @@ namespace DualWield
 
         #endregion
 
-        #region Bone Mirror PoC (V-Key)
+        #region Bone Mirror (V-Key toggle, hybrid approach v10.11)
 
         private bool _vWasDown;
         private bool _mirrorActive;
-        private int _mirrorFramesLeft;
-        private bool _boneDumpDone;
-        private const int MIRROR_DURATION = 120; // ~2 seconds
+        private bool _scriptAttached;
 
-        // Bone index pairs: L = 14..20, R = 21..27 (HumanBone enum)
-        private static readonly sbyte[] LH_BONES = { 14, 15, 16, 17, 18, 19, 20 }; // ShoulderL..ItemL
-        private static readonly sbyte[] RH_BONES = { 21, 22, 23, 24, 25, 26, 27 }; // ShoulderR..ItemR
+        // v10.11 restored: Weapon-to-bone offsets, captured BEFORE enabling the callback.
+        // weapon_frame = bone_entitial_frame * offset
+        // → offset = bone_frame^-1 * weapon_frame (= bone_frame.TransformToLocal(weapon_frame))
+        private MatrixFrame _rhWeaponOffset;
+        private MatrixFrame _lhWeaponOffset;
+        private bool _offsetsCaptured;
 
         /// <summary>
-        /// v10.3 Bone Mirror Diagnostic:
-        /// V key cycles through test modes:
-        ///   Mode 0 = OFF
-        ///   Mode 1 = FREEZE: LH arm locked to rest pose (verifies SetOutQuat works)
-        ///   Mode 2 = COPY:   LH gets RH's local rotation (verifies local calc works)
-        ///   Mode 3 = MIRROR: Full delta-from-rest sagittal mirroring
+        /// V key toggles MirrorZ bone mirroring on/off.
+        /// Hybrid: PostIntegrate callback for mesh + manual weapon entity sync with offsets.
         /// </summary>
         private void ProcessManualTest(Agent agent)
         {
@@ -707,66 +710,88 @@ namespace DualWield
 
             if (vDown && !_vWasDown)
             {
-                // First V press: attach script if not done yet
+                // First V press: capture offsets BEFORE enabling callback, then attach script
                 if (!_scriptAttached)
                 {
-                    DumpBoneHierarchy(agent);
-                    _boneDumpDone = true;
+                    CaptureWeaponBoneOffsets(agent);
                     AttachBoneMirrorScript(agent);
                 }
 
-                // Cycle mode: 0 → 1 → 2 → 3 → 0
-                int newMode = (DualWieldBoneMirrorScript.Mode + 1) % DualWieldBoneMirrorScript.MODE_COUNT;
-                DualWieldBoneMirrorScript.Mode = newMode;
-
-                string modeName = DualWieldBoneMirrorScript.MODE_NAMES[newMode];
-                Color color = newMode == 0 ? Colors.Yellow : Colors.Magenta;
-
-                InformationManager.DisplayMessage(new InformationMessage(
-                    $"[DW] Bone Mirror: {modeName}", color));
-                DualWieldLog.Log($"[BoneMirror] Mode changed to {newMode}: {modeName}");
-
-                // Reset timer on any activation
-                if (newMode > 0)
+                if (_mirrorActive)
                 {
-                    _mirrorActive = true;
-                    _mirrorFramesLeft = MIRROR_DURATION;
+                    _mirrorActive = false;
+                    DualWieldBoneMirrorScript.Mode = 0;
+                    InformationManager.DisplayMessage(new InformationMessage(
+                        "[DW] Bone Mirror: OFF", Colors.Yellow));
                 }
                 else
                 {
-                    _mirrorActive = false;
-                    _mirrorFramesLeft = 0;
+                    _mirrorActive = true;
+                    DualWieldBoneMirrorScript.Mode = 2; // MIRROR_Z
+                    InformationManager.DisplayMessage(new InformationMessage(
+                        "[DW] Bone Mirror: MIRROR_Z (active)", Colors.Green));
                 }
+                DualWieldLog.Log($"[BoneMirror] Toggle: mirrorActive={_mirrorActive}");
             }
             _vWasDown = vDown;
+        }
 
-            if (!_mirrorActive) return;
+        /// <summary>
+        /// v10.11: Capture the local offset between weapon entities and their attachment bones.
+        /// Must be called BEFORE EnableScriptDrivenPostIntegrateCallback (which breaks auto-sync).
+        /// offset = bone_entitial_frame.TransformToLocal(weapon_entity_frame)
+        /// </summary>
+        private void CaptureWeaponBoneOffsets(Agent agent)
+        {
+            if (_offsetsCaptured) return;
 
-            _mirrorFramesLeft--;
-            if (_mirrorFramesLeft <= 0)
+            try
             {
-                _mirrorActive = false;
-                DualWieldBoneMirrorScript.Mode = 0;
-                InformationManager.DisplayMessage(new InformationMessage(
-                    "[DW] Bone Mirror: timeout → OFF", Colors.Yellow));
-                return;
+                var skeleton = agent.AgentVisuals?.GetSkeleton();
+                if (skeleton == null) return;
+
+                const sbyte RH_WEAPON_BONE = 27;
+                const sbyte LH_WEAPON_BONE = 20;
+
+                var mainSlot = agent.GetPrimaryWieldedItemIndex();
+                var offSlot = agent.GetOffhandWieldedItemIndex();
+
+                if (mainSlot != EquipmentIndex.None)
+                {
+                    var weaponEntity = agent.GetWeaponEntityFromEquipmentSlot(mainSlot);
+                    if (weaponEntity != null)
+                    {
+                        MatrixFrame boneFrame = skeleton.GetBoneEntitialFrame(RH_WEAPON_BONE);
+                        MatrixFrame weaponFrame = weaponEntity.GetFrame();
+                        _rhWeaponOffset = boneFrame.TransformToLocal(weaponFrame);
+                        DualWieldLog.Log($"[WeaponOffset] RH: bone={boneFrame.origin} weapon={weaponFrame.origin} offset={_rhWeaponOffset.origin}");
+                    }
+                }
+
+                if (offSlot != EquipmentIndex.None)
+                {
+                    var weaponEntity = agent.GetWeaponEntityFromEquipmentSlot(offSlot);
+                    if (weaponEntity != null)
+                    {
+                        MatrixFrame boneFrame = skeleton.GetBoneEntitialFrame(LH_WEAPON_BONE);
+                        MatrixFrame weaponFrame = weaponEntity.GetFrame();
+                        _lhWeaponOffset = boneFrame.TransformToLocal(weaponFrame);
+                        DualWieldLog.Log($"[WeaponOffset] LH: bone={boneFrame.origin} weapon={weaponFrame.origin} offset={_lhWeaponOffset.origin}");
+                    }
+                }
+
+                _offsetsCaptured = true;
+                DualWieldLog.Log("[WeaponOffset] v10.11 restored: Offsets captured before callback activation.");
             }
-
-            // Diagnostic after 30 frames
-            if (_mirrorFramesLeft == MIRROR_DURATION - 30)
+            catch (System.Exception ex)
             {
-                bool fired = DualWieldBoneMirrorScript.CallbackFired;
-                InformationManager.DisplayMessage(new InformationMessage(
-                    $"[DW] Callback fired: {fired}",
-                    fired ? Colors.Green : Colors.Red));
+                DualWieldLog.Log($"[WeaponOffset] Capture error: {ex.Message}");
             }
         }
 
-        private bool _scriptAttached;
-
         /// <summary>
         /// Attach DualWieldBoneMirrorScript to the agent's GameEntity.
-        /// This enables the SkeletonPostIntegrateCallback hook.
+        /// Enables PostIntegrate callback for mesh bone mirroring.
         /// </summary>
         private void AttachBoneMirrorScript(Agent agent)
         {
@@ -775,90 +800,79 @@ namespace DualWield
             try
             {
                 var agentVisuals = agent.AgentVisuals;
-                if (agentVisuals == null)
-                {
-                    DualWieldLog.Log("[BoneMirror] AgentVisuals is NULL");
-                    return;
-                }
+                if (agentVisuals == null) return;
 
                 var entity = agentVisuals.GetEntity();
-                if (entity == null)
-                {
-                    DualWieldLog.Log("[BoneMirror] Agent Entity is NULL");
-                    return;
-                }
-
                 var skeleton = agentVisuals.GetSkeleton();
-                if (skeleton == null)
-                {
-                    DualWieldLog.Log("[BoneMirror] Skeleton is NULL");
-                    return;
-                }
+                if (entity == null || skeleton == null) return;
 
-                DualWieldLog.Log($"[BoneMirror] Entity valid, skeleton bones={skeleton.GetBoneCount()}");
-
-                // Step 1: Add our ScriptComponentBehavior to the agent entity
-                // CreateAndAddScriptComponent uses CLASS NAME (or NameOverride), NOT the tag!
                 string scriptName = nameof(DualWieldBoneMirrorScript);
                 entity.CreateAndAddScriptComponent(scriptName, true);
-                DualWieldLog.Log($"[BoneMirror] CreateAndAddScriptComponent('{scriptName}') called");
 
-                // Step 2: Get reference to the created script
                 var script = entity.GetFirstScriptOfType<DualWieldBoneMirrorScript>();
                 if (script == null)
                 {
                     DualWieldLog.Log("[BoneMirror] ERROR: Script not found after CreateAndAdd!");
-                    InformationManager.DisplayMessage(new InformationMessage(
-                        "[DW] BoneMirror script NOT FOUND!", Colors.Red));
                     return;
                 }
 
-                // Step 3: Give the script a reference to the skeleton
                 script.AgentSkeleton = skeleton;
-
-                // Step 4: Enable the PostIntegrate callback on the skeleton
                 skeleton.EnableScriptDrivenPostIntegrateCallback();
 
                 _scriptAttached = true;
-                DualWieldLog.Log("[BoneMirror] Script attached + PostIntegrate callback enabled!");
-                InformationManager.DisplayMessage(new InformationMessage(
-                    "[DW] BoneMirror script attached!", Colors.Green));
+                DualWieldLog.Log("[BoneMirror] v10.11: Script attached + callback enabled.");
             }
             catch (System.Exception ex)
             {
-                DualWieldLog.Log($"[BoneMirror] AttachScript ERROR: {ex.Message}\n{ex.StackTrace}");
-                InformationManager.DisplayMessage(new InformationMessage(
-                    $"[DW] BoneMirror attach FAILED: {ex.Message}", Colors.Red));
+                DualWieldLog.Log($"[BoneMirror] AttachScript ERROR: {ex.Message}");
             }
         }
 
         /// <summary>
-        /// Dump all bone names and indices for the agent's skeleton.
-        /// This confirms the HumanBone enum matches the actual skeleton layout.
+        /// v10.11 restored: Position weapon entities using bone frames × captured offsets.
+        /// new_weapon_frame = new_bone_entitial_frame.TransformToParent(offset)
+        ///
+        /// This was the BEST result: RH perfect, LH at hand but flipped.
+        /// Added: LH gets 180° RotateAboutForward fix for the flip.
         /// </summary>
-        private void DumpBoneHierarchy(Agent agent)
+        private void SyncWeaponEntitiesToMirroredBones(Agent agent)
         {
-            var skeleton = agent.AgentVisuals?.GetSkeleton();
-            if (skeleton == null) { DualWieldLog.Log("[BoneDump] skeleton is NULL"); return; }
+            if (!DualWieldBoneMirrorScript.HasWeaponFrames) return;
+            if (!_offsetsCaptured) return;
 
-            sbyte count = skeleton.GetBoneCount();
-            DualWieldLog.Log($"[BoneDump] Skeleton has {count} bones:");
-
-            for (sbyte i = 0; i < count; i++)
+            try
             {
-                string name = skeleton.GetBoneName(i);
-                sbyte parent = skeleton.GetParentBoneIndex(i);
-                DualWieldLog.Log($"  [{i:D2}] '{name}' parent={parent}");
+                var mainSlot = agent.GetPrimaryWieldedItemIndex();
+                var offSlot = agent.GetOffhandWieldedItemIndex();
+
+                // RH weapon: bone frame (unchanged) × RH offset
+                if (mainSlot != EquipmentIndex.None)
+                {
+                    var entity = agent.GetWeaponEntityFromEquipmentSlot(mainSlot);
+                    if (entity != null)
+                    {
+                        MatrixFrame boneFrame = DualWieldBoneMirrorScript.LastRHWeaponBoneFrame;
+                        MatrixFrame weaponFrame = boneFrame.TransformToParent(_rhWeaponOffset);
+                        entity.SetFrame(ref weaponFrame);
+                    }
+                }
+
+                // LH weapon: mirrored bone frame × LH offset
+                if (offSlot != EquipmentIndex.None)
+                {
+                    var entity = agent.GetWeaponEntityFromEquipmentSlot(offSlot);
+                    if (entity != null)
+                    {
+                        MatrixFrame boneFrame = DualWieldBoneMirrorScript.LastLHWeaponBoneFrame;
+                        MatrixFrame weaponFrame = boneFrame.TransformToParent(_lhWeaponOffset);
+                        entity.SetFrame(ref weaponFrame);
+                    }
+                }
             }
-
-            // Also log the Monster's known bone indices for comparison
-            var monster = agent.Monster;
-            if (monster != null)
+            catch (System.Exception ex)
             {
-                DualWieldLog.Log($"[BoneDump] Monster MainHandBone={monster.MainHandBoneIndex}" +
-                    $" OffHandBone={monster.OffHandBoneIndex}" +
-                    $" MainHandItemBone={monster.MainHandItemBoneIndex}" +
-                    $" OffHandItemBone={monster.OffHandItemBoneIndex}");
+                if (_tickCount % 300 == 0)
+                    DualWieldLog.Log($"[WeaponSync] Error: {ex.Message}");
             }
         }
 
@@ -895,8 +909,9 @@ namespace DualWield
             _rmbCooldown = 0;
             _rmbAttackIdx = 0;
             _mirrorActive = false;
-            _mirrorFramesLeft = 0;
             _scriptAttached = false;
+            _vWasDown = false;
+            _offsetsCaptured = false;
             DualWieldBoneMirrorScript.ResetState();
             Patches.DualWieldAnimationPatches.ClearAll();
             Patches.DualWieldWieldingPatches.ClearTrackingState();
