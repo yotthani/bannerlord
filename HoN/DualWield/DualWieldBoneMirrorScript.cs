@@ -1,125 +1,182 @@
 using DualWield.Core;
+using TaleWorlds.Core;
 using TaleWorlds.DotNet;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
+using TaleWorlds.MountAndBlade;
 
 namespace DualWield
 {
     /// <summary>
-    /// v10.0 PoC: ScriptComponentBehavior attached to an Agent's GameEntity.
+    /// v10.6: Direct MirrorZ of local bone rotations.
     ///
-    /// When EnableScriptDrivenPostIntegrateCallback() is active on the skeleton,
-    /// the native engine calls SkeletonPostIntegrateCallback AFTER animation computation
-    /// but BEFORE GPU rendering. This is the ONLY hook point where bone transforms
-    /// can be modified without being overwritten by the native pipeline.
+    /// DISCOVERY: From rest pose data, LH and RH local rotations relate by:
+    ///   LH_local = MirrorZ(RH_local)  where MirrorZ = M * R * M, M = diag(1,1,-1)
     ///
-    /// SetBoneLocalFrame (per-tick in OnMissionTick) does NOT work — confirmed dead end.
-    /// SetOutQuat/SetOutBoneDisplacement (in this callback) write to the animation RESULT.
+    /// This holds for BOTH rest pose AND animated pose. So the algorithm is:
+    ///   1. Compute RH bone's current LOCAL rotation (from entitial transforms)
+    ///   2. Apply MirrorZ → this IS the correct LH local rotation
+    ///   3. Set via SetOutQuat
+    ///
+    /// No delta computation, no rest-pose subtraction needed.
+    ///
+    /// PROOF: Mz * Mz = I, so mirroring each bone independently produces
+    /// the correct entity-space mirror for the entire chain:
+    ///   S * Mz*A*Mz * Mz*B*Mz = S * Mz * A * B * Mz
+    ///
+    /// V key cycles: OFF → FREEZE → MIRROR_Z → OFF
     /// </summary>
     [ScriptComponentParams("dw_bone_mirror")]
     public class DualWieldBoneMirrorScript : ScriptComponentBehavior
     {
-        /// <summary>
-        /// When true, the callback actively mirrors RH arm bones onto LH arm bones.
-        /// Toggled by the V-key in DualWieldMissionBehavior.
-        /// </summary>
-        public static bool MirrorEnabled { get; set; }
+        public static int Mode { get; set; }
+        public static readonly string[] MODE_NAMES = {
+            "OFF",
+            "FREEZE (T-pose)",
+            "MIRROR_Z (direct)"
+        };
+        public const int MODE_COUNT = 3;
 
-        /// <summary>
-        /// Reference to the agent's skeleton. Set when attaching the script.
-        /// Needed by AnimResult methods (GetEntitialOutTransform, SetOutQuat, etc.)
-        /// </summary>
         public Skeleton AgentSkeleton { get; set; }
-
-        /// <summary>
-        /// Tracks whether the callback has ever fired (diagnostic).
-        /// </summary>
         public static bool CallbackFired { get; private set; }
         private static int _callbackCount;
 
+        // ── All arm bone pairs, root-to-tip ──
+        // Clavicle, Upperarm, UpperarmTwist1, Forearm, Forearm1, Hand
+        private static readonly sbyte[] RH_ARM = { 21, 22, 23, 24, 25, 26 };
+        private static readonly sbyte[] LH_ARM = { 14, 15, 16, 17, 18, 19 };
+        private const int PAIR_COUNT = 6;
+
+        // Cached LH rest rotations (for FREEZE mode only)
+        private Mat3[] _lhRestLocal;
+        private bool _restCached;
+
+        private void CacheRestPoses()
+        {
+            if (_restCached || AgentSkeleton == null) return;
+            _lhRestLocal = new Mat3[PAIR_COUNT];
+            for (int i = 0; i < PAIR_COUNT; i++)
+            {
+                MatrixFrame lhRest = AgentSkeleton.GetBoneLocalRestFrame(LH_ARM[i], true);
+                _lhRestLocal[i] = lhRest.rotation;
+            }
+            _restCached = true;
+            DualWieldLog.Log("[BoneMirror] v10.6: Rest poses cached. MirrorZ direct mode.");
+        }
+
         /// <summary>
-        /// Called by native engine AFTER animation integration, BEFORE rendering.
-        /// This is where we can safely modify bone transforms without being overwritten.
+        /// MirrorZ: M * R * M where M = diag(1, 1, -1).
+        /// Derived from actual rest-pose data comparing LH vs RH bones.
         ///
-        /// Return true = we modified the animation result, engine should use our values.
-        /// Return false = no modification, use normal animation result.
+        /// (M*R*M)[i][j] = M[i] * R[i][j] * M[j], M = diag(1,1,-1):
+        ///   s' = ( s.x,  s.y, -s.z)   negate only z (row 2, col 0)
+        ///   f' = ( f.x,  f.y, -f.z)   negate only z (row 2, col 1)
+        ///   u' = (-u.x, -u.y,  u.z)   negate x,y (row 0,1 col 2) keep z (row 2, col 2)
+        ///
+        /// Verified against rest pose data:
+        ///   RH[22] s=(0.834,0.051,0.549) → MirrorZ → (0.834,0.051,-0.549) = LH[15] ✓
         /// </summary>
+        private static Mat3 MirrorZ(Mat3 r)
+        {
+            return new Mat3(
+                new Vec3( r.s.x,  r.s.y, -r.s.z),
+                new Vec3( r.f.x,  r.f.y, -r.f.z),
+                new Vec3(-r.u.x, -r.u.y,  r.u.z)
+            );
+        }
+
         protected override bool SkeletonPostIntegrateCallback(AnimResult animResult)
         {
             _callbackCount++;
             CallbackFired = true;
 
-            if (!MirrorEnabled || AgentSkeleton == null)
+            if (Mode == 0 || AgentSkeleton == null)
                 return false;
 
-            // Log first callback
-            if (_callbackCount == 1)
-            {
-                DualWieldLog.Log("[BoneMirror] SkeletonPostIntegrateCallback FIRED for first time!");
-            }
+            if (!_restCached)
+                CacheRestPoses();
 
             try
             {
-                // ── PHASE 1: Mirror UpperarmR → UpperarmL and ForearmR → ForearmL ──
-                // Read the current RH arm transforms from the animation result
-                sbyte upperarmR = 22; // HumanBone.UpperarmR
-                sbyte upperarmL = 15; // HumanBone.UpperarmL
+                if (Mode == 1)
+                    return ApplyFreeze(animResult);
 
-                Transformation rhTransform = animResult.GetEntitialOutTransform(upperarmR, AgentSkeleton);
-
-                // Mirror position: negate X (mirror across sagittal/YZ plane)
-                Vec3 mirroredPos = new Vec3(-rhTransform.Origin.x, rhTransform.Origin.y, rhTransform.Origin.z);
-                animResult.SetOutBoneDisplacement(upperarmL, mirroredPos, AgentSkeleton);
-
-                // Mirror rotation across sagittal (YZ) plane:
-                // For a proper reflection, negate the entire side vector (X-axis)
-                // and negate X components of forward and up vectors
-                Mat3 rhRot = rhTransform.Rotation;
-                Mat3 mirroredRot = new Mat3(
-                    new Vec3(-rhRot.s.x, -rhRot.s.y, -rhRot.s.z), // side: fully negated
-                    new Vec3(-rhRot.f.x,  rhRot.f.y,  rhRot.f.z), // forward: negate X
-                    new Vec3(-rhRot.u.x,  rhRot.u.y,  rhRot.u.z)  // up: negate X
-                );
-                animResult.SetOutQuat(upperarmL, mirroredRot, AgentSkeleton);
-
-                // Also mirror forearm for more visible effect
-                sbyte forearmR = 24; // HumanBone.ForearmR
-                sbyte forearmL = 17; // HumanBone.ForearmL
-
-                Transformation rhForearm = animResult.GetEntitialOutTransform(forearmR, AgentSkeleton);
-                Vec3 mirroredFPos = new Vec3(-rhForearm.Origin.x, rhForearm.Origin.y, rhForearm.Origin.z);
-                animResult.SetOutBoneDisplacement(forearmL, mirroredFPos, AgentSkeleton);
-
-                Mat3 rhFRot = rhForearm.Rotation;
-                Mat3 mirroredFRot = new Mat3(
-                    new Vec3(-rhFRot.s.x, -rhFRot.s.y, -rhFRot.s.z),
-                    new Vec3(-rhFRot.f.x,  rhFRot.f.y,  rhFRot.f.z),
-                    new Vec3(-rhFRot.u.x,  rhFRot.u.y,  rhFRot.u.z)
-                );
-                animResult.SetOutQuat(forearmL, mirroredFRot, AgentSkeleton);
-
-                // Log periodically
-                if (_callbackCount % 60 == 0)
-                {
-                    DualWieldLog.Log($"[BoneMirror] Callback #{_callbackCount}: mirror applied, " +
-                        $"RH_upperarm=({rhTransform.Origin.x:F2},{rhTransform.Origin.y:F2},{rhTransform.Origin.z:F2})");
-                }
-
-                return true; // We modified the result
+                // Mode 2: Direct MirrorZ
+                return ApplyMirrorZ(animResult);
             }
             catch (System.Exception ex)
             {
-                DualWieldLog.Log($"[BoneMirror] Callback ERROR: {ex.Message}");
+                DualWieldLog.Log($"[BoneMirror] ERROR: {ex.Message}\n{ex.StackTrace}");
                 return false;
             }
         }
 
+        private bool ApplyFreeze(AnimResult animResult)
+        {
+            for (int i = 0; i < PAIR_COUNT; i++)
+                animResult.SetOutQuat(LH_ARM[i], _lhRestLocal[i], AgentSkeleton);
+            return true;
+        }
+
+        private bool ApplyMirrorZ(AnimResult animResult)
+        {
+            for (int i = 0; i < PAIR_COUNT; i++)
+            {
+                sbyte rhBone = RH_ARM[i];
+                sbyte lhBone = LH_ARM[i];
+
+                // ── Step 1: Get RH bone's LOCAL rotation from entitial ──
+                Mat3 rhLocalRot = GetBoneLocalRotation(animResult, rhBone);
+
+                // ── Step 2: Mirror Z → correct LH local rotation ──
+                Mat3 lhLocalRot = MirrorZ(rhLocalRot);
+
+                // ── Step 3: Set on LH bone ──
+                animResult.SetOutQuat(lhBone, lhLocalRot, AgentSkeleton);
+
+                // Log first 2 frames
+                if (_callbackCount <= 2)
+                {
+                    DualWieldLog.Log($"  [MirrorZ] [{i}] RH{rhBone}->LH{lhBone}" +
+                        $" rh.s=({rhLocalRot.s.x:F3},{rhLocalRot.s.y:F3},{rhLocalRot.s.z:F3})" +
+                        $" lh.s=({lhLocalRot.s.x:F3},{lhLocalRot.s.y:F3},{lhLocalRot.s.z:F3})");
+                }
+            }
+
+            // Periodic position comparison
+            if (_callbackCount % 120 == 1)
+            {
+                Transformation rhEnt = animResult.GetEntitialOutTransform(RH_ARM[1], AgentSkeleton);
+                Transformation lhEnt = animResult.GetEntitialOutTransform(LH_ARM[1], AgentSkeleton);
+                InformationManager.DisplayMessage(new InformationMessage(
+                    $"[MirrorZ] RH=({rhEnt.Origin.x:F1},{rhEnt.Origin.y:F1},{rhEnt.Origin.z:F1})" +
+                    $" LH=({lhEnt.Origin.x:F1},{lhEnt.Origin.y:F1},{lhEnt.Origin.z:F1})",
+                    Colors.Cyan));
+            }
+
+            return true;
+        }
+
         /// <summary>
-        /// Reset state (called when mission ends).
+        /// Compute bone's LOCAL rotation: parent_entitial^T * bone_entitial
         /// </summary>
+        private Mat3 GetBoneLocalRotation(AnimResult animResult, sbyte boneIndex)
+        {
+            Transformation boneEntitial = animResult.GetEntitialOutTransform(boneIndex, AgentSkeleton);
+            sbyte parentIdx = AgentSkeleton.GetParentBoneIndex(boneIndex);
+
+            if (parentIdx >= 0)
+            {
+                Transformation parentEntitial = animResult.GetEntitialOutTransform(parentIdx, AgentSkeleton);
+                return parentEntitial.Rotation.TransformToLocal(in boneEntitial.Rotation);
+            }
+
+            return boneEntitial.Rotation;
+        }
+
         public static void ResetState()
         {
-            MirrorEnabled = false;
+            Mode = 0;
             CallbackFired = false;
             _callbackCount = 0;
         }

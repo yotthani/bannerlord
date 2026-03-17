@@ -694,55 +694,48 @@ namespace DualWield
         private static readonly sbyte[] RH_BONES = { 21, 22, 23, 24, 25, 26, 27 }; // ShoulderR..ItemR
 
         /// <summary>
-        /// v10.0 Bone Mirror PoC:
-        /// V key toggles bone mirroring on/off.
-        /// Uses SkeletonPostIntegrateCallback (native engine hook AFTER animation, BEFORE render).
-        ///
-        /// First V press:
-        ///   1. Dumps bone hierarchy to log
-        ///   2. Attaches DualWieldBoneMirrorScript to agent entity
-        ///   3. Enables PostIntegrate callback on skeleton
-        ///   4. Sets MirrorEnabled = true
-        ///
-        /// Second V press: disables mirroring.
+        /// v10.3 Bone Mirror Diagnostic:
+        /// V key cycles through test modes:
+        ///   Mode 0 = OFF
+        ///   Mode 1 = FREEZE: LH arm locked to rest pose (verifies SetOutQuat works)
+        ///   Mode 2 = COPY:   LH gets RH's local rotation (verifies local calc works)
+        ///   Mode 3 = MIRROR: Full delta-from-rest sagittal mirroring
         /// </summary>
         private void ProcessManualTest(Agent agent)
         {
             bool vDown = Input.IsKeyDown(InputKey.V);
 
-            // Toggle mirror mode on V press
             if (vDown && !_vWasDown)
             {
-                if (!_mirrorActive)
+                // First V press: attach script if not done yet
+                if (!_scriptAttached)
+                {
+                    DumpBoneHierarchy(agent);
+                    _boneDumpDone = true;
+                    AttachBoneMirrorScript(agent);
+                }
+
+                // Cycle mode: 0 → 1 → 2 → 3 → 0
+                int newMode = (DualWieldBoneMirrorScript.Mode + 1) % DualWieldBoneMirrorScript.MODE_COUNT;
+                DualWieldBoneMirrorScript.Mode = newMode;
+
+                string modeName = DualWieldBoneMirrorScript.MODE_NAMES[newMode];
+                Color color = newMode == 0 ? Colors.Yellow : Colors.Magenta;
+
+                InformationManager.DisplayMessage(new InformationMessage(
+                    $"[DW] Bone Mirror: {modeName}", color));
+                DualWieldLog.Log($"[BoneMirror] Mode changed to {newMode}: {modeName}");
+
+                // Reset timer on any activation
+                if (newMode > 0)
                 {
                     _mirrorActive = true;
                     _mirrorFramesLeft = MIRROR_DURATION;
-
-                    // First activation: dump bone hierarchy
-                    if (!_boneDumpDone)
-                    {
-                        DumpBoneHierarchy(agent);
-                        _boneDumpDone = true;
-                    }
-
-                    // Attach ScriptComponentBehavior to agent entity + enable callback
-                    AttachBoneMirrorScript(agent);
-
-                    DualWieldBoneMirrorScript.MirrorEnabled = true;
-
-                    InformationManager.DisplayMessage(new InformationMessage(
-                        "[DW] BONE MIRROR PoC: ON (PostIntegrate)", Colors.Magenta));
-                    DualWieldLog.Log("[BoneMirror] PoC activated — PostIntegrate path");
                 }
                 else
                 {
                     _mirrorActive = false;
                     _mirrorFramesLeft = 0;
-                    DualWieldBoneMirrorScript.MirrorEnabled = false;
-
-                    InformationManager.DisplayMessage(new InformationMessage(
-                        "[DW] BONE MIRROR PoC: OFF", Colors.Magenta));
-                    DualWieldLog.Log("[BoneMirror] PoC deactivated");
                 }
             }
             _vWasDown = vDown;
@@ -753,20 +746,19 @@ namespace DualWield
             if (_mirrorFramesLeft <= 0)
             {
                 _mirrorActive = false;
-                DualWieldBoneMirrorScript.MirrorEnabled = false;
+                DualWieldBoneMirrorScript.Mode = 0;
                 InformationManager.DisplayMessage(new InformationMessage(
-                    "[DW] BONE MIRROR PoC: timeout", Colors.Yellow));
+                    "[DW] Bone Mirror: timeout → OFF", Colors.Yellow));
                 return;
             }
 
-            // Diagnostic: check if callback is actually firing
+            // Diagnostic after 30 frames
             if (_mirrorFramesLeft == MIRROR_DURATION - 30)
             {
                 bool fired = DualWieldBoneMirrorScript.CallbackFired;
                 InformationManager.DisplayMessage(new InformationMessage(
                     $"[DW] Callback fired: {fired}",
                     fired ? Colors.Green : Colors.Red));
-                DualWieldLog.Log($"[BoneMirror] After 30 frames, CallbackFired={fired}");
             }
         }
 
