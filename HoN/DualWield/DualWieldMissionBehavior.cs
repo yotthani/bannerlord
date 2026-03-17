@@ -223,7 +223,8 @@ namespace DualWield
                     if (!mainWpn.IsEmpty) mainUsageIndex = mainWpn.CurrentUsageIndex;
                 }
 
-                agent.SetWieldedItemIndexAsClient(Agent.HandIndex.OffHand, offHandSlot, true, false, mainUsageIndex);
+                // v9.0: isWieldedOnSpawn=true so native engine initializes leftHandUsageSetIndex
+                agent.SetWieldedItemIndexAsClient(Agent.HandIndex.OffHand, offHandSlot, true, true, mainUsageIndex);
                 DualWieldLog.Log($"SetWieldedItemIndexAsClient: offhand slot {(int)offHandSlot} for {agent.Name}");
             }
             catch (Exception ex)
@@ -308,12 +309,66 @@ namespace DualWield
             if (!_tickLoggedOnce)
             {
                 _tickLoggedOnce = true;
-                // v7.48: IsActive is now set in constructor (before spawn phase).
-                // First tick just logs diagnostics.
-                DualWieldLog.Log("OnMissionTick: v7.48 — IsActive in ctor, rotation diag, MMB+B input");
-                DualWieldLog.Log($"  LH_Uppercut idx={LH_Uppercut.Index}, LH_Direct idx={LH_Direct.Index}");
-                DualWieldLog.Log($"  LH_SwingR idx={LH_SwingR.Index}, LH_SwingL idx={LH_SwingL.Index}");
+                DualWieldLog.Log("OnMissionTick: v9.0 — Usage set diagnostics");
                 Patches.ForceLeftStancePatch.ForceLeftStance = false;
+
+                // v9.0: Usage set registration diagnostics (delayed to first tick so agent is ready)
+                try
+                {
+                    int dwOffIdx = MBItem.GetItemUsageIndex("dw_offhand");
+                    int dwMainIdx = MBItem.GetItemUsageIndex("dw_mainhand_swing_thrust");
+                    int shieldIdx = MBItem.GetItemUsageIndex("hand_shield");
+                    int vanillaSwingThrust = MBItem.GetItemUsageIndex("onehanded_swing_thrust");
+
+                    DualWieldLog.Log($"[UsageIdx] dw_offhand={dwOffIdx}, dw_mainhand_swing_thrust={dwMainIdx}");
+                    DualWieldLog.Log($"[UsageIdx] hand_shield={shieldIdx}, onehanded_swing_thrust={vanillaSwingThrust}");
+
+                    InformationManager.DisplayMessage(new InformationMessage(
+                        $"[DW] UsageIdx: dw_off={dwOffIdx} dw_main={dwMainIdx} shield={shieldIdx}",
+                        dwOffIdx >= 0 ? Colors.Green : Colors.Red));
+
+                    // Also log player's actual weapon usages
+                    var player = Agent.Main;
+                    if (player != null && player.IsActive())
+                    {
+                        var mainIdx = player.GetPrimaryWieldedItemIndex();
+                        var offIdx = player.GetOffhandWieldedItemIndex();
+                        string mainUsage = "none";
+                        string offUsage = "none";
+                        int mainUsageNativeIdx = -1;
+                        int offUsageNativeIdx = -1;
+
+                        if (mainIdx != EquipmentIndex.None)
+                        {
+                            var w = player.Equipment[mainIdx];
+                            if (!w.IsEmpty && w.CurrentUsageItem != null)
+                            {
+                                mainUsage = w.CurrentUsageItem.ItemUsage ?? "null";
+                                mainUsageNativeIdx = string.IsNullOrEmpty(mainUsage) ? -1 : MBItem.GetItemUsageIndex(mainUsage);
+                            }
+                        }
+                        if (offIdx != EquipmentIndex.None)
+                        {
+                            var w = player.Equipment[offIdx];
+                            if (!w.IsEmpty && w.CurrentUsageItem != null)
+                            {
+                                offUsage = w.CurrentUsageItem.ItemUsage ?? "null";
+                                offUsageNativeIdx = string.IsNullOrEmpty(offUsage) ? -1 : MBItem.GetItemUsageIndex(offUsage);
+                            }
+                        }
+
+                        DualWieldLog.Log($"[Player] mainSlot={mainIdx} usage='{mainUsage}' nativeIdx={mainUsageNativeIdx}");
+                        DualWieldLog.Log($"[Player] offSlot={offIdx} usage='{offUsage}' nativeIdx={offUsageNativeIdx}");
+
+                        InformationManager.DisplayMessage(new InformationMessage(
+                            $"[DW] Main: '{mainUsage}'={mainUsageNativeIdx} Off: '{offUsage}'={offUsageNativeIdx}",
+                            offUsageNativeIdx >= 0 ? Colors.Green : Colors.Yellow));
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    DualWieldLog.Log($"[UsageIdx] Error: {ex.Message}");
+                }
             }
 
             _tickCount++;
