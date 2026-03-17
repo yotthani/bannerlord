@@ -681,51 +681,193 @@ namespace DualWield
 
         #endregion
 
-        #region V-Key Manual Test (diagnostic — same as v7.38 test rig)
+        #region Bone Mirror PoC (V-Key)
 
         private bool _vWasDown;
-        private int _vTestIdx;
-        private int _vTestCooldown;
+        private bool _mirrorActive;
+        private int _mirrorFramesLeft;
+        private bool _boneDumpDone;
+        private const int MIRROR_DURATION = 120; // ~2 seconds
 
-        // v7.42c: Test fist_left_stance on CH1 (v7.16 proven mechanism)
-        // NOT 1h_left_stance on ch0 (native engine ignores managed left_stance state)
-        private static readonly string[] VTestActions = new[]
-        {
-            "act_release_uppercut_fist_left_stance",    // 0: thrust equivalent
-            "act_release_swingleft_fist_left_stance",   // 1: slashleft equivalent
-            "act_release_swingright_fist_left_stance",  // 2: slashright equivalent
-            "act_release_direct_fist_left_stance",      // 3: overswing equivalent
-        };
+        // Bone index pairs: L = 14..20, R = 21..27 (HumanBone enum)
+        private static readonly sbyte[] LH_BONES = { 14, 15, 16, 17, 18, 19, 20 }; // ShoulderL..ItemL
+        private static readonly sbyte[] RH_BONES = { 21, 22, 23, 24, 25, 26, 27 }; // ShoulderR..ItemR
 
         /// <summary>
-        /// V key = manual LH attack (diagnostic comparison to auto follow-up).
-        /// Cycles through the 4 confirmed left-hand actions.
-        /// If V works but auto doesn't, the issue is timing/state.
+        /// v10.0 Bone Mirror PoC:
+        /// V key toggles bone mirroring on/off.
+        /// Uses SkeletonPostIntegrateCallback (native engine hook AFTER animation, BEFORE render).
+        ///
+        /// First V press:
+        ///   1. Dumps bone hierarchy to log
+        ///   2. Attaches DualWieldBoneMirrorScript to agent entity
+        ///   3. Enables PostIntegrate callback on skeleton
+        ///   4. Sets MirrorEnabled = true
+        ///
+        /// Second V press: disables mirroring.
         /// </summary>
         private void ProcessManualTest(Agent agent)
         {
             bool vDown = Input.IsKeyDown(InputKey.V);
-            if (vDown && !_vWasDown && _vTestCooldown == 0)
+
+            // Toggle mirror mode on V press
+            if (vDown && !_vWasDown)
             {
-                string actName = VTestActions[_vTestIdx];
-                var action = ActionIndexCache.Create(actName);
+                if (!_mirrorActive)
+                {
+                    _mirrorActive = true;
+                    _mirrorFramesLeft = MIRROR_DURATION;
 
-                DualWieldLog.Log($"[V-TEST] Firing '{actName}' on CH1 idx={action.Index}");
+                    // First activation: dump bone hierarchy
+                    if (!_boneDumpDone)
+                    {
+                        DumpBoneHierarchy(agent);
+                        _boneDumpDone = true;
+                    }
 
-                // v7.43g: Back to ch1 — fist_left_stance only works on ch1
-                bool ok = agent.SetActionChannel(1, in action, true, 0);
-                _vTestCooldown = 25;
+                    // Attach ScriptComponentBehavior to agent entity + enable callback
+                    AttachBoneMirrorScript(agent);
 
-                bool isDW = DualWieldStateManager.IsDualWielding(agent);
-                InformationManager.DisplayMessage(
-                    new InformationMessage(
-                        $"[V] {_vTestIdx}: {(ok ? "OK" : "FAIL")} LS={agent.GetIsLeftStance()} DW={isDW}",
-                        ok ? Colors.Green : Colors.Red));
+                    DualWieldBoneMirrorScript.MirrorEnabled = true;
 
-                _vTestIdx = (_vTestIdx + 1) % VTestActions.Length;
+                    InformationManager.DisplayMessage(new InformationMessage(
+                        "[DW] BONE MIRROR PoC: ON (PostIntegrate)", Colors.Magenta));
+                    DualWieldLog.Log("[BoneMirror] PoC activated — PostIntegrate path");
+                }
+                else
+                {
+                    _mirrorActive = false;
+                    _mirrorFramesLeft = 0;
+                    DualWieldBoneMirrorScript.MirrorEnabled = false;
+
+                    InformationManager.DisplayMessage(new InformationMessage(
+                        "[DW] BONE MIRROR PoC: OFF", Colors.Magenta));
+                    DualWieldLog.Log("[BoneMirror] PoC deactivated");
+                }
             }
-            if (_vTestCooldown > 0) _vTestCooldown--;
             _vWasDown = vDown;
+
+            if (!_mirrorActive) return;
+
+            _mirrorFramesLeft--;
+            if (_mirrorFramesLeft <= 0)
+            {
+                _mirrorActive = false;
+                DualWieldBoneMirrorScript.MirrorEnabled = false;
+                InformationManager.DisplayMessage(new InformationMessage(
+                    "[DW] BONE MIRROR PoC: timeout", Colors.Yellow));
+                return;
+            }
+
+            // Diagnostic: check if callback is actually firing
+            if (_mirrorFramesLeft == MIRROR_DURATION - 30)
+            {
+                bool fired = DualWieldBoneMirrorScript.CallbackFired;
+                InformationManager.DisplayMessage(new InformationMessage(
+                    $"[DW] Callback fired: {fired}",
+                    fired ? Colors.Green : Colors.Red));
+                DualWieldLog.Log($"[BoneMirror] After 30 frames, CallbackFired={fired}");
+            }
+        }
+
+        private bool _scriptAttached;
+
+        /// <summary>
+        /// Attach DualWieldBoneMirrorScript to the agent's GameEntity.
+        /// This enables the SkeletonPostIntegrateCallback hook.
+        /// </summary>
+        private void AttachBoneMirrorScript(Agent agent)
+        {
+            if (_scriptAttached) return;
+
+            try
+            {
+                var agentVisuals = agent.AgentVisuals;
+                if (agentVisuals == null)
+                {
+                    DualWieldLog.Log("[BoneMirror] AgentVisuals is NULL");
+                    return;
+                }
+
+                var entity = agentVisuals.GetEntity();
+                if (entity == null)
+                {
+                    DualWieldLog.Log("[BoneMirror] Agent Entity is NULL");
+                    return;
+                }
+
+                var skeleton = agentVisuals.GetSkeleton();
+                if (skeleton == null)
+                {
+                    DualWieldLog.Log("[BoneMirror] Skeleton is NULL");
+                    return;
+                }
+
+                DualWieldLog.Log($"[BoneMirror] Entity valid, skeleton bones={skeleton.GetBoneCount()}");
+
+                // Step 1: Add our ScriptComponentBehavior to the agent entity
+                // CreateAndAddScriptComponent uses CLASS NAME (or NameOverride), NOT the tag!
+                string scriptName = nameof(DualWieldBoneMirrorScript);
+                entity.CreateAndAddScriptComponent(scriptName, true);
+                DualWieldLog.Log($"[BoneMirror] CreateAndAddScriptComponent('{scriptName}') called");
+
+                // Step 2: Get reference to the created script
+                var script = entity.GetFirstScriptOfType<DualWieldBoneMirrorScript>();
+                if (script == null)
+                {
+                    DualWieldLog.Log("[BoneMirror] ERROR: Script not found after CreateAndAdd!");
+                    InformationManager.DisplayMessage(new InformationMessage(
+                        "[DW] BoneMirror script NOT FOUND!", Colors.Red));
+                    return;
+                }
+
+                // Step 3: Give the script a reference to the skeleton
+                script.AgentSkeleton = skeleton;
+
+                // Step 4: Enable the PostIntegrate callback on the skeleton
+                skeleton.EnableScriptDrivenPostIntegrateCallback();
+
+                _scriptAttached = true;
+                DualWieldLog.Log("[BoneMirror] Script attached + PostIntegrate callback enabled!");
+                InformationManager.DisplayMessage(new InformationMessage(
+                    "[DW] BoneMirror script attached!", Colors.Green));
+            }
+            catch (System.Exception ex)
+            {
+                DualWieldLog.Log($"[BoneMirror] AttachScript ERROR: {ex.Message}\n{ex.StackTrace}");
+                InformationManager.DisplayMessage(new InformationMessage(
+                    $"[DW] BoneMirror attach FAILED: {ex.Message}", Colors.Red));
+            }
+        }
+
+        /// <summary>
+        /// Dump all bone names and indices for the agent's skeleton.
+        /// This confirms the HumanBone enum matches the actual skeleton layout.
+        /// </summary>
+        private void DumpBoneHierarchy(Agent agent)
+        {
+            var skeleton = agent.AgentVisuals?.GetSkeleton();
+            if (skeleton == null) { DualWieldLog.Log("[BoneDump] skeleton is NULL"); return; }
+
+            sbyte count = skeleton.GetBoneCount();
+            DualWieldLog.Log($"[BoneDump] Skeleton has {count} bones:");
+
+            for (sbyte i = 0; i < count; i++)
+            {
+                string name = skeleton.GetBoneName(i);
+                sbyte parent = skeleton.GetParentBoneIndex(i);
+                DualWieldLog.Log($"  [{i:D2}] '{name}' parent={parent}");
+            }
+
+            // Also log the Monster's known bone indices for comparison
+            var monster = agent.Monster;
+            if (monster != null)
+            {
+                DualWieldLog.Log($"[BoneDump] Monster MainHandBone={monster.MainHandBoneIndex}" +
+                    $" OffHandBone={monster.OffHandBoneIndex}" +
+                    $" MainHandItemBone={monster.MainHandItemBoneIndex}" +
+                    $" OffHandItemBone={monster.OffHandItemBoneIndex}");
+            }
         }
 
         #endregion
@@ -760,6 +902,10 @@ namespace DualWield
             _rmbWasDown = false;
             _rmbCooldown = 0;
             _rmbAttackIdx = 0;
+            _mirrorActive = false;
+            _mirrorFramesLeft = 0;
+            _scriptAttached = false;
+            DualWieldBoneMirrorScript.ResetState();
             Patches.DualWieldAnimationPatches.ClearAll();
             Patches.DualWieldWieldingPatches.ClearTrackingState();
             DualWieldStateManager.Clear();
