@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name value="Battle Action Bar" />
+  <Id value="BattleActionBar" />
+  <Version value="v1.0.0" />
+  <SingleplayerModule value="true" />
+  <MultiplayerModule value="false" />
+  <Official value="false" />
+  <DependedModules>
+    <DependedModule Id="Native" DependentVersion="v1.3.0" />
+    <DependedModule Id="SandBoxCore" DependentVersion="v1.3.0" />
+    <DependedModule Id="Sandbox" DependentVersion="v1.3.0" />
+  </DependedModules>
+  <SubModules>
+    <SubModule>
+      <Name value="BattleActionBar" />
+      <DLLName value="BattleActionBar.dll" />
+      <SubModuleClassType value="BattleActionBar.BattleActionBarSubModule" />
+      <Tags>
+        <Tag key="DedicatedServerType" value="none" />
+        <Tag key="IsNoRenderModeElement" value="false" />
+      </Tags>
+    </SubModule>
+  </SubModules>
+</Module>

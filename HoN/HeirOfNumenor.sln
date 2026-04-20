@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArmorCosmetics", "ArmorCosm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanionRoles", "CompanionRoles\CompanionRoles.csproj", "{4BFCADBE-BCDE-F012-3456-789ABCDEF012}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattleActionBar", "BattleActionBar\BattleActionBar.csproj", "{5CADBECF-CDEF-0123-4567-89ABCDEF0123}"
+EndProject
 
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,5 +78,9 @@ Global
 		{4BFCADBE-BCDE-F012-3456-789ABCDEF012}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BFCADBE-BCDE-F012-3456-789ABCDEF012}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BFCADBE-BCDE-F012-3456-789ABCDEF012}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CADBECF-CDEF-0123-4567-89ABCDEF0123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CADBECF-CDEF-0123-4567-89ABCDEF0123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CADBECF-CDEF-0123-4567-89ABCDEF0123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CADBECF-CDEF-0123-4567-89ABCDEF0123}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
