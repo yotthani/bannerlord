@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name value="Layered Armor" />
+  <Id value="LayeredArmor" />
+  <Version value="v1.0.0" />
+  <SingleplayerModule value="true" />
+  <MultiplayerModule value="false" />
+  <Official value="false" />
+  <DependedModules>
+    <DependedModule Id="Native" DependentVersion="v1.3.0" />
+    <DependedModule Id="SandBoxCore" DependentVersion="v1.3.0" />
+    <DependedModule Id="Sandbox" DependentVersion="v1.3.0" />
+  </DependedModules>
+  <SubModules>
+    <SubModule>
+      <Name value="LayeredArmor" />
+      <DLLName value="LayeredArmor.dll" />
+      <SubModuleClassType value="LayeredArmor.LayeredArmorSubModule" />
+      <Tags>
+        <Tag key="DedicatedServerType" value="none" />
+        <Tag key="IsNoRenderModeElement" value="false" />
+      </Tags>
+    </SubModule>
+  </SubModules>
+</Module>

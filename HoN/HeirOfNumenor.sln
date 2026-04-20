@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DualWield", "DualWield\Dual
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MixedFormations", "MixedFormations\MixedFormations.csproj", "{F6A7B8C9-6789-ABCD-EF01-23456789ABCD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LayeredArmor", "LayeredArmor\LayeredArmor.csproj", "{07B8C9DA-789A-BCDE-F012-3456789ABCDE}"
+EndProject
 
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,5 +48,9 @@ Global
 		{F6A7B8C9-6789-ABCD-EF01-23456789ABCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6A7B8C9-6789-ABCD-EF01-23456789ABCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6A7B8C9-6789-ABCD-EF01-23456789ABCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07B8C9DA-789A-BCDE-F012-3456789ABCDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07B8C9DA-789A-BCDE-F012-3456789ABCDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07B8C9DA-789A-BCDE-F012-3456789ABCDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07B8C9DA-789A-BCDE-F012-3456789ABCDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
