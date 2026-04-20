@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name value="Siege Dismount" />
+  <Id value="SiegeDismount" />
+  <Version value="v1.0.0" />
+  <SingleplayerModule value="true" />
+  <MultiplayerModule value="false" />
+  <Official value="false" />
+  <DependedModules>
+    <DependedModule Id="Native" DependentVersion="v1.3.0" />
+    <DependedModule Id="SandBoxCore" DependentVersion="v1.3.0" />
+    <DependedModule Id="Sandbox" DependentVersion="v1.3.0" />
+  </DependedModules>
+  <SubModules>
+    <SubModule>
+      <Name value="SiegeDismount" />
+      <DLLName value="SiegeDismount.dll" />
+      <SubModuleClassType value="SiegeDismount.SiegeDismountSubModule" />
+      <Tags>
+        <Tag key="DedicatedServerType" value="none" />
+        <Tag key="IsNoRenderModeElement" value="false" />
+      </Tags>
+    </SubModule>
+  </SubModules>
+</Module>
