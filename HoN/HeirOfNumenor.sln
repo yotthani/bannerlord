@@ -33,6 +33,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquipPresets", "EquipPreset
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormationPresets", "FormationPresets\FormationPresets.csproj", "{8FDAEBFC-F012-3456-789A-BCDEF0123456}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmithingExtended", "SmithingExtended\SmithingExtended.csproj", "{9AEBFC0D-0123-4567-89AB-CDEF01234567}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiefManagement", "FiefManagement\FiefManagement.csproj", "{ABFC0DE1-1234-5678-9ABC-DEF012345678}"
+EndProject
 
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,5 +104,13 @@ Global
 		{8FDAEBFC-F012-3456-789A-BCDEF0123456}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FDAEBFC-F012-3456-789A-BCDEF0123456}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FDAEBFC-F012-3456-789A-BCDEF0123456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AEBFC0D-0123-4567-89AB-CDEF01234567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AEBFC0D-0123-4567-89AB-CDEF01234567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AEBFC0D-0123-4567-89AB-CDEF01234567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AEBFC0D-0123-4567-89AB-CDEF01234567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABFC0DE1-1234-5678-9ABC-DEF012345678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABFC0DE1-1234-5678-9ABC-DEF012345678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABFC0DE1-1234-5678-9ABC-DEF012345678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABFC0DE1-1234-5678-9ABC-DEF012345678}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
