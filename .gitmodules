@@ -1,0 +1,3 @@
+[submodule "CustomLobbyMod"]
+	path = CustomLobbyMod
+	url = https://github.com/yotthani/CustomLobbyMod.git
