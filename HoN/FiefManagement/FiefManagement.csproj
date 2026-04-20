@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <Platforms>x64</Platforms>
+    <Configurations>Debug;Release</Configurations>
+    <AssemblyName>FiefManagement</AssemblyName>
+    <RootNamespace>FiefManagement</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
+    <GameBinaries>$(GameFolder)\bin\Win64_Shipping_Client</GameBinaries>
+    <SandBoxModule>$(GameFolder)\Modules\SandBox</SandBoxModule>
+    <NativeModule>$(GameFolder)\Modules\Native</NativeModule>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+    <PackageReference Include="Bannerlord.MCM" Version="5.*" IncludeAssets="compile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="TaleWorlds.Core"><HintPath>$(GameBinaries)\TaleWorlds.Core.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.Library"><HintPath>$(GameBinaries)\TaleWorlds.Library.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.Engine"><HintPath>$(GameBinaries)\TaleWorlds.Engine.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.Engine.GauntletUI"><HintPath>$(GameBinaries)\TaleWorlds.Engine.GauntletUI.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.MountAndBlade"><HintPath>$(GameBinaries)\TaleWorlds.MountAndBlade.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.View"><HintPath>$(NativeModule)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.View.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.CampaignSystem"><HintPath>$(GameBinaries)\TaleWorlds.CampaignSystem.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.CampaignSystem.ViewModelCollection"><HintPath>$(GameBinaries)\TaleWorlds.CampaignSystem.ViewModelCollection.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.Core.ViewModelCollection"><HintPath>$(GameBinaries)\TaleWorlds.Core.ViewModelCollection.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.Localization"><HintPath>$(GameBinaries)\TaleWorlds.Localization.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.ObjectSystem"><HintPath>$(GameBinaries)\TaleWorlds.ObjectSystem.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.SaveSystem"><HintPath>$(GameBinaries)\TaleWorlds.SaveSystem.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.ScreenSystem"><HintPath>$(GameBinaries)\TaleWorlds.ScreenSystem.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.InputSystem"><HintPath>$(GameBinaries)\TaleWorlds.InputSystem.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.DotNet"><HintPath>$(GameBinaries)\TaleWorlds.DotNet.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.GauntletUI"><HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="TaleWorlds.GauntletUI.Data"><HintPath>$(GameBinaries)\TaleWorlds.GauntletUI.Data.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="SandBox"><HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="SandBox.GauntletUI"><HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.GauntletUI.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="SandBox.View"><HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.View.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="SandBox.ViewModelCollection"><HintPath>$(SandBoxModule)\bin\Win64_Shipping_Client\SandBox.ViewModelCollection.dll</HintPath><Private>False</Private></Reference>
+  </ItemGroup>
+
+  <Target Name="DeployToModules" AfterTargets="Build">
+    <PropertyGroup>
+      <ModuleFolder>$(GameFolder)\Modules\FiefManagement</ModuleFolder>
+      <ModuleBinFolder>$(ModuleFolder)\bin\Win64_Shipping_Client</ModuleBinFolder>
+    </PropertyGroup>
+    <MakeDir Directories="$(ModuleFolder)" />
+    <MakeDir Directories="$(ModuleBinFolder)" />
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModuleBinFolder)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+    <Copy SourceFiles="$(ProjectDir)SubModule.xml" DestinationFolder="$(ModuleFolder)" SkipUnchangedFiles="true" />
+    <Message Text="FiefManagement deployed to: $(ModuleFolder)" Importance="high" />
+  </Target>
+
+  <Target Name="CleanModule" AfterTargets="Clean">
+    <PropertyGroup>
+      <ModuleFolder>$(GameFolder)\Modules\FiefManagement</ModuleFolder>
+    </PropertyGroup>
+    <RemoveDir Directories="$(ModuleFolder)" Condition="Exists('$(ModuleFolder)')" />
+  </Target>
+
+</Project>
