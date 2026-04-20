@@ -130,11 +130,17 @@
     </ItemGroup>
     <Copy SourceFiles="@(DataFiles)" DestinationFiles="@(DataFiles->'$(ModuleFolder)\Data\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 
+    <!-- Copy Examples folder recursively (theme author docs + reference templates) -->
+    <ItemGroup>
+      <ExampleFiles Include="$(ProjectDir)Examples\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ExampleFiles)" DestinationFiles="@(ExampleFiles->'$(ModuleFolder)\Examples\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
     <!-- Output success message -->
     <Message Text="&#xA;========================================" Importance="high" />
     <Message Text="BannerlordThemeSwitcher deployed to:" Importance="high" />
     <Message Text="  $(ModuleFolder)" Importance="high" />
-    <Message Text="  - DLL, SubModule.xml, Themes/, Data/" Importance="high" />
+    <Message Text="  - DLL, SubModule.xml, README.md, Themes/, Data/, Examples/" Importance="high" />
     <Message Text="========================================&#xA;" Importance="high" />
   </Target>
 

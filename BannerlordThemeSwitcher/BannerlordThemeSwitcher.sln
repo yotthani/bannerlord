@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11709.129 insiders
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BannerlordThemeSwitcher", "BannerlordThemeSwitcher.csproj", "{F7ADB438-802B-8E5C-E1B3-BD474F990DEA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7ADB438-802B-8E5C-E1B3-BD474F990DEA}.Debug|x64.ActiveCfg = Debug|x64
+		{F7ADB438-802B-8E5C-E1B3-BD474F990DEA}.Debug|x64.Build.0 = Debug|x64
+		{F7ADB438-802B-8E5C-E1B3-BD474F990DEA}.Release|x64.ActiveCfg = Release|x64
+		{F7ADB438-802B-8E5C-E1B3-BD474F990DEA}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7F2F56E8-CE68-44F6-8042-3AF3AF26F175}
+	EndGlobalSection
+EndGlobal

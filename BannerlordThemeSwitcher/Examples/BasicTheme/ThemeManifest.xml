@@ -1,69 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ════════════════════════════════════════════════════════════════════════════
-  EXAMPLE: Basic Theme Structure
+  EXAMPLE: Minimal theme template — copy this folder, rename, edit colors.
   ════════════════════════════════════════════════════════════════════════════
-  
-  This is a reference example - NOT loaded by the game.
-  Copy this folder to Themes/ and rename to create your own theme.
-  
-  FOLDER STRUCTURE:
-  
+
+  This file IS valid syntax — copy the folder to Themes/YourTheme/ and the
+  game will load it on next launch (Theme name = folder name unless <Name>
+  is set explicitly).
+
+  FOLDER LAYOUT
+  =============
   Themes/
-  └── YourThemeName/
-      ├── ThemeManifest.xml       (this file)
+  └── YourTheme/
+      ├── ThemeManifest.xml      ← this file (REQUIRED)
+      ├── SpriteConfig.xml       ← optional, only if you ship sprites
+      ├── Sprites/               ← optional PNG overrides
+      │   └── frame_9.png
       └── GUI/
-          └── Brushes/
+          └── Brushes/           ← optional explicit brush XMLs
               └── YourBrushes.xml
-  
-  HOW IT WORKS:
-  
+
+  HOW BRUSH OVERRIDE WORKS
+  ========================
   1. Game loads vanilla brush "ButtonBrush"
-  2. Your theme adds "ButtonBrush.YourTheme"  
-  3. When active, patch redirects "ButtonBrush" -> "ButtonBrush.YourTheme"
-  4. No vanilla files modified!
-  
-  BRUSH NAMING: OriginalName.ThemeId
-    ButtonBrush       -> ButtonBrush.MyTheme
-    Standard.Panel    -> Standard.Panel.MyTheme
+  2. The mod auto-generates "ButtonBrush.YourTheme" from your color scheme
+  3. Harmony patch redirects the lookup to your themed variant when active
+  4. No vanilla files modified
+
+  See:
+  - COLOR_SCHEME_REFERENCE.md (../ColorSchemeTheme/) — every color slot
+  - BRUSH_REFERENCE.xml (../BrushReference/) — vanilla brush names
+  - SpriteTheming/README.md — how to ship custom sprites
 -->
 <Theme>
-  <!-- REQUIRED: Must match folder name -->
-  <Id>ExampleTheme</Id>
-  
-  <!-- Display name in settings -->
-  <n>Example Theme</n>
-  
-  <Description>An example theme showing the basic structure</Description>
+  <!-- Display name (folder name is used if omitted). -->
+  <Name>Example Theme</Name>
+  <Description>Minimal theme template — copy and edit.</Description>
   <Author>Your Name</Author>
   <Version>1.0.0</Version>
-  
-  <!-- 
-    KINGDOM BINDINGS - Auto-switch when player joins these kingdoms
-    Known IDs: vlandia, battania, empire, empire_w, empire_s, sturgia, aserai, khuzait
+
+  <!--
+    Start from a built-in palette so you don't have to fill all 30 slots.
+    Available: vlandia · sturgia · battania · empire · aserai · khuzait · naval
+    Comment this out if you want to start from the neutral default.
   -->
-  <KingdomBindings>
-    <!-- <Kingdom id="vlandia" /> -->
-  </KingdomBindings>
-  
-  <Components>
-    <Brushes enabled="true" />
-    <Sprites enabled="false" />
-  </Components>
-  
-  <!-- Reference colors - not used by system, just documentation -->
-  <ColorPalette>
-    <Background>#1E1E1E</Background>
-    <Surface>#2D2D30</Surface>
-    <Border>#3E3E42</Border>
+  <BaseCulture>vlandia</BaseCulture>
+
+  <!--
+    AUTO-SWITCH: when the player joins a kingdom in this list,
+    this theme activates automatically (overrides MCM manual selection).
+    Both forms work:    <Kingdom>vlandia</Kingdom>     OR    <Kingdom id="vlandia"/>
+  -->
+  <BoundKingdoms>
+    <!-- <Kingdom>vlandia</Kingdom> -->
+  </BoundKingdoms>
+
+  <!--
+    OPTIONAL component opt-in (attribute syntax).
+    Defaults: Brushes=true, Sprites=auto-detected from Sprites/ folder.
+    Set Sprites="true" to force-enable even if no sprites are present yet.
+  -->
+  <Components Brushes="true" Sprites="false" />
+
+  <!--
+    AutoTheme = pattern-based brush coloring with HSV saturation boost.
+    Recommended unless you ship a complete set of explicit brush XMLs.
+  -->
+  <AutoTheme>true</AutoTheme>
+
+  <!--
+    COLOR PALETTE — overrides anything inherited from BaseCulture.
+    Format: #RRGGBB or #RRGGBBAA  (alpha: 00 transparent → FF opaque).
+    Only the slots you list are overridden; the rest keep BaseCulture values.
+  -->
+  <ColorScheme>
     <Primary>#007ACC</Primary>
     <Secondary>#68217A</Secondary>
-    <Accent>#00D4AA</Accent>
-    <TextPrimary>#F1F1F1</TextPrimary>
-    <TextSecondary>#CCCCCC</TextSecondary>
-    <TextMuted>#808080</TextMuted>
-    <Positive>#90EE90</Positive>
-    <Negative>#FF6B6B</Negative>
+    <Tertiary>#00D4AA</Tertiary>
+
+    <Text>#F1F1F1EE</Text>
+    <TextMuted>#CCCCCC</TextMuted>
+    <TextHighlight>#00D4AA</TextHighlight>
+    <TextTitle>#007ACC</TextTitle>
+    <TextOnPrimary>#FFFFFF</TextOnPrimary>
+    <TextDisabled>#808080</TextDisabled>
+
+    <Background>#1E1E1E99</Background>
+    <BackgroundDark>#0F0F0FBB</BackgroundDark>
+    <BackgroundLight>#2D2D30AA</BackgroundLight>
+    <BackgroundAccent>#007ACC20</BackgroundAccent>
+    <BackgroundHover>#007ACC40</BackgroundHover>
+    <BackgroundSelected>#007ACC60</BackgroundSelected>
+
+    <Border>#3E3E42AA</Border>
+    <BorderMuted>#3E3E4255</BorderMuted>
+    <BorderHighlight>#007ACCFF</BorderHighlight>
+    <BorderSecondary>#68217AAA</BorderSecondary>
+
+    <ButtonBackground>#007ACC25</ButtonBackground>
+    <ButtonHover>#007ACC50</ButtonHover>
+    <ButtonPressed>#007ACC80</ButtonPressed>
+    <ButtonDisabled>#3A3A3A44</ButtonDisabled>
+    <ButtonBorder>#007ACCCC</ButtonBorder>
+
+    <Success>#90EE90</Success>
     <Warning>#FFD700</Warning>
-  </ColorPalette>
+    <Error>#FF6B6B</Error>
+    <Info>#4169E1</Info>
+
+    <Gold>#FFD700</Gold>
+    <Experience>#9370DB</Experience>
+    <Health>#FF6B6B</Health>
+    <Morale>#90EE90</Morale>
+    <Shadow>#00000088</Shadow>
+    <Glow>#007ACC66</Glow>
+  </ColorScheme>
 </Theme>

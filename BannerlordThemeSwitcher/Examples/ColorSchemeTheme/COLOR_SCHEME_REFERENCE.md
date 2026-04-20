@@ -163,7 +163,7 @@ The base culture provides default values that you can then override in your `<Co
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <Theme>
-  <n>Crimson Legion</n>
+  <Name>Crimson Legion</Name>
   <Description>A dark theme with blood red accents</Description>
   <Author>ThemeAuthor</Author>
   <Version>1.0.0</Version>

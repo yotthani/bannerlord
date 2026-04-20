@@ -71,7 +71,7 @@ Available attributes:
 -->
 
 <Theme>
-  <n>Custom Theme Example</n>
+  <Name>Custom Theme Example</Name>
   <Description>A fully customizable theme demonstrating the color scheme system</Description>
   <Author>Your Name</Author>
   <Version>1.0.0</Version>

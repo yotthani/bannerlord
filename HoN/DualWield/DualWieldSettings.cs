@@ -1,6 +1,7 @@
 using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Base.Global;
+using MCM.Common;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 
@@ -25,9 +26,30 @@ namespace DualWield
         [SettingPropertyGroup("General")]
         public int OffHandRotation { get; set; } = 9;
 
-        [SettingPropertyInteger("Attack Mode", 0, 1, HintText = "0 = Separated (LMB=right, MMB=left, RMB=block). 1 = Alternating (LMB alternates R/L).", Order = 3, RequireRestart = false)]
+        [SettingPropertyDropdown("Kampfmodus", Order = 3, RequireRestart = false,
+            HintText = "Spiegel = beide Arme synchron. Alternierend = jeder 2. LMB ist LH. Getrennt = MMB/B für LH. In-Game: N-Taste wechselt.")]
         [SettingPropertyGroup("General")]
-        public int AttackMode { get; set; } = 0;
+        public Dropdown<string> CombatModeDropdown { get; set; } = new Dropdown<string>(
+            new string[]
+            {
+                "Spiegel (Mirror)",
+                "Alternierend (LMB)",
+                "Getrennt (MMB/B)"
+            },
+            0);
+
+        /// <summary>
+        /// Returns 0/1/2 from the dropdown selection. Used by MissionBehavior.
+        /// </summary>
+        public int AttackMode
+        {
+            get => CombatModeDropdown.SelectedIndex;
+            set
+            {
+                if (value >= 0 && value < CombatModeDropdown.Count)
+                    CombatModeDropdown.SelectedIndex = value;
+            }
+        }
 
         [SettingPropertyFloatingInteger("Off-Hand Damage Multiplier", 0.5f, 1.0f, "#0%", HintText = "Damage multiplier for off-hand strikes.", Order = 0, RequireRestart = false)]
         [SettingPropertyGroup("Combat")]

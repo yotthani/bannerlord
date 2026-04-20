@@ -160,7 +160,7 @@ STEP 2: Create SpriteData.xml in YourMod/GUI/
   <!-- STEP 2a: Define your sprite category -->
   <SpriteCategories>
     <SpriteCategory>
-      <n>ui_mytheme</n>
+      <Name>ui_mytheme</Name>
       <!-- Optional: Add AlwaysLoad tag if sprites should always be in memory -->
       <!-- <AlwaysLoad /> -->
       <SpriteSheetCount>1</SpriteSheetCount>
@@ -173,7 +173,7 @@ STEP 2: Create SpriteData.xml in YourMod/GUI/
     <!-- Simple sprite example -->
     <SpritePart>
       <SheetID>1</SheetID>
-      <n>MyTheme\my_icon</n>
+      <Name>MyTheme\my_icon</Name>
       <Width>64</Width>
       <Height>64</Height>
       <SheetX>0</SheetX>
@@ -184,7 +184,7 @@ STEP 2: Create SpriteData.xml in YourMod/GUI/
     <!-- Button sprite for 9-slice -->
     <SpritePart>
       <SheetID>1</SheetID>
-      <n>MyTheme\my_button</n>
+      <Name>MyTheme\my_button</Name>
       <Width>128</Width>
       <Height>64</Height>
       <SheetX>64</SheetX>
@@ -195,7 +195,7 @@ STEP 2: Create SpriteData.xml in YourMod/GUI/
     <!-- Frame sprite for 9-slice -->
     <SpritePart>
       <SheetID>1</SheetID>
-      <n>MyTheme\my_frame</n>
+      <Name>MyTheme\my_frame</Name>
       <Width>96</Width>
       <Height>96</Height>
       <SheetX>192</SheetX>
@@ -208,13 +208,13 @@ STEP 2: Create SpriteData.xml in YourMod/GUI/
   <Sprites>
     <!-- Generic sprite (fixed size) -->
     <GenericSprite>
-      <n>MyTheme\my_icon</n>
+      <Name>MyTheme\my_icon</Name>
       <SpritePartName>MyTheme\my_icon</SpritePartName>
     </GenericSprite>
 
     <!-- 9-slice sprite (scalable button) -->
     <NineRegionSprite>
-      <n>my_button_9</n>
+      <Name>my_button_9</Name>
       <SpritePartName>MyTheme\my_button</SpritePartName>
       <LeftWidth>16</LeftWidth>
       <RightWidth>16</RightWidth>
@@ -224,7 +224,7 @@ STEP 2: Create SpriteData.xml in YourMod/GUI/
 
     <!-- 9-slice sprite (scalable frame) -->
     <NineRegionSprite>
-      <n>my_frame_9</n>
+      <Name>my_frame_9</Name>
       <SpritePartName>MyTheme\my_frame</SpritePartName>
       <LeftWidth>24</LeftWidth>
       <RightWidth>24</RightWidth>
