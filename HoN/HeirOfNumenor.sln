@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransferbuttonMenu", "Trans
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquipPresets", "EquipPresets\EquipPresets.csproj", "{7ECFDAEB-EF01-2345-6789-ABCDEF012345}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormationPresets", "FormationPresets\FormationPresets.csproj", "{8FDAEBFC-F012-3456-789A-BCDEF0123456}"
+EndProject
 
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -94,5 +96,9 @@ Global
 		{7ECFDAEB-EF01-2345-6789-ABCDEF012345}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7ECFDAEB-EF01-2345-6789-ABCDEF012345}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7ECFDAEB-EF01-2345-6789-ABCDEF012345}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FDAEBFC-F012-3456-789A-BCDEF0123456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FDAEBFC-F012-3456-789A-BCDEF0123456}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FDAEBFC-F012-3456-789A-BCDEF0123456}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FDAEBFC-F012-3456-789A-BCDEF0123456}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
