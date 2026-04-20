@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MixedFormations", "MixedFor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LayeredArmor", "LayeredArmor\LayeredArmor.csproj", "{07B8C9DA-789A-BCDE-F012-3456789ABCDE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCavalryAI", "SmartCavalryAI\SmartCavalryAI.csproj", "{18C9DAEB-89AB-CDEF-0123-456789ABCDEF}"
+EndProject
 
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,5 +54,9 @@ Global
 		{07B8C9DA-789A-BCDE-F012-3456789ABCDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07B8C9DA-789A-BCDE-F012-3456789ABCDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07B8C9DA-789A-BCDE-F012-3456789ABCDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18C9DAEB-89AB-CDEF-0123-456789ABCDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18C9DAEB-89AB-CDEF-0123-456789ABCDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18C9DAEB-89AB-CDEF-0123-456789ABCDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18C9DAEB-89AB-CDEF-0123-456789ABCDEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
