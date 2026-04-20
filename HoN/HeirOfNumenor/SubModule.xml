@@ -51,13 +51,5 @@
         <GameType value="CampaignStoryMode"/>
       </IncludedGameTypes>
     </XmlNode>
-    <!-- Culture Resources Configuration -->
-    <XmlNode>
-      <XmlName id="CultureResources" path="culture_resources"/>
-      <IncludedGameTypes>
-        <GameType value="Campaign"/>
-        <GameType value="CampaignStoryMode"/>
-      </IncludedGameTypes>
-    </XmlNode>
   </Xmls>
 </Module>

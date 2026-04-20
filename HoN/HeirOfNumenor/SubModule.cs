@@ -1,5 +1,4 @@
 using HarmonyLib;
-using HeirOfNumenor.Features.CustomResourceSystem;
 using HeirOfNumenor.Features.EquipPresets;
 using HeirOfNumenor.Features.FormationPresets;
 using HeirOfNumenor.Features.MemorySystem;
@@ -177,10 +176,7 @@ namespace HeirOfNumenor
                     // Troop Status & Memory System
                     campaignStarter.AddBehavior(new TroopStatusCampaignBehavior());
                     campaignStarter.AddBehavior(new MemorySystemCampaignBehavior());
-                    
-                    // Custom Resource System (cultural needs)
-                    campaignStarter.AddBehavior(new CustomResourceCampaignBehavior());
-                    
+
                     // Smithing Extended
                     campaignStarter.AddBehavior(new SmithingExtendedCampaignBehavior());
                 }
