@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattleActionBar", "BattleAc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransferbuttonMenu", "TransferbuttonMenu\TransferbuttonMenu.csproj", "{6DBECFDA-DEF0-1234-5678-9ABCDEF01234}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EquipPresets", "EquipPresets\EquipPresets.csproj", "{7ECFDAEB-EF01-2345-6789-ABCDEF012345}"
+EndProject
 
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,5 +90,9 @@ Global
 		{6DBECFDA-DEF0-1234-5678-9ABCDEF01234}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DBECFDA-DEF0-1234-5678-9ABCDEF01234}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DBECFDA-DEF0-1234-5678-9ABCDEF01234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ECFDAEB-EF01-2345-6789-ABCDEF012345}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ECFDAEB-EF01-2345-6789-ABCDEF012345}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ECFDAEB-EF01-2345-6789-ABCDEF012345}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ECFDAEB-EF01-2345-6789-ABCDEF012345}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
